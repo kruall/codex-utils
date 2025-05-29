@@ -1,0 +1,9 @@
+{
+  "id": "DEV-16",
+  "title": "Add started_at and closed_at timestamp fields to tasks",
+  "description": "Implement started_at and closed_at timestamp fields in the Task model to track when tasks are started and completed. Update the task start and done commands to set these timestamps.",
+  "status": "todo",
+  "comments": [],
+  "created_at": 1748534827.344876,
+  "updated_at": 1748534827.344876
+}

@@ -1,0 +1,9 @@
+{
+  "id": "DEV-17",
+  "title": "Add task linking functionality with related links",
+  "description": "Implement the ability to add links between tasks. Start with 'related' link type to connect related tasks. Add CLI commands to add, list, and remove task links.",
+  "status": "todo",
+  "comments": [],
+  "created_at": 1748534831.479786,
+  "updated_at": 1748534831.479787
+}
