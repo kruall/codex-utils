@@ -5,6 +5,7 @@ Task Manager CLI tool for managing queues and tasks.
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
