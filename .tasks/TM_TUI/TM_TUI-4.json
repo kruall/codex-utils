@@ -1,0 +1,17 @@
+{
+  "id": "TM_TUI-4",
+  "title": "Update TUI for new persistence layer",
+  "description": "Adapt TUI code to work with refactored storage module",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-3",
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553464.252788,
+  "updated_at": 1748553488.5780978,
+  "started_at": null,
+  "closed_at": null
+}

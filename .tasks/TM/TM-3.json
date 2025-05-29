@@ -1,0 +1,18 @@
+{
+  "id": "TM-3",
+  "title": "Refactor persistence layer",
+  "description": "Extract file operations and JSON handling into separate storage module",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_TUI-4",
+      "TM_WEB-8",
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553462.9956148,
+  "updated_at": 1748553480.9739113,
+  "started_at": null,
+  "closed_at": null
+}

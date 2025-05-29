@@ -1,0 +1,17 @@
+{
+  "id": "TM_WEB-9",
+  "title": "Update Web dashboard for exception handling",
+  "description": "Adapt web interface to display errors from core",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-4",
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553472.921496,
+  "updated_at": 1748553491.5766253,
+  "started_at": null,
+  "closed_at": null
+}

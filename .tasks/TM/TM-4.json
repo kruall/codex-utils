@@ -1,0 +1,18 @@
+{
+  "id": "TM-4",
+  "title": "Introduce custom exception handling",
+  "description": "Replace boolean returns with exceptions for clearer error reporting",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_TUI-5",
+      "TM_WEB-9",
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553470.605938,
+  "updated_at": 1748553482.004187,
+  "started_at": null,
+  "closed_at": null
+}

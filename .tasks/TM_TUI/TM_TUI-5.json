@@ -1,0 +1,17 @@
+{
+  "id": "TM_TUI-5",
+  "title": "Update TUI for exception handling",
+  "description": "Adapt TUI to handle exceptions from core",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-4",
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553471.8673525,
+  "updated_at": 1748553490.5943837,
+  "started_at": null,
+  "closed_at": null
+}

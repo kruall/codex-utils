@@ -1,0 +1,16 @@
+{
+  "id": "TM-6",
+  "title": "Expand unit tests for error handling",
+  "description": "Add tests covering new exceptions and edge cases",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553479.2418346,
+  "updated_at": 1748553485.6469026,
+  "started_at": null,
+  "closed_at": null
+}
