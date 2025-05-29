@@ -78,6 +78,8 @@ Generate an HTML dashboard listing all tasks:
 ```
 
 The page is written to `docs/index.html` and can be published with GitHub Pages.
+This repository includes a GitHub Actions workflow that automatically deploys
+the `docs/` folder to GitHub Pages whenever changes are pushed to `main`.
 
 
 ### React Dashboard
