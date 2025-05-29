@@ -2,7 +2,7 @@
   "id": "DEV-3",
   "title": "Add CI check for PR task status validation",
   "description": "Implement CI workflow to verify that PRs with [<task-id>] format in title have corresponding tasks that were 'todo' or 'in_progress' before PR creation and become 'done' after PR merge. This ensures proper task workflow compliance.",
-  "status": "todo",
+  "status": "in_progress",
   "comments": [
     {
       "id": 1,
@@ -28,8 +28,18 @@
       "id": 5,
       "text": "Example PR titles to validate: '[DEV-1] Add user authentication', '[DOC-5] Update API documentation', '[FEATURE-123] Implement search functionality'. Should extract task-ids: DEV-1, DOC-5, FEATURE-123 respectively.",
       "created_at": 1748516043.4902668
+    },
+    {
+      "id": 6,
+      "text": "Starting implementation of CI workflow to validate task status",
+      "created_at": 1748516238.5826151
+    },
+    {
+      "id": 7,
+      "text": "Added workflow and script to check PR task status; fixed tests.yml",
+      "created_at": 1748516311.7427182
     }
   ],
   "created_at": 1748516017.53114,
-  "updated_at": 1748516043.4902809
+  "updated_at": 1748516311.7427423
 }
