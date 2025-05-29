@@ -184,7 +184,8 @@ class TaskManager:
                         continue
 
                     tasks.append(task_obj.to_dict())
-                except Exception:
+                except (FileNotFoundError, PermissionError, json.JSONDecodeError) as e:
+                    log_error(f"Error processing task file '{task_file}': {e}")
                     continue
         
         # Sort by creation time
