@@ -5,6 +5,7 @@ Task Manager CLI tool for managing queues and tasks.
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -44,7 +45,16 @@ class TaskManager:
             return False
         
         queue_dir = self.tasks_root / name
-        
+
+        # Check write permissions on tasks root
+        try:
+            if not os.access(self.tasks_root, os.W_OK):
+                print(f"Error creating queue '{name}': Permission denied", file=sys.stderr)
+                return False
+        except OSError as e:
+            print(f"Error creating queue '{name}': {e}", file=sys.stderr)
+            return False
+
         try:
             if queue_dir.exists():
                 print(f"Error: Queue '{name}' already exists", file=sys.stderr)
