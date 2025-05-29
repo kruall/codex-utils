@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+# Always restore working directory on exit
+cleanup() {
+    popd >/dev/null || true
+}
 
 pushd "$(dirname "$0")" >/dev/null
+trap cleanup EXIT
 
 if [ ! -d ".venv" ]; then
     python3 -m venv .venv
@@ -9,7 +15,8 @@ fi
 
 source .venv/bin/activate
 if [ -z "$TM_NO_INSTALL" ]; then
-    pip install -r requirements.txt || echo "pip install failed, continuing"
+    if ! pip install -r requirements.txt; then
+        echo "pip install failed, continuing"
+    fi
 fi
 
-popd >/dev/null
