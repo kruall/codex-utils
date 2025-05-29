@@ -5,8 +5,10 @@ from typing import Callable
 from .core import TaskManager
 from .dashboard import generate_dashboard
 from .tui import launch_tui
-from .utils import format_timestamp
+from .utils import format_timestamp, setup_logging
 from . import __version__
+
+
 
 
 def queue_list(args: argparse.Namespace, tm: TaskManager) -> int:
@@ -58,7 +60,9 @@ def task_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
     if not tasks:
         print("No tasks found")
     else:
-        print(f"{'ID':<15} {'Title':<30} {'Status':<12} {'Queue':<15} {'Created'}")
+        print(
+            f"{'ID':<15} {'Title':<30} {'Status':<12} {'Queue':<15} {'Created'}"
+        )
         print("-" * 90)
         for task in tasks:
             queue_name = task['id'].rsplit('-', 1)[0]
@@ -197,6 +201,8 @@ COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = 
 }
 
 def main():
+    setup_logging()
+
     parser = argparse.ArgumentParser(description="Task Manager CLI")
     parser.add_argument(
         "--version",

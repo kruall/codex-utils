@@ -1,4 +1,4 @@
-import sys
+import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,9 +16,8 @@ def launch_tui(tm: "TaskManager") -> None:
         from textual.widgets import Header, Footer, Button, Static, Input, DataTable  # type: ignore
         from textual.containers import Vertical  # type: ignore
     except Exception:  # pragma: no cover - optional dependency
-        print(
-            "Textual is required for the UI. Install with 'pip install textual'",
-            file=sys.stderr,
+        logging.getLogger(__name__).error(
+            "Textual is required for the UI. Install with 'pip install textual'"
         )
         return
 
