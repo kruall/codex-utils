@@ -5,6 +5,8 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from .models import Queue, Task
+
 
 class TaskManager:
     def __init__(self, tasks_root: str = ".tasks"):
@@ -19,13 +21,10 @@ class TaskManager:
                 meta_file = queue_dir / "meta.json"
                 if meta_file.exists():
                     try:
-                        with open(meta_file, 'r') as f:
+                        with open(meta_file, "r") as f:
                             meta = json.load(f)
-                            queues.append({
-                                'name': queue_dir.name,
-                                'title': meta.get('title', ''),
-                                'description': meta.get('description', '')
-                            })
+                        queue = Queue.from_meta(queue_dir.name, meta)
+                        queues.append(queue.to_dict())
                     except (json.JSONDecodeError, IOError):
                         # Skip corrupted meta files
                         continue
@@ -66,15 +65,16 @@ class TaskManager:
         try:
             queue_dir.mkdir(parents=True)
             meta_file = queue_dir / "meta.json"
-            
+
+            queue_obj = Queue(name=name, title=title, description=description)
             meta_data = {
-                'title': title,
-                'description': description
+                "title": queue_obj.title,
+                "description": queue_obj.description,
             }
-            
-            with open(meta_file, 'w') as f:
+
+            with open(meta_file, "w") as f:
                 json.dump(meta_data, f, indent=2)
-            
+
             print(f"Queue '{name}' created successfully")
             return True
             
@@ -105,32 +105,24 @@ class TaskManager:
     def task_add(self, title: str, description: str, queue: str) -> Optional[str]:
         """Add a new task to a queue."""
         queue_dir = self.tasks_root / queue
-        
+
         if not queue_dir.exists():
             print(f"Error: Queue '{queue}' does not exist", file=sys.stderr)
             return None
-        
+
         try:
             task_num = self._get_next_task_number(queue)
             task_id = f"{queue}-{task_num}"
             task_file = queue_dir / f"{task_id}.json"
-            
-            task_data = {
-                'id': task_id,
-                'title': title,
-                'description': description,
-                'status': 'todo',
-                'comments': [],
-                'created_at': time.time(),
-                'updated_at': time.time()
-            }
-            
-            with open(task_file, 'w') as f:
-                json.dump(task_data, f, indent=2)
-            
+
+            task_obj = Task(id=task_id, title=title, description=description)
+
+            with open(task_file, "w") as f:
+                json.dump(task_obj.to_dict(), f, indent=2)
+
             print(f"Task '{task_id}' created successfully")
             return task_id
-            
+
         except (OSError, IOError) as e:
             print(f"Error creating task: {e}", file=sys.stderr)
             return None
@@ -148,29 +140,30 @@ class TaskManager:
             return task_file
         return None
 
-    def _load_task(self, task_id: str) -> Optional[Dict]:
+    def _load_task(self, task_id: str) -> Optional[Task]:
         """Load task data from file."""
         task_file = self._find_task_file(task_id)
         if not task_file:
             return None
-        
+
         try:
-            with open(task_file, 'r') as f:
-                return json.load(f)
+            with open(task_file, "r") as f:
+                data = json.load(f)
+            return Task.from_dict(data)
         except (json.JSONDecodeError, IOError):
             return None
 
-    def _save_task(self, task_data: Dict) -> bool:
+    def _save_task(self, task_data: Task) -> bool:
         """Save task data to file."""
-        task_id = task_data['id']
+        task_id = task_data.id
         task_file = self._find_task_file(task_id)
         if not task_file:
             return False
-        
+
         try:
-            task_data['updated_at'] = time.time()
-            with open(task_file, 'w') as f:
-                json.dump(task_data, f, indent=2)
+            task_data.updated_at = time.time()
+            with open(task_file, "w") as f:
+                json.dump(task_data.to_dict(), f, indent=2)
             return True
         except (OSError, IOError):
             return False
@@ -189,21 +182,22 @@ class TaskManager:
             for task_file in queue_dir.glob("*.json"):
                 if task_file.name == "meta.json":
                     continue
-                
+
                 try:
-                    with open(task_file, 'r') as f:
-                        task_data = json.load(f)
-                    
+                    with open(task_file, "r") as f:
+                        data = json.load(f)
+                    task_obj = Task.from_dict(data)
+
                     # Filter by status if specified
-                    if status and task_data.get('status') != status:
+                    if status and task_obj.status != status:
                         continue
-                    
-                    tasks.append(task_data)
+
+                    tasks.append(task_obj.to_dict())
                 except (json.JSONDecodeError, IOError):
                     continue
         
         # Sort by creation time
-        tasks.sort(key=lambda t: t.get('created_at', 0))
+        tasks.sort(key=lambda t: t.get("created_at", 0))
         return tasks
 
     def task_show(self, task_id: str) -> Optional[Dict]:
@@ -212,8 +206,8 @@ class TaskManager:
         if not task_data:
             print(f"Error: Task '{task_id}' not found", file=sys.stderr)
             return None
-        
-        return task_data
+
+        return task_data.to_dict()
 
     def task_update(self, task_id: str, field: str, value: str) -> bool:
         """Update a specific field of a task."""
@@ -228,8 +222,8 @@ class TaskManager:
             print(f"Error: Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}", file=sys.stderr)
             return False
         
-        task_data[field] = value
-        
+        setattr(task_data, field, value)
+
         if self._save_task(task_data):
             print(f"Task '{task_id}' updated successfully")
             return True
@@ -253,19 +247,16 @@ class TaskManager:
             return False
         
         # Generate comment ID
-        existing_ids = [c.get('id', 0) for c in task_data.get('comments', [])]
+        existing_ids = [c.get("id", 0) for c in task_data.comments]
         comment_id = max(existing_ids, default=0) + 1
         
         comment_data = {
-            'id': comment_id,
-            'text': comment,
-            'created_at': time.time()
+            "id": comment_id,
+            "text": comment,
+            "created_at": time.time(),
         }
-        
-        if 'comments' not in task_data:
-            task_data['comments'] = []
-        
-        task_data['comments'].append(comment_data)
+
+        task_data.comments.append(comment_data)
         
         if self._save_task(task_data):
             print(f"Comment added to task '{task_id}' with ID {comment_id}")
@@ -280,14 +271,14 @@ class TaskManager:
         if not task_data:
             print(f"Error: Task '{task_id}' not found", file=sys.stderr)
             return False
-        
-        comments = task_data.get('comments', [])
+
+        comments = task_data.comments
         original_count = len(comments)
         
         # Remove comment with matching ID
-        task_data['comments'] = [c for c in comments if c.get('id') != comment_id]
+        task_data.comments = [c for c in comments if c.get("id") != comment_id]
         
-        if len(task_data['comments']) == original_count:
+        if len(task_data.comments) == original_count:
             print(f"Error: Comment with ID {comment_id} not found in task '{task_id}'", file=sys.stderr)
             return False
         
@@ -304,6 +295,6 @@ class TaskManager:
         if not task_data:
             print(f"Error: Task '{task_id}' not found", file=sys.stderr)
             return None
-        
-        return task_data.get('comments', [])
+
+        return task_data.comments
 
