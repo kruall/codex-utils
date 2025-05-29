@@ -2,14 +2,34 @@
   "id": "DEV-8",
   "title": "Expand tests after refactor",
   "description": "Add unit tests for new modules and dataclasses",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Cover dataclass serialization and CLI wrapper functions in tests.",
       "created_at": 1748521736.6619318
+    },
+    {
+      "id": 2,
+      "text": "Planning new tests for TaskManager internal methods.",
+      "created_at": 1748536310.803575
+    },
+    {
+      "id": 3,
+      "text": "Running baseline tests before modifications.",
+      "created_at": 1748536333.0838432
+    },
+    {
+      "id": 4,
+      "text": "Added tests for task operations and verified passes.",
+      "created_at": 1748536379.9183688
+    },
+    {
+      "id": 5,
+      "text": "Added tests and closing task as done.",
+      "created_at": 1748537282.0829833
     }
   ],
   "created_at": 1748521734.4381368,
-  "updated_at": 1748521736.6619656
+  "updated_at": 1748537283.8523223
 }

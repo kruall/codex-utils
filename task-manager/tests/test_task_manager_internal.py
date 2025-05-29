@@ -203,9 +203,55 @@ class TestTaskManagerInternal(unittest.TestCase):
             # Verify queue was created in relative path
             rel_path = Path(self.test_dir) / "relative_tasks" / "rel-queue"
             self.assertTrue(rel_path.exists())
-            
+
         finally:
             os.chdir(original_cwd)
+
+    def test_task_add_and_show_internal(self):
+        """Test adding a task and showing its details."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("Task", "Desc", "q")
+        self.assertEqual(task_id, "q-1")
+
+        task = self.tm.task_show(task_id)
+        self.assertIsNotNone(task)
+        self.assertEqual(task["title"], "Task")
+        self.assertEqual(task["description"], "Desc")
+        self.assertEqual(task["status"], "todo")
+
+    def test_task_update_and_status_changes(self):
+        """Test task update, start and done status changes."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("Task", "Desc", "q")
+        self.assertTrue(self.tm.task_update(task_id, "title", "New Title"))
+        self.assertTrue(self.tm.task_start(task_id))
+        self.assertTrue(self.tm.task_done(task_id))
+
+        task = self.tm.task_show(task_id)
+        self.assertEqual(task["title"], "New Title")
+        self.assertEqual(task["status"], "done")
+
+    def test_task_comments_internal(self):
+        """Test adding, listing and removing task comments."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("Task", "Desc", "q")
+
+        self.assertTrue(self.tm.task_comment_add(task_id, "c1"))
+        self.assertTrue(self.tm.task_comment_add(task_id, "c2"))
+        comments = self.tm.task_comment_list(task_id)
+        self.assertEqual(len(comments), 2)
+
+        self.assertTrue(self.tm.task_comment_remove(task_id, 1))
+        comments = self.tm.task_comment_list(task_id)
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(comments[0]["text"], "c2")
+
+    def test_get_next_task_number_internal(self):
+        """Test internal task numbering logic."""
+        self.tm.queue_add("q", "Queue", "desc")
+        self.assertEqual(self.tm._get_next_task_number("q"), 1)
+        self.tm.task_add("A", "B", "q")
+        self.assertEqual(self.tm._get_next_task_number("q"), 2)
 
 
 if __name__ == '__main__':
