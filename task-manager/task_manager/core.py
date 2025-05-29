@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import time
@@ -7,6 +6,7 @@ from typing import Dict, List, Optional
 
 from .models import Queue, Task
 from .utils import log_error
+from .storage import load_json, save_json
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +23,11 @@ class TaskManager:
             if queue_dir.is_dir():
                 meta_file = queue_dir / "meta.json"
                 if meta_file.exists():
-                    try:
-                        with open(meta_file, "r") as f:
-                            meta = json.load(f)
-                        queue = Queue.from_meta(queue_dir.name, meta)
-                        queues.append(queue.to_dict())
-                    except (json.JSONDecodeError, IOError):
-                        # Skip corrupted meta files
+                    meta = load_json(meta_file)
+                    if not meta:
                         continue
+                    queue = Queue.from_meta(queue_dir.name, meta)
+                    queues.append(queue.to_dict())
         return queues
 
     def queue_add(self, name: str, title: str, description: str) -> bool:
@@ -72,8 +69,7 @@ class TaskManager:
                 "description": queue_obj.description,
             }
 
-            with open(meta_file, "w") as f:
-                json.dump(meta_data, f, indent=2)
+            save_json(meta_file, meta_data)
 
             logger.info(f"Queue '{name}' created successfully")
             return True
@@ -117,8 +113,7 @@ class TaskManager:
 
             task_obj = Task(id=task_id, title=title, description=description)
 
-            with open(task_file, "w") as f:
-                json.dump(task_obj.to_dict(), f, indent=2)
+            save_json(task_file, task_obj.to_dict())
 
             logger.info(f"Task '{task_id}' created successfully")
             return task_id
@@ -146,12 +141,10 @@ class TaskManager:
         if not task_file:
             return None
 
-        try:
-            with open(task_file, "r") as f:
-                data = json.load(f)
-            return Task.from_dict(data)
-        except (json.JSONDecodeError, IOError):
+        data = load_json(task_file)
+        if data is None:
             return None
+        return Task.from_dict(data)
 
     def _save_task(self, task_data: Task) -> bool:
         """Save task data to file."""
@@ -160,13 +153,8 @@ class TaskManager:
         if not task_file:
             return False
 
-        try:
-            task_data.updated_at = time.time()
-            with open(task_file, "w") as f:
-                json.dump(task_data.to_dict(), f, indent=2)
-            return True
-        except (OSError, IOError):
-            return False
+        task_data.updated_at = time.time()
+        return save_json(task_file, task_data.to_dict())
 
     def task_list(self, status: Optional[str] = None, queue: Optional[str] = None) -> List[Dict]:
         """List tasks with optional filtering."""
@@ -184,8 +172,9 @@ class TaskManager:
                     continue
 
                 try:
-                    with open(task_file, "r") as f:
-                        data = json.load(f)
+                    data = load_json(task_file)
+                    if data is None:
+                        continue
                     task_obj = Task.from_dict(data)
 
                     # Filter by status if specified
@@ -193,7 +182,7 @@ class TaskManager:
                         continue
 
                     tasks.append(task_obj.to_dict())
-                except (json.JSONDecodeError, IOError):
+                except Exception:
                     continue
         
         # Sort by creation time
