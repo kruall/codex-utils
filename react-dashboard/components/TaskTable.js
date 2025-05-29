@@ -17,7 +17,7 @@ export default function TaskTable({ tasks }) {
             <td>{task.id}</td>
             <td>{task.title}</td>
             <td>{task.status}</td>
-            <td>{task.id.split('-')[0]}</td>
+            <td>{task.id ? task.id.split('-')[0] : 'N/A'}</td>
           </tr>
         ))}
       </tbody>

@@ -11,9 +11,11 @@ export async function getStaticProps() {
     for (const q of queues) {
       const queueDir = path.join(tasksDir, q)
       for (const file of fs.readdirSync(queueDir)) {
-        if (file.endsWith('.json')) {
+        if (file.endsWith('.json') && file !== 'meta.json') {
           const data = JSON.parse(fs.readFileSync(path.join(queueDir, file), 'utf8'))
-          tasks.push(data)
+          if (data.id) {
+            tasks.push(data)
+          }
         }
       }
     }

@@ -176,3 +176,4 @@ cython_debug/
 # Node build artifacts
 react-dashboard/node_modules/
 react-dashboard/out/
+react-dashboard/.next/
