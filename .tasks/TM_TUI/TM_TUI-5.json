@@ -2,11 +2,27 @@
   "id": "TM_TUI-5",
   "title": "Add keyboard navigation",
   "description": "Implement keybindings and focus management for faster navigation",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started work on keyboard navigation",
+      "created_at": 1748554268.3110247
+    },
+    {
+      "id": 2,
+      "text": "Implemented keybindings and focus management",
+      "created_at": 1748554351.0700183
+    },
+    {
+      "id": 3,
+      "text": "Finished task",
+      "created_at": 1748554353.1432557
+    }
+  ],
   "links": {},
   "created_at": 1748553499.1068456,
-  "updated_at": 1748553499.106846,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748554353.1432796,
+  "started_at": 1748554267.3341706,
+  "closed_at": 1748554350.0818524
 }
