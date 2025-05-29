@@ -2,15 +2,26 @@
   "id": "TM_WEB-9",
   "title": "Replace inline styles with CSS modules",
   "description": "Improve maintainability by migrating component styling to CSS modules",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start migrating components to CSS modules.",
+      "created_at": 1748555643.723459
+    },
+    {
+      "id": 2,
+      "text": "Converted inline styles to CSS modules and ensured tests pass.",
+      "created_at": 1748555828.4712734
+    }
+  ],
   "links": {
     "related": [
       "DEV-21"
     ]
   },
   "created_at": 1748553430.2685616,
-  "updated_at": 1748553440.6431053,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748556034.241406,
+  "started_at": 1748555638.5866306,
+  "closed_at": 1748556034.2413938
 }

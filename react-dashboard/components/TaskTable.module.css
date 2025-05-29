@@ -1,0 +1,31 @@
+.filterControls {
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inline {
+  margin-left: 4px;
+}
+
+.pageSize {
+  margin-left: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.pagination {
+  margin-top: 8px;
+}
+
+.marginRight {
+  margin-right: 8px;
+}
+
+.link {
+  color: #0070f3;
+}
