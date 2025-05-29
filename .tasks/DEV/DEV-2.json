@@ -2,7 +2,7 @@
   "id": "DEV-2",
   "title": "Refactor task_manager.py code structure",
   "description": "Split the monolithic task_manager.py file into smaller, more maintainable modules. Separate concerns like TaskManager class, CLI parsing, TUI interface, and utility functions into different files.",
-  "status": "in_progress",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -41,5 +41,5 @@
     }
   ],
   "created_at": 1748515927.1541288,
-  "updated_at": 1748516472.1736097
+  "updated_at": 1748524450.313299
 }
