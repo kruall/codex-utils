@@ -233,12 +233,40 @@ class TaskManager:
             return False
 
     def task_start(self, task_id: str) -> bool:
-        """Start a task (set status to 'in_progress')."""
-        return self.task_update(task_id, 'status', 'in_progress')
+        """Start a task (set status to 'in_progress' and record time)."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            logger.error(f"Error: Task '{task_id}' not found")
+            return False
+
+        task_data.status = 'in_progress'
+        if task_data.started_at is None:
+            task_data.started_at = time.time()
+
+        if self._save_task(task_data):
+            logger.info(f"Task '{task_id}' updated successfully")
+            return True
+        else:
+            logger.error(f"Error: Failed to update task '{task_id}'")
+            return False
 
     def task_done(self, task_id: str) -> bool:
-        """Mark a task as done (set status to 'done')."""
-        return self.task_update(task_id, 'status', 'done')
+        """Mark a task as done (set status to 'done' and record time)."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            logger.error(f"Error: Task '{task_id}' not found")
+            return False
+
+        task_data.status = 'done'
+        if task_data.closed_at is None:
+            task_data.closed_at = time.time()
+
+        if self._save_task(task_data):
+            logger.info(f"Task '{task_id}' updated successfully")
+            return True
+        else:
+            logger.error(f"Error: Failed to update task '{task_id}'")
+            return False
 
     def task_comment_add(self, task_id: str, comment: str) -> bool:
         """Add a comment to a task."""
