@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
+import Link from 'next/link'
+
 
 export default function TaskTable({ tasks }) {
   const [pageSize, setPageSize] = useState(10)
@@ -97,7 +99,11 @@ export default function TaskTable({ tasks }) {
         <tbody>
           {pagedTasks.map(task => (
             <tr key={task.id}>
-              <td>{task.id}</td>
+              <td>
+                <Link href={`/task/${task.id}`} style={{ color: '#0070f3' }}>
+                  {task.id}
+                </Link>
+              </td>
               <td>{task.title}</td>
               <td>{task.status}</td>
               <td>{task.id ? task.id.split('-')[0] : 'N/A'}</td>
