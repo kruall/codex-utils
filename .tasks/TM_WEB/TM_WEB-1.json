@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-1",
+  "title": "Add delete actions in web",
+  "description": "Enable deleting tasks and queues via dashboard",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-1"
+    ]
+  },
+  "created_at": 1748540591.6116464,
+  "updated_at": 1748540605.786244,
+  "started_at": null,
+  "closed_at": null
+}

@@ -1,0 +1,16 @@
+{
+  "id": "TM_TUI-2",
+  "title": "Add comments interface",
+  "description": "Provide TUI for viewing and adding comments",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-2"
+    ]
+  },
+  "created_at": 1748540585.6959803,
+  "updated_at": 1748540606.6851642,
+  "started_at": null,
+  "closed_at": null
+}

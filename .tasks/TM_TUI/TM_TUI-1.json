@@ -1,0 +1,16 @@
+{
+  "id": "TM_TUI-1",
+  "title": "Support deletion of tasks and queues",
+  "description": "Add TUI actions to remove tasks or queues",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-1"
+    ]
+  },
+  "created_at": 1748540583.1323383,
+  "updated_at": 1748540603.5454617,
+  "started_at": null,
+  "closed_at": null
+}

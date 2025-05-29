@@ -1,0 +1,18 @@
+{
+  "id": "TM-2",
+  "title": "Edit task comments command",
+  "description": "Implement command to edit comments on tasks",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_TUI-2",
+      "TM_TUI-3",
+      "TM_WEB-2"
+    ]
+  },
+  "created_at": 1748540580.5285208,
+  "updated_at": 1748540609.9751074,
+  "started_at": null,
+  "closed_at": null
+}
