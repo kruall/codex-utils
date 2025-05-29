@@ -246,6 +246,18 @@ class TestTaskManagerInternal(unittest.TestCase):
         self.assertEqual(len(comments), 1)
         self.assertEqual(comments[0]["text"], "c2")
 
+    def test_task_comment_edit_internal(self):
+        """Test editing task comments."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("Task", "Desc", "q")
+
+        self.assertTrue(self.tm.task_comment_add(task_id, "old"))
+        self.assertTrue(self.tm.task_comment_edit(task_id, 1, "new"))
+        comments = self.tm.task_comment_list(task_id)
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(comments[0]["text"], "new")
+        self.assertIn("updated_at", comments[0])
+
     def test_queue_delete_internal(self):
         """Test deleting a queue via TaskManager."""
         self.tm.queue_add("del", "Del", "desc")

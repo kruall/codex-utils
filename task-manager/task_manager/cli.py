@@ -138,6 +138,11 @@ def comment_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
     return 0 if success else 1
 
 
+def comment_edit_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_comment_edit(args.id, args.comment_id, args.comment)
+    return 0 if success else 1
+
+
 def comment_remove_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
     success = tm.task_comment_remove(args.id, args.comment_id)
     return 0 if success else 1
@@ -159,6 +164,7 @@ def comment_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
 
 COMMENT_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "add": comment_add_cmd,
+    "edit": comment_edit_cmd,
     "remove": comment_remove_cmd,
     "list": comment_list_cmd,
 }
@@ -368,6 +374,12 @@ def main():
     task_comment_add_parser = task_comment_subparsers.add_parser("add", help="Add a comment to task")
     task_comment_add_parser.add_argument("--id", required=True, help="Task ID")
     task_comment_add_parser.add_argument("--comment", required=True, help="Comment text")
+
+    # task comment edit
+    task_comment_edit_parser = task_comment_subparsers.add_parser("edit", help="Edit a comment on task")
+    task_comment_edit_parser.add_argument("--id", required=True, help="Task ID")
+    task_comment_edit_parser.add_argument("--comment-id", type=int, required=True, help="Comment ID")
+    task_comment_edit_parser.add_argument("--comment", required=True, help="New comment text")
     
     # task comment remove
     task_comment_remove_parser = task_comment_subparsers.add_parser("remove", help="Remove a comment from task")
