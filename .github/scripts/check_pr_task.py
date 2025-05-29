@@ -40,10 +40,8 @@ def main() -> int:
         return 0
 
     pr = event["pull_request"]
-    action = event.get("action")
     title = pr.get("title", "")
-    merged = pr.get("merged", False)
-    
+
     # Get base branch SHA to check status before PR
     base_sha = pr.get("base", {}).get("sha")
     if not base_sha:
@@ -75,32 +73,15 @@ def main() -> int:
     print(f"Task {task_id} status before PR: {status_before_pr}")
     print(f"Task {task_id} status after PR: {current_status}")
 
-    # Validate workflow based on PR action
-    if action == "closed" and merged:
-        # When PR is merged, validate the complete workflow
-        if status_before_pr == "done":
-            print(f"Error: Task {task_id} was already 'done' before PR. Tasks should not be 'done' before work starts.")
-            return 1
+    if status_before_pr == "done":
+        print(f"Error: Task {task_id} was already 'done' before PR. Tasks should not be 'done' before work starts.")
+        return 1
+    
+    if current_status != "done":
+        print(f"Error: Task {task_id} must be 'done' when PR is merged; current: {current_status}")
+        return 1
         
-        if current_status != "done":
-            print(f"Error: Task {task_id} must be 'done' when PR is merged; current: {current_status}")
-            return 1
-            
-        print(f"✓ Task {task_id} workflow is correct: {status_before_pr} → {current_status}")
-        
-    else:
-        # During PR development
-        if status_before_pr == "done":
-            print(f"Error: Task {task_id} was already 'done' before PR. Cannot work on completed tasks.")
-            return 1
-        
-        # Current status should be valid
-        valid_statuses = {"todo", "in_progress", "done"}
-        if current_status not in valid_statuses:
-            print(f"Error: Task {task_id} has invalid status '{current_status}'. Must be one of: {valid_statuses}")
-            return 1
-            
-        print(f"✓ Task {task_id} status transition is valid: {status_before_pr} → {current_status}")
+    print(f"✓ Task {task_id} workflow is correct: {status_before_pr} → {current_status}")
 
     return 0
 

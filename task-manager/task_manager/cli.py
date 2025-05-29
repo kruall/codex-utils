@@ -1,12 +1,23 @@
 import argparse
+from pathlib import Path
+
 from .core import TaskManager
 from .tui import launch_tui
 from .utils import format_timestamp
+from . import __version__
 
 def main():
     parser = argparse.ArgumentParser(description="Task Manager CLI")
-    parser.add_argument("--tasks-root", default=".tasks", 
-                       help="Root directory for tasks storage (default: .tasks)")
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Show version information and exit",
+    )
+    parser.add_argument(
+        "--tasks-root",
+        default=".tasks",
+        help="Root directory for tasks storage (default: .tasks)",
+    )
     
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -78,7 +89,12 @@ def main():
     task_comment_list_parser.add_argument("--id", required=True, help="Task ID")
     
     args = parser.parse_args()
-    
+
+    if args.version:
+        print(f"Task Manager CLI version {__version__}")
+        print(f"Tasks directory: {Path(args.tasks_root).resolve()}")
+        return 0
+
     if not args.command:
         parser.print_help()
         return 1

@@ -2,14 +2,24 @@
   "id": "DEV-11",
   "title": "Add --version option",
   "description": "Show version and config path via CLI",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Support output of CLI version and tasks directory.",
       "created_at": 1748521742.468148
+    },
+    {
+      "id": 2,
+      "text": "Starting DEV-11 implementation",
+      "created_at": 1748522109.0078824
+    },
+    {
+      "id": 3,
+      "text": "Implemented version option and tests",
+      "created_at": 1748522248.6855245
     }
   ],
   "created_at": 1748521741.5078592,
-  "updated_at": 1748521742.4681802
+  "updated_at": 1748523963.177461
 }
