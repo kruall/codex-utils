@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import useTasks from '../hooks/useTasks'
 import styles from './TaskTable.module.css'
 
 
-export default function TaskTable({ tasks }) {
+export default function TaskTable({ tasks: tasksProp }) {
+  const tasks = tasksProp ?? useTasks()
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')

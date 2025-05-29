@@ -2,15 +2,26 @@
   "id": "TM_WEB-10",
   "title": "Implement global state management",
   "description": "Use React context or state management library for tasks to reduce prop drilling",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started working on implementing global state management",
+      "created_at": 1748556475.025279
+    },
+    {
+      "id": 2,
+      "text": "Implemented TaskProvider context and updated components to use global tasks state",
+      "created_at": 1748556580.4329457
+    }
+  ],
   "links": {
     "related": [
       "DEV-21"
     ]
   },
   "created_at": 1748553432.1043518,
-  "updated_at": 1748553441.5037804,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748556582.146319,
+  "started_at": 1748556472.9148653,
+  "closed_at": 1748556582.1462955
 }
