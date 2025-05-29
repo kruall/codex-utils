@@ -9,15 +9,29 @@ export default function Navigation() {
       marginBottom: '16px' 
     }}>
       <div style={{ display: 'flex', gap: '16px' }}>
-        <Link href="/" style={{ 
-          color: '#0070f3', 
+        <Link href="/" style={{
+          color: '#0070f3',
           textDecoration: 'none',
           fontWeight: 'bold'
         }}>
-          📊 Dashboard
+          🏠 Home
         </Link>
-        <Link href="/todo" style={{ 
-          color: '#0070f3', 
+        <Link href="/table" style={{
+          color: '#0070f3',
+          textDecoration: 'none',
+          fontWeight: 'bold'
+        }}>
+          📋 Task List
+        </Link>
+        <Link href="/kanban" style={{
+          color: '#0070f3',
+          textDecoration: 'none',
+          fontWeight: 'bold'
+        }}>
+          🗂 Kanban Board
+        </Link>
+        <Link href="/todo" style={{
+          color: '#0070f3',
           textDecoration: 'none',
           fontWeight: 'bold'
         }}>

@@ -2,11 +2,27 @@
   "id": "TM_WEB-4",
   "title": "Separate task list and kanban board into different pages",
   "description": "Split the current combined view into separate pages: one for task list view and another for kanban board view. This will improve navigation and allow users to choose their preferred view mode.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start work on splitting dashboard views into separate pages",
+      "created_at": 1748551607.837413
+    },
+    {
+      "id": 2,
+      "text": "Implemented separated task views with table and kanban pages and updated navigation",
+      "created_at": 1748552064.2820592
+    },
+    {
+      "id": 3,
+      "text": "All tests passed",
+      "created_at": 1748552064.4201367
+    }
+  ],
   "links": {},
   "created_at": 1748551382.8842611,
-  "updated_at": 1748551382.8842611,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748552064.559595,
+  "started_at": 1748551606.7242832,
+  "closed_at": 1748552064.5595553
 }

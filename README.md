@@ -101,7 +101,7 @@ the `docs/` folder to GitHub Pages whenever changes are pushed to `main`.
 
 
 ### React Dashboard
-A Next.js frontend under `react-dashboard/` renders tasks in both table and kanban views.
+A Next.js frontend under `react-dashboard/` renders tasks. The task list and kanban board are available on separate pages.
 To develop locally:
 ```bash
 cd react-dashboard

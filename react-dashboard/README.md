@@ -1,6 +1,6 @@
 # Codex React Dashboard
 
-This directory contains a small [Next.js](https://nextjs.org/) application that renders tasks from the `.tasks` directory in both table and kanban views.
+This directory contains a small [Next.js](https://nextjs.org/) application that renders tasks from the `.tasks` directory. The task list and kanban board are now available on separate pages.
 
 ## Development
 
@@ -15,7 +15,9 @@ The dashboard reads local task files during build time using `getStaticProps`.
 
 ### Pages
 
-- `/` - main dashboard with table and kanban views
+- `/` - home page
+- `/table` - task list view
+- `/kanban` - kanban board view
 - `/todo` - page showing only tasks with a `todo` status
 
 To generate a static site for GitHub Pages run:
