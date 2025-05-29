@@ -24,7 +24,7 @@ class TaskManager:
                 meta_file = queue_dir / "meta.json"
                 if meta_file.exists():
                     meta = load_json(meta_file)
-                    if not meta:
+                    if meta is None:
                         continue
                     queue = Queue.from_meta(queue_dir.name, meta)
                     queues.append(queue.to_dict())
