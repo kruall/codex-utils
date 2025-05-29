@@ -2,15 +2,31 @@
   "id": "TM_TUI-2",
   "title": "Add comments interface",
   "description": "Provide TUI for viewing and adding comments",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started implementing comment interface",
+      "created_at": 1748542131.356007
+    },
+    {
+      "id": 2,
+      "text": "Implemented basic comments view/add in TUI",
+      "created_at": 1748542167.3050761
+    },
+    {
+      "id": 3,
+      "text": "Completed implementation",
+      "created_at": 1748542199.6257226
+    }
+  ],
   "links": {
     "related": [
       "TM-2"
     ]
   },
   "created_at": 1748540585.6959803,
-  "updated_at": 1748540606.6851642,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748542199.6257646,
+  "started_at": 1748542129.3158634,
+  "closed_at": 1748542197.7992551
 }
