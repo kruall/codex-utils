@@ -473,6 +473,55 @@ class TestTaskManagement(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("Error: Comment with ID 999 not found", result.stderr)
 
+    def test_task_comment_edit(self):
+        """Test editing task comments."""
+        # Create a task
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task with Comments",
+            "--description", "Description",
+            "--queue", "test-queue"
+        ])
+
+        # Add a comment
+        self.run_task_manager([
+            "task", "comment", "add",
+            "--id", "test-queue-1",
+            "--comment", "Old"
+        ])
+
+        # Edit the comment
+        result = self.run_task_manager([
+            "task", "comment", "edit",
+            "--id", "test-queue-1",
+            "--comment-id", "1",
+            "--comment", "New"
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Comment 1 edited in task 'test-queue-1'", result.stdout)
+
+        result = self.run_task_manager(["task", "comment", "list", "--id", "test-queue-1"])
+        self.assertIn("New", result.stdout)
+        self.assertNotIn("Old", result.stdout)
+
+    def test_task_comment_edit_nonexistent(self):
+        """Test editing non-existent comment."""
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task",
+            "--description", "Desc",
+            "--queue", "test-queue"
+        ])
+
+        result = self.run_task_manager([
+            "task", "comment", "edit",
+            "--id", "test-queue-1",
+            "--comment-id", "999",
+            "--comment", "X"
+        ])
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Error: Comment with ID 999 not found", result.stderr)
+
     def test_task_comment_operations_nonexistent_task(self):
         """Test comment operations on non-existent task."""
         # Try to add comment to non-existent task
@@ -497,6 +546,16 @@ class TestTaskManagement(unittest.TestCase):
             "task", "comment", "remove",
             "--id", "nonexistent-1",
             "--comment-id", "1"
+        ])
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Error: Task 'nonexistent-1' not found", result.stderr)
+
+        # Try to edit comment on non-existent task
+        result = self.run_task_manager([
+            "task", "comment", "edit",
+            "--id", "nonexistent-1",
+            "--comment-id", "1",
+            "--comment", "X"
         ])
         self.assertEqual(result.returncode, 1)
         self.assertIn("Error: Task 'nonexistent-1' not found", result.stderr)

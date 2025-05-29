@@ -295,6 +295,31 @@ class TaskManager:
             log_error(f"Error: Failed to add comment to task '{task_id}'")
             return False
 
+    def task_comment_edit(self, task_id: str, comment_id: int, text: str) -> bool:
+        """Edit a comment on a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            log_error(f"Error: Task '{task_id}' not found")
+            return False
+
+        for comment in task_data.comments:
+            if comment.get("id") == comment_id:
+                comment["text"] = text
+                comment["updated_at"] = time.time()
+                break
+        else:
+            log_error(
+                f"Error: Comment with ID {comment_id} not found in task '{task_id}'"
+            )
+            return False
+
+        if self._save_task(task_data):
+            logger.info(f"Comment {comment_id} edited in task '{task_id}'")
+            return True
+
+        log_error(f"Error: Failed to edit comment in task '{task_id}'")
+        return False
+
     def task_comment_remove(self, task_id: str, comment_id: int) -> bool:
         """Remove a comment from a task."""
         task_data = self._load_task(task_id)
