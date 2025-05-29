@@ -43,7 +43,8 @@ def launch_tui(tm: "TaskManager") -> None:
             self.show_main()
 
         def show_main(self) -> None:
-            assert self.body
+            if self.body is None:
+                raise RuntimeError("Body container is not initialized")
             self.body.remove_children()
             self.body.mount(Static("Task Manager", classes="title"))
             self.body.mount(Button("Queues", id="queues"))
@@ -51,18 +52,23 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.mount(Button("Quit", id="quit"))
 
         def show_queues(self) -> None:
-            assert self.body
+            if self.body is None:
+                raise RuntimeError("Body container is not initialized")
             self.body.remove_children()
             table: DataTable = DataTable()
             table.add_columns("Name", "Title", "Description")
             for q in self.manager.queue_list():
                 table.add_row(q["name"], q["title"], q["description"])
             self.body.mount(table)
+            # Input and button for deleting a queue
+            self.body.mount(Input(placeholder="Queue name", id="del_queue_name"))
+            self.body.mount(Button("Delete Queue", id="queue_delete"))
             self.body.mount(Button("Add Queue", id="queue_add"))
             self.body.mount(Button("Back", id="main"))
 
         def show_tasks(self) -> None:
-            assert self.body
+            if self.body is None:
+                raise RuntimeError("Body container is not initialized")
             self.body.remove_children()
             table: DataTable = DataTable()
             table.add_columns("ID", "Title", "Status")
@@ -71,10 +77,12 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.mount(table)
             self.body.mount(Input(placeholder="Task ID", id="task_id"))
             self.body.mount(Button("View Comments", id="view_comments"))
+            self.body.mount(Button("Delete Task", id="task_delete"))
             self.body.mount(Button("Back", id="main"))
 
         def show_comments(self, task_id: str) -> None:
-            assert self.body
+            if self.body is None:
+                raise RuntimeError("Body container is not initialized")
             self.body.remove_children()
             self.current_task_id = task_id
             self.body.mount(Static(f"Comments for {task_id}", classes="title"))
@@ -101,7 +109,8 @@ def launch_tui(tm: "TaskManager") -> None:
             elif button_id == "main":
                 self.show_main()
             elif button_id == "queue_add":
-                assert self.body
+                if self.body is None:
+                    raise RuntimeError("Body container is not initialized")
                 self.body.remove_children()
                 name_in = Input(placeholder="Queue name", id="q_name")
                 title_in = Input(placeholder="Queue title", id="q_title")
@@ -116,11 +125,29 @@ def launch_tui(tm: "TaskManager") -> None:
                 if task_id:
                     self.show_comments(task_id)
             elif button_id == "add_comment":
-                assert self.current_task_id
+                if self.current_task_id is None:
+                    raise RuntimeError("Current task ID is not set")
                 comment = self.query_one("#new_comment", Input).value
                 if comment:
                     self.manager.task_comment_add(self.current_task_id, comment)
                 self.show_comments(self.current_task_id)
+            elif button_id == "queue_delete":
+                name = self.query_one("#del_queue_name", Input).value
+                if name:
+                    if self.body is None:
+                        raise RuntimeError("Body container is not initialized")
+                    self.body.remove_children()
+                    self.body.mount(Static(f"Are you sure you want to delete the queue '{name}'?", classes="confirmation"))
+                    self.body.mount(Button("Yes", id="confirm_delete_queue"))
+                    self.body.mount(Button("No", id="queues"))
+            elif button_id == "task_delete":
+                task_id = self.query_one("#task_id", Input).value
+                if task_id:
+                    if self.body is None:
+                        raise RuntimeError("Body container is not initialized")
+                    self.body.mount(Static(f"Are you sure you want to delete task '{task_id}'?", id="confirm_delete"))
+                    self.body.mount(Button("Yes", id="confirm_yes"))
+                    self.body.mount(Button("No", id="confirm_no"))
             elif button_id == "create_queue":
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
