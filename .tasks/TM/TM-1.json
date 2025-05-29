@@ -2,8 +2,24 @@
   "id": "TM-1",
   "title": "Add task/queue deletion commands",
   "description": "Implement CLI commands to delete tasks and queues",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on deletion commands",
+      "created_at": 1748542123.898095
+    },
+    {
+      "id": 2,
+      "text": "Implemented delete commands and tests",
+      "created_at": 1748542227.3164392
+    },
+    {
+      "id": 3,
+      "text": "Completed implementation",
+      "created_at": 1748542269.5371919
+    }
+  ],
   "links": {
     "related": [
       "TM_TUI-1",
@@ -11,7 +27,7 @@
     ]
   },
   "created_at": 1748540578.1653335,
-  "updated_at": 1748540605.787068,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748542269.5372279,
+  "started_at": 1748542121.7009246,
+  "closed_at": 1748542267.3872318
 }

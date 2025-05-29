@@ -19,6 +19,9 @@ Launch the interactive Textual interface:
 
 # Create a new queue
 ./tm queue add --name "feature-queue" --title "Feature Development" --description "Queue for new features"
+
+# Delete a queue
+./tm queue delete --name "feature-queue"
 ```
 
 ### Task Management
@@ -43,6 +46,9 @@ Launch the interactive Textual interface:
 # Start or finish work
 ./tm task start --id feature-queue-1
 ./tm task done --id feature-queue-1
+
+# Delete a task
+./tm task delete --id feature-queue-1
 ```
 
 ### Comment System

@@ -326,6 +326,31 @@ class TestTaskManagement(unittest.TestCase):
             data = json.load(f)
         self.assertIsNotNone(data.get("closed_at"))
 
+    def test_task_delete(self):
+        """Test deleting a task."""
+        self.run_task_manager([
+            "task",
+            "add",
+            "--title",
+            "Task to Delete",
+            "--description",
+            "Desc",
+            "--queue",
+            "test-queue",
+        ])
+
+        result = self.run_task_manager([
+            "task",
+            "delete",
+            "--id",
+            "test-queue-1",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Task 'test-queue-1' deleted successfully", result.stdout)
+
+        task_file = self.tasks_root / "test-queue" / "test-queue-1.json"
+        self.assertFalse(task_file.exists())
+
     def test_task_comment_add(self):
         """Test adding comments to a task."""
         # Create a task

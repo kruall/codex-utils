@@ -32,9 +32,16 @@ def queue_add(args: argparse.Namespace, tm: TaskManager) -> int:
     return 0 if success else 1
 
 
+def queue_delete(args: argparse.Namespace, tm: TaskManager) -> int:
+    """Handle `queue delete` command."""
+    success = tm.queue_delete(args.name)
+    return 0 if success else 1
+
+
 QUEUE_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "list": queue_list,
     "add": queue_add,
+    "delete": queue_delete,
 }
 
 
@@ -77,6 +84,12 @@ def task_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
 def task_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
     task_id = tm.task_add(args.title, args.description, args.queue)
     return 0 if task_id else 1
+
+
+def task_delete_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    """Handle `task delete` command."""
+    success = tm.task_delete(args.id)
+    return 0 if success else 1
 
 
 def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
@@ -209,6 +222,7 @@ def handle_link(args: argparse.Namespace, tm: TaskManager) -> int:
 TASK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "list": task_list_cmd,
     "add": task_add_cmd,
+    "delete": task_delete_cmd,
     "show": task_show_cmd,
     "update": task_update_cmd,
     "start": task_start_cmd,
@@ -304,6 +318,10 @@ def main():
     queue_add_parser.add_argument("--name", required=True, help="Queue name")
     queue_add_parser.add_argument("--title", required=True, help="Queue title")
     queue_add_parser.add_argument("--description", required=True, help="Queue description")
+
+    # queue delete
+    queue_delete_parser = queue_subparsers.add_parser("delete", help="Delete a queue")
+    queue_delete_parser.add_argument("--name", required=True, help="Queue name")
     
     # Task commands
     task_parser = subparsers.add_parser("task", help="Task management")
@@ -319,6 +337,10 @@ def main():
     task_add_parser.add_argument("--title", required=True, help="Task title")
     task_add_parser.add_argument("--description", required=True, help="Task description")
     task_add_parser.add_argument("--queue", required=True, help="Queue name")
+
+    # task delete
+    task_delete_parser = task_subparsers.add_parser("delete", help="Delete a task")
+    task_delete_parser.add_argument("--id", required=True, help="Task ID")
     
     # task show
     task_show_parser = task_subparsers.add_parser("show", help="Show task details")
