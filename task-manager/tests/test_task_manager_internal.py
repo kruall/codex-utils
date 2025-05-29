@@ -11,7 +11,11 @@ import os
 
 # Add the parent directory to the path to import task_manager
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from task_manager import TaskManager
+from task_manager import (
+    TaskManager,
+    QueueExistsError,
+    StorageError,
+)
 
 
 class TestTaskManagerInternal(unittest.TestCase):
@@ -39,8 +43,7 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_queue_add_internal(self):
         """Test queue_add method directly."""
-        success = self.tm.queue_add("test-queue", "Test Queue", "A test queue")
-        self.assertTrue(success)
+        self.tm.queue_add("test-queue", "Test Queue", "A test queue")
         
         # Verify directory structure
         queue_dir = self.tasks_root / "test-queue"
@@ -60,12 +63,11 @@ class TestTaskManagerInternal(unittest.TestCase):
     def test_queue_add_duplicate_internal(self):
         """Test queue_add method with duplicate name."""
         # Create first queue
-        success1 = self.tm.queue_add("duplicate", "First", "First description")
-        self.assertTrue(success1)
-        
+        self.tm.queue_add("duplicate", "First", "First description")
+
         # Try to create duplicate
-        success2 = self.tm.queue_add("duplicate", "Second", "Second description")
-        self.assertFalse(success2)
+        with self.assertRaises(QueueExistsError):
+            self.tm.queue_add("duplicate", "Second", "Second description")
         
         # Verify original queue is unchanged
         meta_file = self.tasks_root / "duplicate" / "meta.json"
@@ -85,8 +87,7 @@ class TestTaskManagerInternal(unittest.TestCase):
         ]
         
         for name, title, description in queues_data:
-            success = self.tm.queue_add(name, title, description)
-            self.assertTrue(success)
+            self.tm.queue_add(name, title, description)
         
         # Get queue list
         queues = self.tm.queue_list()
@@ -113,8 +114,7 @@ class TestTaskManagerInternal(unittest.TestCase):
             f.write("invalid json content")
         
         # Create a valid queue
-        success = self.tm.queue_add("valid-queue", "Valid Queue", "Valid description")
-        self.assertTrue(success)
+        self.tm.queue_add("valid-queue", "Valid Queue", "Valid description")
         
         # Get queue list - should only return valid queue
         queues = self.tm.queue_list()
@@ -128,8 +128,7 @@ class TestTaskManagerInternal(unittest.TestCase):
         queue_dir.mkdir(parents=True)
         
         # Create a valid queue
-        success = self.tm.queue_add("valid-queue", "Valid Queue", "Valid description")
-        self.assertTrue(success)
+        self.tm.queue_add("valid-queue", "Valid Queue", "Valid description")
         
         # Get queue list - should only return valid queue
         queues = self.tm.queue_list()
@@ -144,8 +143,7 @@ class TestTaskManagerInternal(unittest.TestCase):
             f.write("This is not a queue")
         
         # Create a valid queue
-        success = self.tm.queue_add("valid-queue", "Valid Queue", "Valid description")
-        self.assertTrue(success)
+        self.tm.queue_add("valid-queue", "Valid Queue", "Valid description")
         
         # Get queue list - should only return valid queue
         queues = self.tm.queue_list()
@@ -154,12 +152,11 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_queue_add_with_unicode(self):
         """Test queue_add method with unicode characters."""
-        success = self.tm.queue_add(
+        self.tm.queue_add(
             "unicode-queue",
             "Тест Queue with émojis 🚀",
-            "Description with unicode: ñáéíóú and 中文"
+            "Description with unicode: ñáéíóú and 中文",
         )
-        self.assertTrue(success)
         
         # Verify unicode was stored correctly
         meta_file = self.tasks_root / "unicode-queue" / "meta.json"
@@ -183,8 +180,8 @@ class TestTaskManagerInternal(unittest.TestCase):
         
         try:
             # This should fail due to permission error
-            success = tm_readonly.queue_add("test-queue", "Test", "Test description")
-            self.assertFalse(success)
+            with self.assertRaises(StorageError):
+                tm_readonly.queue_add("test-queue", "Test", "Test description")
         finally:
             # Restore permissions for cleanup
             readonly_root.chmod(0o755)
@@ -197,8 +194,7 @@ class TestTaskManagerInternal(unittest.TestCase):
             os.chdir(self.test_dir)
             tm = TaskManager("relative_tasks")
             
-            success = tm.queue_add("rel-queue", "Relative Queue", "Relative path test")
-            self.assertTrue(success)
+            tm.queue_add("rel-queue", "Relative Queue", "Relative path test")
             
             # Verify queue was created in relative path
             rel_path = Path(self.test_dir) / "relative_tasks" / "rel-queue"
@@ -223,9 +219,9 @@ class TestTaskManagerInternal(unittest.TestCase):
         """Test task update, start and done status changes."""
         self.tm.queue_add("q", "Queue", "desc")
         task_id = self.tm.task_add("Task", "Desc", "q")
-        self.assertTrue(self.tm.task_update(task_id, "title", "New Title"))
-        self.assertTrue(self.tm.task_start(task_id))
-        self.assertTrue(self.tm.task_done(task_id))
+        self.tm.task_update(task_id, "title", "New Title")
+        self.tm.task_start(task_id)
+        self.tm.task_done(task_id)
 
         task = self.tm.task_show(task_id)
         self.assertEqual(task["title"], "New Title")
@@ -236,12 +232,12 @@ class TestTaskManagerInternal(unittest.TestCase):
         self.tm.queue_add("q", "Queue", "desc")
         task_id = self.tm.task_add("Task", "Desc", "q")
 
-        self.assertTrue(self.tm.task_comment_add(task_id, "c1"))
-        self.assertTrue(self.tm.task_comment_add(task_id, "c2"))
+        self.tm.task_comment_add(task_id, "c1")
+        self.tm.task_comment_add(task_id, "c2")
         comments = self.tm.task_comment_list(task_id)
         self.assertEqual(len(comments), 2)
 
-        self.assertTrue(self.tm.task_comment_remove(task_id, 1))
+        self.tm.task_comment_remove(task_id, 1)
         comments = self.tm.task_comment_list(task_id)
         self.assertEqual(len(comments), 1)
         self.assertEqual(comments[0]["text"], "c2")
@@ -251,8 +247,8 @@ class TestTaskManagerInternal(unittest.TestCase):
         self.tm.queue_add("q", "Queue", "desc")
         task_id = self.tm.task_add("Task", "Desc", "q")
 
-        self.assertTrue(self.tm.task_comment_add(task_id, "old"))
-        self.assertTrue(self.tm.task_comment_edit(task_id, 1, "new"))
+        self.tm.task_comment_add(task_id, "old")
+        self.tm.task_comment_edit(task_id, 1, "new")
         comments = self.tm.task_comment_list(task_id)
         self.assertEqual(len(comments), 1)
         self.assertEqual(comments[0]["text"], "new")
@@ -261,14 +257,14 @@ class TestTaskManagerInternal(unittest.TestCase):
     def test_queue_delete_internal(self):
         """Test deleting a queue via TaskManager."""
         self.tm.queue_add("del", "Del", "desc")
-        self.assertTrue(self.tm.queue_delete("del"))
+        self.tm.queue_delete("del")
         self.assertEqual(self.tm.queue_list(), [])
 
     def test_task_delete_internal(self):
         """Test deleting a task via TaskManager."""
         self.tm.queue_add("q", "Queue", "desc")
         task_id = self.tm.task_add("Task", "Desc", "q")
-        self.assertTrue(self.tm.task_delete(task_id))
+        self.tm.task_delete(task_id)
         self.assertEqual(self.tm.task_list(), [])
 
     def test_get_next_task_number_internal(self):
