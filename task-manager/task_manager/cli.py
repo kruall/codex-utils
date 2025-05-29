@@ -1,10 +1,187 @@
 import argparse
 from pathlib import Path
+from typing import Callable
 
 from .core import TaskManager
 from .tui import launch_tui
 from .utils import format_timestamp
 from . import __version__
+
+
+def queue_list(args: argparse.Namespace, tm: TaskManager) -> int:
+    """Handle `queue list` command."""
+    queues = tm.queue_list()
+    if not queues:
+        print("No queues found")
+    else:
+        print(f"{'Name':<20} {'Title':<30} {'Description'}")
+        print("-" * 80)
+        for queue in queues:
+            print(
+                f"{queue['name']:<20} {queue['title']:<30} {queue['description']}"
+            )
+    return 0
+
+
+def queue_add(args: argparse.Namespace, tm: TaskManager) -> int:
+    """Handle `queue add` command."""
+    success = tm.queue_add(args.name, args.title, args.description)
+    return 0 if success else 1
+
+
+QUEUE_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
+    "list": queue_list,
+    "add": queue_add,
+}
+
+
+def handle_queue(args: argparse.Namespace, tm: TaskManager) -> int:
+    action = args.queue_action
+    if not action:
+        print(args.parser_queue.format_help())
+        return 1
+    func = QUEUE_ACTIONS.get(action)
+    if not func:
+        print(args.parser_queue.format_help())
+        return 1
+    return func(args, tm)
+
+
+def task_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    tasks = tm.task_list(args.status, args.queue)
+    if not tasks:
+        print("No tasks found")
+    else:
+        print(f"{'ID':<15} {'Title':<30} {'Status':<12} {'Queue':<15} {'Created'}")
+        print("-" * 90)
+        for task in tasks:
+            queue_name = task['id'].rsplit('-', 1)[0]
+            created = format_timestamp(task.get('created_at', 0))
+            print(
+                f"{task['id']:<15} {task['title']:<30} {task['status']:<12} "
+                f"{queue_name:<15} {created}"
+            )
+    return 0
+
+
+def task_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    task_id = tm.task_add(args.title, args.description, args.queue)
+    return 0 if task_id else 1
+
+
+def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    task_data = tm.task_show(args.id)
+    if task_data:
+        print(f"ID: {task_data['id']}")
+        print(f"Title: {task_data['title']}")
+        print(f"Description: {task_data['description']}")
+        print(f"Status: {task_data['status']}")
+        print(f"Created: {format_timestamp(task_data.get('created_at', 0))}")
+        print(f"Updated: {format_timestamp(task_data.get('updated_at', 0))}")
+
+        comments = task_data.get('comments', [])
+        if comments:
+            print(f"\nComments ({len(comments)}):")
+            for comment in comments:
+                created = format_timestamp(comment.get('created_at', 0))
+                print(f"  [{comment['id']}] {created}: {comment['text']}")
+        else:
+            print("\nNo comments")
+        return 0
+    return 1
+
+
+def task_update_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_update(args.id, args.field, args.value)
+    return 0 if success else 1
+
+
+def task_start_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_start(args.id)
+    return 0 if success else 1
+
+
+def task_done_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_done(args.id)
+    return 0 if success else 1
+
+
+def comment_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_comment_add(args.id, args.comment)
+    return 0 if success else 1
+
+
+def comment_remove_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_comment_remove(args.id, getattr(args, 'comment_id'))
+    return 0 if success else 1
+
+
+def comment_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    comments = tm.task_comment_list(args.id)
+    if comments is not None:
+        if not comments:
+            print("No comments found")
+        else:
+            print(f"Comments for task {args.id}:")
+            for comment in comments:
+                created = format_timestamp(comment.get('created_at', 0))
+                print(f"  [{comment['id']}] {created}: {comment['text']}")
+        return 0
+    return 1
+
+
+COMMENT_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
+    "add": comment_add_cmd,
+    "remove": comment_remove_cmd,
+    "list": comment_list_cmd,
+}
+
+
+def handle_comment(args: argparse.Namespace, tm: TaskManager) -> int:
+    action = args.comment_action
+    if not action:
+        print(args.parser_comment.format_help())
+        return 1
+    func = COMMENT_ACTIONS.get(action)
+    if not func:
+        print(args.parser_comment.format_help())
+        return 1
+    return func(args, tm)
+
+
+TASK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
+    "list": task_list_cmd,
+    "add": task_add_cmd,
+    "show": task_show_cmd,
+    "update": task_update_cmd,
+    "start": task_start_cmd,
+    "done": task_done_cmd,
+    "comment": handle_comment,
+}
+
+
+def handle_task(args: argparse.Namespace, tm: TaskManager) -> int:
+    action = args.task_action
+    if not action:
+        print(args.parser_task.format_help())
+        return 1
+    func = TASK_ACTIONS.get(action)
+    if not func:
+        print(args.parser_task.format_help())
+        return 1
+    return func(args, tm)
+
+
+def handle_ui(args: argparse.Namespace, tm: TaskManager) -> int:
+    launch_tui(tm)
+    return 0
+
+
+COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
+    "queue": handle_queue,
+    "task": handle_task,
+    "ui": handle_ui,
+}
 
 def main():
     parser = argparse.ArgumentParser(description="Task Manager CLI")
@@ -98,116 +275,16 @@ def main():
     if not args.command:
         parser.print_help()
         return 1
-    
+
+    args.parser_queue = queue_parser
+    args.parser_task = task_parser
+    args.parser_comment = task_comment_parser
+
     tm = TaskManager(args.tasks_root)
-    
-    if args.command == "queue":
-        if args.queue_action == "list":
-            queues = tm.queue_list()
-            if not queues:
-                print("No queues found")
-            else:
-                print(f"{'Name':<20} {'Title':<30} {'Description'}")
-                print("-" * 80)
-                for queue in queues:
-                    print(f"{queue['name']:<20} {queue['title']:<30} {queue['description']}")
-        
-        elif args.queue_action == "add":
-            success = tm.queue_add(args.name, args.title, args.description)
-            return 0 if success else 1
-        
-        else:
-            queue_parser.print_help()
-            return 1
-    
-    elif args.command == "task":
-        if args.task_action == "list":
-            tasks = tm.task_list(args.status, args.queue)
-            if not tasks:
-                print("No tasks found")
-            else:
-                print(f"{'ID':<15} {'Title':<30} {'Status':<12} {'Queue':<15} {'Created'}")
-                print("-" * 90)
-                for task in tasks:
-                    queue_name = task['id'].rsplit('-', 1)[0]
-                    created = format_timestamp(task.get('created_at', 0))
-                    print(f"{task['id']:<15} {task['title']:<30} {task['status']:<12} {queue_name:<15} {created}")
-        
-        elif args.task_action == "add":
-            task_id = tm.task_add(args.title, args.description, args.queue)
-            return 0 if task_id else 1
-        
-        elif args.task_action == "show":
-            task_data = tm.task_show(args.id)
-            if task_data:
-                print(f"ID: {task_data['id']}")
-                print(f"Title: {task_data['title']}")
-                print(f"Description: {task_data['description']}")
-                print(f"Status: {task_data['status']}")
-                print(f"Created: {format_timestamp(task_data.get('created_at', 0))}")
-                print(f"Updated: {format_timestamp(task_data.get('updated_at', 0))}")
-                
-                comments = task_data.get('comments', [])
-                if comments:
-                    print(f"\nComments ({len(comments)}):")
-                    for comment in comments:
-                        created = format_timestamp(comment.get('created_at', 0))
-                        print(f"  [{comment['id']}] {created}: {comment['text']}")
-                else:
-                    print("\nNo comments")
-                return 0
-            else:
-                return 1
-        
-        elif args.task_action == "update":
-            success = tm.task_update(args.id, args.field, args.value)
-            return 0 if success else 1
-        
-        elif args.task_action == "start":
-            success = tm.task_start(args.id)
-            return 0 if success else 1
-        
-        elif args.task_action == "done":
-            success = tm.task_done(args.id)
-            return 0 if success else 1
-        
-        elif args.task_action == "comment":
-            if args.comment_action == "add":
-                success = tm.task_comment_add(args.id, args.comment)
-                return 0 if success else 1
-            
-            elif args.comment_action == "remove":
-                success = tm.task_comment_remove(args.id, getattr(args, 'comment_id'))
-                return 0 if success else 1
-            
-            elif args.comment_action == "list":
-                comments = tm.task_comment_list(args.id)
-                if comments is not None:
-                    if not comments:
-                        print("No comments found")
-                    else:
-                        print(f"Comments for task {args.id}:")
-                        for comment in comments:
-                            created = format_timestamp(comment.get('created_at', 0))
-                            print(f"  [{comment['id']}] {created}: {comment['text']}")
-                    return 0
-                else:
-                    return 1
-            
-            else:
-                task_comment_parser.print_help()
-                return 1
-        
-        else:
-            task_parser.print_help()
-            return 1
-    
-    elif args.command == "ui":
-        launch_tui(tm)
-        return 0
-    else:
+
+    handler = COMMAND_HANDLERS.get(args.command)
+    if not handler:
         parser.print_help()
         return 1
-    
-    return 0
+    return handler(args, tm)
 

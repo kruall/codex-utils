@@ -2,14 +2,24 @@
   "id": "DEV-6",
   "title": "Extract CLI command functions",
   "description": "Refactor main function to use command-to-function mapping",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Replace long if/elif chain in main CLI with dispatch table and functions.",
       "created_at": 1748521731.6081297
+    },
+    {
+      "id": 2,
+      "text": "Started work on DEV-6",
+      "created_at": 1748524707.2139144
+    },
+    {
+      "id": 3,
+      "text": "Refactored CLI using dispatch table",
+      "created_at": 1748524902.9903128
     }
   ],
   "created_at": 1748521730.7001925,
-  "updated_at": 1748521731.6082094
+  "updated_at": 1748524904.8413794
 }
