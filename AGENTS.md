@@ -112,3 +112,4 @@ The task manager provides multiple interfaces for different use cases:
   • `pytest` passes,
   • `ruff check .` passes,
   • `mypy .` passes
+  • **MANDATORY**: Task was closed with `./tm task done` command when work is completed
