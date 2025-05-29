@@ -2,15 +2,26 @@
   "id": "TM_WEB-11",
   "title": "Improve task update error handling",
   "description": "Show user-friendly errors and loading states when updating tasks via API",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started task to improve update error handling",
+      "created_at": 1748557463.107929
+    },
+    {
+      "id": 2,
+      "text": "Implemented user-friendly error and loading states",
+      "created_at": 1748557508.900846
+    }
+  ],
   "links": {
     "related": [
       "DEV-21"
     ]
   },
   "created_at": 1748553433.926326,
-  "updated_at": 1748553444.155677,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748557511.899294,
+  "started_at": 1748557460.6518633,
+  "closed_at": 1748557511.8992627
 }
