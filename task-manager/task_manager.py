@@ -356,7 +356,7 @@ def launch_tui(tm: "TaskManager") -> None:
 
         def show_main(self) -> None:
             assert self.body
-            self.body.clear()
+            self.body.remove_children()
             self.body.mount(Static("Task Manager", classes="title"))
             self.body.mount(Button("Queues", id="queues"))
             self.body.mount(Button("Tasks", id="tasks"))
@@ -364,8 +364,8 @@ def launch_tui(tm: "TaskManager") -> None:
 
         def show_queues(self) -> None:
             assert self.body
-            self.body.clear()
-            table = DataTable()
+            self.body.remove_children()
+            table: DataTable = DataTable()
             table.add_columns("Name", "Title", "Description")
             for q in self.manager.queue_list():
                 table.add_row(q["name"], q["title"], q["description"])
@@ -375,8 +375,8 @@ def launch_tui(tm: "TaskManager") -> None:
 
         def show_tasks(self) -> None:
             assert self.body
-            self.body.clear()
-            table = DataTable()
+            self.body.remove_children()
+            table: DataTable = DataTable()
             table.add_columns("ID", "Title", "Status")
             for t in self.manager.task_list():
                 table.add_row(t["id"], t["title"], t["status"])
@@ -395,7 +395,7 @@ def launch_tui(tm: "TaskManager") -> None:
                 self.show_main()
             elif button_id == "queue_add":
                 assert self.body
-                self.body.clear()
+                self.body.remove_children()
                 name_in = Input(placeholder="Queue name", id="q_name")
                 title_in = Input(placeholder="Queue title", id="q_title")
                 desc_in = Input(placeholder="Description", id="q_desc")
