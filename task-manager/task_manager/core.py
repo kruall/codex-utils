@@ -69,7 +69,9 @@ class TaskManager:
                 "description": queue_obj.description,
             }
 
-            save_json(meta_file, meta_data)
+            if not save_json(meta_file, meta_data):
+                log_error(f"Error saving metadata for queue '{name}'")
+                return False
 
             logger.info(f"Queue '{name}' created successfully")
             return True
