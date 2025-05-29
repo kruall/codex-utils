@@ -1,0 +1,35 @@
+{
+  "id": "DEV-1",
+  "title": "Create TUI interface with Textual",
+  "description": "Implement a text-based user interface for the task manager using the Textual library. Add 'ui' subcommand to task_manager.py that launches an interactive TUI for managing queues, tasks, and comments.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Requirements: Add textual dependency to requirements.txt",
+      "created_at": 1748513701.177484
+    },
+    {
+      "id": 2,
+      "text": "Implementation: Add 'ui' subcommand to task_manager.py that launches interactive TUI",
+      "created_at": 1748513707.511113
+    },
+    {
+      "id": 3,
+      "text": "Features needed: Queue management (list, create), Task management (list, create, update, start, done), Task details view with comments, Comment management (add, remove)",
+      "created_at": 1748513751.926084
+    },
+    {
+      "id": 4,
+      "text": "Technical: Use Textual widgets for modern TUI experience, maintain all existing CLI functionality",
+      "created_at": 1748513756.203052
+    },
+    {
+      "id": 5,
+      "text": "Usage: Should work as './tm ui' or 'python task-manager/task_manager.py ui'",
+      "created_at": 1748513761.635071
+    }
+  ],
+  "created_at": 1748513645.185745,
+  "updated_at": 1748513761.635085
+}
