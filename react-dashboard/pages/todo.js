@@ -18,8 +18,8 @@ export async function getStaticProps() {
         }
       }
     }
-  } catch {
-    // ignore errors for build portability
+  } catch (error) {
+    console.error('Error reading tasks directory:', error);
   }
   return { props: { tasks } }
 }
