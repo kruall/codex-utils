@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Callable
 
 from .core import TaskManager
+from .dashboard import generate_dashboard
 from .tui import launch_tui
 from .utils import format_timestamp
 from . import __version__
@@ -182,10 +183,17 @@ def handle_ui(args: argparse.Namespace, tm: TaskManager) -> int:
     return 0
 
 
+def handle_dashboard(args: argparse.Namespace, tm: TaskManager) -> int:
+    path = generate_dashboard(args.tasks_root, args.output)
+    print(f"Dashboard generated at {path}")
+    return 0
+
+
 COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "queue": handle_queue,
     "task": handle_task,
     "ui": handle_ui,
+    "dashboard": handle_dashboard,
 }
 
 def main():
@@ -205,6 +213,16 @@ def main():
 
     # UI command
     subparsers.add_parser("ui", help="Launch interactive Textual UI")
+
+    # Dashboard command
+    dashboard_parser = subparsers.add_parser(
+        "dashboard", help="Generate static HTML dashboard"
+    )
+    dashboard_parser.add_argument(
+        "--output",
+        default="docs/index.html",
+        help="Output HTML file (default: docs/index.html)",
+    )
     
     # Queue commands
     queue_parser = subparsers.add_parser("queue", help="Queue management")
