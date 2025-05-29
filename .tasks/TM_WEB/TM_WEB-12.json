@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-12",
+  "title": "Add PropTypes or migrate to TypeScript",
+  "description": "Introduce static type checking to improve code reliability",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "DEV-21"
+    ]
+  },
+  "created_at": 1748553435.8020942,
+  "updated_at": 1748553444.9749477,
+  "started_at": null,
+  "closed_at": null
+}
