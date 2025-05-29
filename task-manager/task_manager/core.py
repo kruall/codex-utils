@@ -1,11 +1,13 @@
 import json
+import logging
 import os
-import sys
 import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
 from .models import Queue, Task
+
+logger = logging.getLogger(__name__)
 
 
 class TaskManager:
@@ -34,7 +36,7 @@ class TaskManager:
         """Add a new queue."""
         # Validate queue name
         if not name or not name.strip():
-            print("Error: Queue name cannot be empty", file=sys.stderr)
+            logger.error("Error: Queue name cannot be empty")
             return False
         
         queue_dir = self.tasks_root / name
@@ -45,18 +47,15 @@ class TaskManager:
             mode = os.stat(self.tasks_root).st_mode
             write_bits = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
             if not (mode & write_bits):
-                print(
-                    f"Error creating queue '{name}': Permission denied",
-                    file=sys.stderr,
-                )
+                logger.error(f"Error creating queue '{name}': Permission denied")
                 return False
         except OSError as e:
-            print(f"Error creating queue '{name}': {e}", file=sys.stderr)
+            logger.error(f"Error creating queue '{name}': {e}")
             return False
 
         try:
             if queue_dir.exists():
-                print(f"Error: Queue '{name}' already exists", file=sys.stderr)
+                logger.error(f"Error: Queue '{name}' already exists")
                 return False
         except (OSError, PermissionError):
             # If we can't check if it exists due to permissions, try to create anyway
@@ -75,11 +74,11 @@ class TaskManager:
             with open(meta_file, "w") as f:
                 json.dump(meta_data, f, indent=2)
 
-            print(f"Queue '{name}' created successfully")
+            logger.info(f"Queue '{name}' created successfully")
             return True
             
         except (OSError, IOError) as e:
-            print(f"Error creating queue '{name}': {e}", file=sys.stderr)
+            logger.error(f"Error creating queue '{name}': {e}")
             return False
 
     def _get_next_task_number(self, queue_name: str) -> int:
@@ -107,7 +106,7 @@ class TaskManager:
         queue_dir = self.tasks_root / queue
 
         if not queue_dir.exists():
-            print(f"Error: Queue '{queue}' does not exist", file=sys.stderr)
+            logger.error(f"Error: Queue '{queue}' does not exist")
             return None
 
         try:
@@ -120,11 +119,11 @@ class TaskManager:
             with open(task_file, "w") as f:
                 json.dump(task_obj.to_dict(), f, indent=2)
 
-            print(f"Task '{task_id}' created successfully")
+            logger.info(f"Task '{task_id}' created successfully")
             return task_id
 
         except (OSError, IOError) as e:
-            print(f"Error creating task: {e}", file=sys.stderr)
+            logger.error(f"Error creating task: {e}")
             return None
 
     def _find_task_file(self, task_id: str) -> Optional[Path]:
@@ -204,7 +203,7 @@ class TaskManager:
         """Show detailed information about a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            logger.error(f"Error: Task '{task_id}' not found")
             return None
 
         return task_data.to_dict()
@@ -213,22 +212,24 @@ class TaskManager:
         """Update a specific field of a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            logger.error(f"Error: Task '{task_id}' not found")
             return False
         
         # Validate field
         allowed_fields = ['title', 'description', 'status']
         if field not in allowed_fields:
-            print(f"Error: Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}", file=sys.stderr)
+            logger.error(
+                f"Error: Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}"
+            )
             return False
         
         setattr(task_data, field, value)
 
         if self._save_task(task_data):
-            print(f"Task '{task_id}' updated successfully")
+            logger.info(f"Task '{task_id}' updated successfully")
             return True
         else:
-            print(f"Error: Failed to update task '{task_id}'", file=sys.stderr)
+            logger.error(f"Error: Failed to update task '{task_id}'")
             return False
 
     def task_start(self, task_id: str) -> bool:
@@ -243,7 +244,7 @@ class TaskManager:
         """Add a comment to a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            logger.error(f"Error: Task '{task_id}' not found")
             return False
         
         # Generate comment ID
@@ -259,17 +260,17 @@ class TaskManager:
         task_data.comments.append(comment_data)
         
         if self._save_task(task_data):
-            print(f"Comment added to task '{task_id}' with ID {comment_id}")
+            logger.info(f"Comment added to task '{task_id}' with ID {comment_id}")
             return True
         else:
-            print(f"Error: Failed to add comment to task '{task_id}'", file=sys.stderr)
+            logger.error(f"Error: Failed to add comment to task '{task_id}'")
             return False
 
     def task_comment_remove(self, task_id: str, comment_id: int) -> bool:
         """Remove a comment from a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            logger.error(f"Error: Task '{task_id}' not found")
             return False
 
         comments = task_data.comments
@@ -279,21 +280,21 @@ class TaskManager:
         task_data.comments = [c for c in comments if c.get("id") != comment_id]
         
         if len(task_data.comments) == original_count:
-            print(f"Error: Comment with ID {comment_id} not found in task '{task_id}'", file=sys.stderr)
+            logger.error(f"Error: Comment with ID {comment_id} not found in task '{task_id}'")
             return False
         
         if self._save_task(task_data):
-            print(f"Comment {comment_id} removed from task '{task_id}'")
+            logger.info(f"Comment {comment_id} removed from task '{task_id}'")
             return True
         else:
-            print(f"Error: Failed to remove comment from task '{task_id}'", file=sys.stderr)
+            logger.error(f"Error: Failed to remove comment from task '{task_id}'")
             return False
 
     def task_comment_list(self, task_id: str) -> Optional[List[Dict]]:
         """List all comments for a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            logger.error(f"Error: Task '{task_id}' not found")
             return None
 
         return task_data.comments

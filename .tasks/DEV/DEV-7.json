@@ -2,14 +2,34 @@
   "id": "DEV-7",
   "title": "Implement logging",
   "description": "Switch from print statements to logging with levels",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Use logging module with info/warning/error levels instead of print.",
       "created_at": 1748521733.388382
+    },
+    {
+      "id": 2,
+      "text": "Starting DEV-7 implement logging",
+      "created_at": 1748529050.9388082
+    },
+    {
+      "id": 3,
+      "text": "Implemented logging across modules and added setup function",
+      "created_at": 1748529266.9724383
+    },
+    {
+      "id": 4,
+      "text": "Completed DEV-7",
+      "created_at": 1748529277.0330784
+    },
+    {
+      "id": 5,
+      "text": "Addressing feedback: user-facing messages should use print, not logging",
+      "created_at": 1748534493.496091
     }
   ],
   "created_at": 1748521732.5266454,
-  "updated_at": 1748521733.3884168
+  "updated_at": 1748534564.8647392
 }
