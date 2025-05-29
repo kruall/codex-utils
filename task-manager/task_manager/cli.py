@@ -151,6 +151,37 @@ COMMENT_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
 }
 
 
+def link_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_link_add(args.id, args.target_id, args.type)
+    return 0 if success else 1
+
+
+def link_remove_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    success = tm.task_link_remove(args.id, args.target_id, args.type)
+    return 0 if success else 1
+
+
+def link_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    links = tm.task_link_list(args.id)
+    if links is not None:
+        if not links:
+            print("No links found")
+        else:
+            print(f"Links for task {args.id}:")
+            for link_type, targets in links.items():
+                for target in targets:
+                    print(f"  {link_type}: {target}")
+        return 0
+    return 1
+
+
+LINK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
+    "add": link_add_cmd,
+    "remove": link_remove_cmd,
+    "list": link_list_cmd,
+}
+
+
 def handle_comment(args: argparse.Namespace, tm: TaskManager) -> int:
     action = args.comment_action
     if not action:
@@ -163,6 +194,18 @@ def handle_comment(args: argparse.Namespace, tm: TaskManager) -> int:
     return func(args, tm)
 
 
+def handle_link(args: argparse.Namespace, tm: TaskManager) -> int:
+    action = args.link_action
+    if not action:
+        print(args.parser_link.format_help())
+        return 1
+    func = LINK_ACTIONS.get(action)
+    if not func:
+        print(args.parser_link.format_help())
+        return 1
+    return func(args, tm)
+
+
 TASK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "list": task_list_cmd,
     "add": task_add_cmd,
@@ -171,6 +214,7 @@ TASK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "start": task_start_cmd,
     "done": task_done_cmd,
     "comment": handle_comment,
+    "link": handle_link,
 }
 
 
@@ -311,6 +355,26 @@ def main():
     # task comment list
     task_comment_list_parser = task_comment_subparsers.add_parser("list", help="List task comments")
     task_comment_list_parser.add_argument("--id", required=True, help="Task ID")
+
+    # task link commands
+    task_link_parser = task_subparsers.add_parser("link", help="Task link management")
+    task_link_subparsers = task_link_parser.add_subparsers(dest="link_action", help="Link actions")
+
+    # task link add
+    task_link_add_parser = task_link_subparsers.add_parser("add", help="Add a link between tasks")
+    task_link_add_parser.add_argument("--id", required=True, help="Task ID")
+    task_link_add_parser.add_argument("--target-id", required=True, help="Target task ID")
+    task_link_add_parser.add_argument("--type", default="related", help="Link type")
+
+    # task link remove
+    task_link_remove_parser = task_link_subparsers.add_parser("remove", help="Remove a link between tasks")
+    task_link_remove_parser.add_argument("--id", required=True, help="Task ID")
+    task_link_remove_parser.add_argument("--target-id", required=True, help="Target task ID")
+    task_link_remove_parser.add_argument("--type", default="related", help="Link type")
+
+    # task link list
+    task_link_list_parser = task_link_subparsers.add_parser("list", help="List task links")
+    task_link_list_parser.add_argument("--id", required=True, help="Task ID")
     
     args = parser.parse_args()
 
@@ -326,6 +390,7 @@ def main():
     args.parser_queue = queue_parser
     args.parser_task = task_parser
     args.parser_comment = task_comment_parser
+    args.parser_link = task_link_parser
 
     tm = TaskManager(args.tasks_root)
 

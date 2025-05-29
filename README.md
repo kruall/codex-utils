@@ -57,6 +57,18 @@ Launch the interactive Textual interface:
 ./tm task comment remove --id feature-queue-1 --comment-id 1
 ```
 
+### Task Links
+```bash
+# Add a related link between tasks
+./tm task link add --id feature-queue-1 --target-id feature-queue-2
+
+# List links for a task
+./tm task link list --id feature-queue-1
+
+# Remove a link
+./tm task link remove --id feature-queue-1 --target-id feature-queue-2
+```
+
 ### Typical Workflow
 1. **Create a queue**: `./tm queue add --name "my-queue" --title "My Queue" --description "Description"`.
 2. **Add a task**: `./tm task add --title "Task title" --description "Description" --queue my-queue`.
