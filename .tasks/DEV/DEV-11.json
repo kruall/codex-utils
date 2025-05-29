@@ -2,7 +2,7 @@
   "id": "DEV-11",
   "title": "Add --version option",
   "description": "Show version and config path via CLI",
-  "status": "in_progress",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -21,5 +21,5 @@
     }
   ],
   "created_at": 1748521741.5078592,
-  "updated_at": 1748522248.6855562
+  "updated_at": 1748523963.177461
 }
