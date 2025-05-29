@@ -246,6 +246,19 @@ class TestTaskManagerInternal(unittest.TestCase):
         self.assertEqual(len(comments), 1)
         self.assertEqual(comments[0]["text"], "c2")
 
+    def test_queue_delete_internal(self):
+        """Test deleting a queue via TaskManager."""
+        self.tm.queue_add("del", "Del", "desc")
+        self.assertTrue(self.tm.queue_delete("del"))
+        self.assertEqual(self.tm.queue_list(), [])
+
+    def test_task_delete_internal(self):
+        """Test deleting a task via TaskManager."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("Task", "Desc", "q")
+        self.assertTrue(self.tm.task_delete(task_id))
+        self.assertEqual(self.tm.task_list(), [])
+
     def test_get_next_task_number_internal(self):
         """Test internal task numbering logic."""
         self.tm.queue_add("q", "Queue", "desc")

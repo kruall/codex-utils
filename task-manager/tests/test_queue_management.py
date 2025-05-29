@@ -157,6 +157,31 @@ class TestQueueManagement(unittest.TestCase):
         result = self.run_task_manager(["queue", "invalid"])
         self.assertNotEqual(result.returncode, 0)
 
+    def test_queue_delete(self):
+        """Test deleting an existing queue."""
+        self.run_task_manager([
+            "queue",
+            "add",
+            "--name",
+            "del-queue",
+            "--title",
+            "Del",
+            "--description",
+            "To delete",
+        ])
+
+        result = self.run_task_manager([
+            "queue",
+            "delete",
+            "--name",
+            "del-queue",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Queue 'del-queue' deleted successfully", result.stdout)
+
+        queue_dir = self.tasks_root / "del-queue"
+        self.assertFalse(queue_dir.exists())
+
     def test_tasks_root_creation(self):
         """Test that tasks root directory is created if it doesn't exist."""
         # Use a non-existent directory

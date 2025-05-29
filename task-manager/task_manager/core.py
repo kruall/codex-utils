@@ -406,3 +406,35 @@ class TaskManager:
             return None
         return task_data.links
 
+    def queue_delete(self, name: str) -> bool:
+        """Delete an entire queue and all its tasks."""
+        queue_dir = self.tasks_root / name
+        if not queue_dir.exists() or not queue_dir.is_dir():
+            log_error(f"Error: Queue '{name}' not found")
+            return False
+
+        try:
+            import shutil
+
+            shutil.rmtree(queue_dir)
+            logger.info(f"Queue '{name}' deleted successfully")
+            return True
+        except (OSError, IOError) as e:
+            log_error(f"Error deleting queue '{name}': {e}")
+            return False
+
+    def task_delete(self, task_id: str) -> bool:
+        """Delete a task file from its queue."""
+        task_file = self._find_task_file(task_id)
+        if not task_file or not task_file.exists():
+            log_error(f"Error: Task '{task_id}' not found")
+            return False
+
+        try:
+            task_file.unlink()
+            logger.info(f"Task '{task_id}' deleted successfully")
+            return True
+        except (OSError, IOError) as e:
+            log_error(f"Error deleting task '{task_id}': {e}")
+            return False
+
