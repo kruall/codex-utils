@@ -2,15 +2,26 @@
   "id": "TM_WEB-8",
   "title": "Refactor data loading into reusable hook",
   "description": "Create a custom React hook to load tasks from .tasks directory and share logic between pages",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting task work",
+      "created_at": 1748554246.0895278
+    },
+    {
+      "id": 2,
+      "text": "Implemented useTasks hook and API, updated pages to use it",
+      "created_at": 1748554398.3414428
+    }
+  ],
   "links": {
     "related": [
       "DEV-21"
     ]
   },
   "created_at": 1748553428.3552904,
-  "updated_at": 1748553439.7551897,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748554400.8065505,
+  "started_at": 1748554245.005533,
+  "closed_at": 1748554400.8065233
 }

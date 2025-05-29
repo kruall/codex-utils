@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-The dashboard reads local task files during build time using `getStaticProps`.
+The dashboard loads tasks at runtime using a shared React hook and API route.
 
 ### Pages
 
