@@ -88,6 +88,10 @@ def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
         print(f"Status: {task_data['status']}")
         print(f"Created: {format_timestamp(task_data.get('created_at', 0))}")
         print(f"Updated: {format_timestamp(task_data.get('updated_at', 0))}")
+        if task_data.get('started_at'):
+            print(f"Started: {format_timestamp(task_data['started_at'])}")
+        if task_data.get('closed_at'):
+            print(f"Closed: {format_timestamp(task_data['closed_at'])}")
 
         comments = task_data.get('comments', [])
         if comments:

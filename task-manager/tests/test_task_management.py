@@ -61,6 +61,8 @@ class TestTaskManagement(unittest.TestCase):
         self.assertEqual(task_data['comments'], [])
         self.assertIn('created_at', task_data)
         self.assertIn('updated_at', task_data)
+        self.assertIsNone(task_data.get('started_at'))
+        self.assertIsNone(task_data.get('closed_at'))
 
     def test_task_add_nonexistent_queue(self):
         """Test adding a task to a non-existent queue."""
@@ -200,6 +202,8 @@ class TestTaskManagement(unittest.TestCase):
         self.assertIn("Created:", result.stdout)
         self.assertIn("Updated:", result.stdout)
         self.assertIn("No comments", result.stdout)
+        self.assertNotIn("Started:", result.stdout)
+        self.assertNotIn("Closed:", result.stdout)
 
     def test_task_show_nonexistent(self):
         """Test showing details of non-existent task."""
@@ -290,6 +294,13 @@ class TestTaskManagement(unittest.TestCase):
         result = self.run_task_manager(["task", "show", "--id", "test-queue-1"])
         self.assertIn("Status: in_progress", result.stdout)
 
+        # Verify started_at timestamp was recorded
+        task_file = self.tasks_root / "test-queue" / "test-queue-1.json"
+        with open(task_file) as f:
+            data = json.load(f)
+        self.assertIsNotNone(data.get("started_at"))
+        self.assertIsNone(data.get("closed_at"))
+
     def test_task_done(self):
         """Test marking a task as done."""
         # Create a task
@@ -308,6 +319,12 @@ class TestTaskManagement(unittest.TestCase):
         # Verify status changed
         result = self.run_task_manager(["task", "show", "--id", "test-queue-1"])
         self.assertIn("Status: done", result.stdout)
+
+        # Verify closed_at timestamp was recorded
+        task_file = self.tasks_root / "test-queue" / "test-queue-1.json"
+        with open(task_file) as f:
+            data = json.load(f)
+        self.assertIsNotNone(data.get("closed_at"))
 
     def test_task_comment_add(self):
         """Test adding comments to a task."""

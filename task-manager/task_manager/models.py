@@ -32,6 +32,8 @@ class Task:
     comments: List[Dict[str, Any]] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
+    started_at: float | None = None
+    closed_at: float | None = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
