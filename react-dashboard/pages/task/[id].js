@@ -70,7 +70,7 @@ export default function TaskPage({ task }) {
     <div className={styles.container}>
       <Navigation />
       <h1>{task.id}</h1>
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <p className={styles.error} role="alert">{error}</p>}
       {success && <p className={styles.success}>Task updated</p>}
       <div className={styles.marginBottom}>
         <label>
