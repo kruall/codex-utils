@@ -1,0 +1,16 @@
+{
+  "id": "TM-5",
+  "title": "Implement caching for task and queue lists",
+  "description": "Cache list results to improve performance with large datasets",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553478.0440648,
+  "updated_at": 1748553484.6664433,
+  "started_at": null,
+  "closed_at": null
+}

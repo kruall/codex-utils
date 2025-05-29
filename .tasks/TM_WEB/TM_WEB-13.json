@@ -1,0 +1,17 @@
+{
+  "id": "TM_WEB-13",
+  "title": "Update Web dashboard for new persistence layer",
+  "description": "Adapt web dashboard to use refactored storage module",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-3",
+      "DEV-19"
+    ]
+  },
+  "created_at": 1748553465.3876405,
+  "updated_at": 1748553489.5653744,
+  "started_at": null,
+  "closed_at": null
+}
