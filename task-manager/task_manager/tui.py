@@ -37,6 +37,22 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body: Vertical | None = None
             self.current_task_id: str | None = None
 
+        def _parse_comment_id(self, cid_str: str) -> int | None:
+            """Helper method to parse comment ID string to integer.
+            
+            Args:
+                cid_str: The comment ID as a string
+                
+            Returns:
+                The comment ID as an integer, or None if parsing fails
+            """
+            if not cid_str:
+                return None
+            try:
+                return int(cid_str)
+            except ValueError:
+                return None
+
         def compose(self) -> ComposeResult:
             yield Header(show_clock=True)
             yield Footer()
@@ -161,10 +177,7 @@ def launch_tui(tm: "TaskManager") -> None:
                 cid = self.query_one("#edit_comment_id", Input).value
                 text = self.query_one("#edit_comment_text", Input).value
                 if cid and text:
-                    try:
-                        cid_int = int(cid)
-                    except ValueError:
-                        cid_int = None
+                    cid_int = self._parse_comment_id(cid)
                     if cid_int is not None:
                         self.manager.task_comment_edit(
                             self.current_task_id, cid_int, text
@@ -175,10 +188,7 @@ def launch_tui(tm: "TaskManager") -> None:
                     raise RuntimeError("Current task ID is not set")
                 cid = self.query_one("#remove_comment_id", Input).value
                 if cid:
-                    try:
-                        cid_int = int(cid)
-                    except ValueError:
-                        cid_int = None
+                    cid_int = self._parse_comment_id(cid)
                     if cid_int is not None:
                         self.manager.task_comment_remove(self.current_task_id, cid_int)
                 self.show_comments(self.current_task_id)
