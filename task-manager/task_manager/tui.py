@@ -2,6 +2,8 @@ import logging
 import time
 from typing import TYPE_CHECKING
 
+from .exceptions import TaskManagerError
+
 if TYPE_CHECKING:
     from .core import TaskManager
 
@@ -73,13 +75,23 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.mount(Button("Quit", id="quit"))
             self.set_focus(self.query_one("#queues"))
 
+        def show_error(self, message: str) -> None:
+            if self.body is None:
+                raise RuntimeError("Body container is not initialized")
+            self.body.mount(Static(f"Error: {message}", classes="error"))
+
         def show_queues(self) -> None:
             if self.body is None:
                 raise RuntimeError("Body container is not initialized")
             self.body.remove_children()
             table: DataTable = DataTable()
             table.add_columns("Name", "Title", "Description")
-            for q in self.manager.queue_list():
+            try:
+                queues = self.manager.queue_list()
+            except TaskManagerError as e:
+                self.show_error(str(e))
+                queues = []
+            for q in queues:
                 table.add_row(q["name"], q["title"], q["description"])
             self.body.mount(table)
             self.set_focus(table)
@@ -95,7 +107,12 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.remove_children()
             table: DataTable = DataTable()
             table.add_columns("ID", "Title", "Status")
-            for t in self.manager.task_list():
+            try:
+                tasks = self.manager.task_list()
+            except TaskManagerError as e:
+                self.show_error(str(e))
+                tasks = []
+            for t in tasks:
                 table.add_row(t["id"], t["title"], t["status"])
             self.body.mount(table)
             self.set_focus(table)
@@ -110,7 +127,11 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.remove_children()
             self.current_task_id = task_id
             self.body.mount(Static(f"Comments for {task_id}", classes="title"))
-            comments = self.manager.task_comment_list(task_id) or []
+            try:
+                comments = self.manager.task_comment_list(task_id) or []
+            except TaskManagerError as e:
+                self.show_error(str(e))
+                comments = []
             for c in comments:
                 created = time.strftime(
                     "%Y-%m-%d %H:%M:%S", time.localtime(c.get("created_at", 0))
@@ -169,7 +190,10 @@ def launch_tui(tm: "TaskManager") -> None:
                     raise RuntimeError("Current task ID is not set")
                 comment = self.query_one("#new_comment", Input).value
                 if comment:
-                    self.manager.task_comment_add(self.current_task_id, comment)
+                    try:
+                        self.manager.task_comment_add(self.current_task_id, comment)
+                    except TaskManagerError as e:
+                        self.show_error(str(e))
                 self.show_comments(self.current_task_id)
             elif button_id == "edit_comment":
                 if self.current_task_id is None:
@@ -179,9 +203,12 @@ def launch_tui(tm: "TaskManager") -> None:
                 if cid and text:
                     cid_int = self._parse_comment_id(cid)
                     if cid_int is not None:
-                        self.manager.task_comment_edit(
-                            self.current_task_id, cid_int, text
-                        )
+                        try:
+                            self.manager.task_comment_edit(
+                                self.current_task_id, cid_int, text
+                            )
+                        except TaskManagerError as e:
+                            self.show_error(str(e))
                 self.show_comments(self.current_task_id)
             elif button_id == "remove_comment":
                 if self.current_task_id is None:
@@ -190,7 +217,10 @@ def launch_tui(tm: "TaskManager") -> None:
                 if cid:
                     cid_int = self._parse_comment_id(cid)
                     if cid_int is not None:
-                        self.manager.task_comment_remove(self.current_task_id, cid_int)
+                        try:
+                            self.manager.task_comment_remove(self.current_task_id, cid_int)
+                        except TaskManagerError as e:
+                            self.show_error(str(e))
                 self.show_comments(self.current_task_id)
             elif button_id == "queue_delete":
                 name = self.query_one("#del_queue_name", Input).value
@@ -213,7 +243,10 @@ def launch_tui(tm: "TaskManager") -> None:
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
                 desc = self.query_one("#q_desc", Input).value
-                self.manager.queue_add(name, title, desc)
+                try:
+                    self.manager.queue_add(name, title, desc)
+                except TaskManagerError as e:
+                    self.show_error(str(e))
                 self.show_queues()
 
     TMApp(tm).run()

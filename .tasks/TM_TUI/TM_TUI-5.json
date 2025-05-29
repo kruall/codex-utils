@@ -18,11 +18,21 @@
       "id": 3,
       "text": "Finished task",
       "created_at": 1748554353.1432557
+    },
+    {
+      "id": 4,
+      "text": "Started implementing exception handling",
+      "created_at": 1748557648.0102353
+    },
+    {
+      "id": 5,
+      "text": "Added exception handling logic",
+      "created_at": 1748557719.351174
     }
   ],
   "links": {},
   "created_at": 1748553499.1068456,
-  "updated_at": 1748554353.1432796,
+  "updated_at": 1748557722.129383,
   "started_at": 1748554267.3341706,
   "closed_at": 1748554350.0818524
 }
