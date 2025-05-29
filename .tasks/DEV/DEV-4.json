@@ -2,14 +2,24 @@
   "id": "DEV-4",
   "title": "Split task_manager.py into modules",
   "description": "Separate core logic and CLI into distinct modules",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Split internal logic and CLI into package files such as core.py and cli.py.",
       "created_at": 1748521727.804441
+    },
+    {
+      "id": 2,
+      "text": "Investigate if this is duplicate of DEV-2",
+      "created_at": 1748522127.6805925
+    },
+    {
+      "id": 3,
+      "text": "Task description duplicates DEV-2. Closing as duplicate.",
+      "created_at": 1748522129.1390028
     }
   ],
   "created_at": 1748521726.3978565,
-  "updated_at": 1748521727.8044817
+  "updated_at": 1748522131.372598
 }
