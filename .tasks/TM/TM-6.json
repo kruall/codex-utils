@@ -2,15 +2,31 @@
   "id": "TM-6",
   "title": "Expand unit tests for error handling",
   "description": "Add tests covering new exceptions and edge cases",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start expanding error handling tests",
+      "created_at": 1748557613.7896876
+    },
+    {
+      "id": 2,
+      "text": "Add internal error handling tests",
+      "created_at": 1748557629.0316865
+    },
+    {
+      "id": 3,
+      "text": "All tests added and passing",
+      "created_at": 1748557666.4187524
+    }
+  ],
   "links": {
     "related": [
       "DEV-19"
     ]
   },
   "created_at": 1748553479.2418346,
-  "updated_at": 1748553485.6469026,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748557666.4187768,
+  "started_at": 1748557611.943019,
+  "closed_at": 1748557663.6237874
 }

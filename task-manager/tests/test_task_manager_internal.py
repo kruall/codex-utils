@@ -14,6 +14,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from task_manager import (
     TaskManager,
     QueueExistsError,
+    QueueNotFoundError,
+    TaskNotFoundError,
+    InvalidFieldError,
+    CommentNotFoundError,
+    LinkNotFoundError,
     StorageError,
 )
 
@@ -273,6 +278,61 @@ class TestTaskManagerInternal(unittest.TestCase):
         self.assertEqual(self.tm._get_next_task_number("q"), 1)
         self.tm.task_add("A", "B", "q")
         self.assertEqual(self.tm._get_next_task_number("q"), 2)
+
+    def test_queue_add_empty_name_internal(self):
+        """Queue name cannot be empty."""
+        with self.assertRaises(ValueError):
+            self.tm.queue_add("", "T", "D")
+
+    def test_queue_delete_nonexistent_internal(self):
+        """Deleting a missing queue raises QueueNotFoundError."""
+        with self.assertRaises(QueueNotFoundError):
+            self.tm.queue_delete("missing")
+
+    def test_task_add_nonexistent_queue_internal(self):
+        """Adding a task to a missing queue raises QueueNotFoundError."""
+        with self.assertRaises(QueueNotFoundError):
+            self.tm.task_add("T", "D", "missing")
+
+    def test_task_show_nonexistent_internal(self):
+        """Showing a non-existent task raises TaskNotFoundError."""
+        with self.assertRaises(TaskNotFoundError):
+            self.tm.task_show("missing-1")
+
+    def test_task_show_invalid_json_internal(self):
+        """Invalid task file content triggers StorageError."""
+        self.tm.queue_add("q", "Queue", "desc")
+        bad_file = Path(self.tasks_root) / "q" / "q-1.json"
+        bad_file.write_text("not json", encoding="utf-8")
+        with self.assertRaises(StorageError):
+            self.tm.task_show("q-1")
+
+    def test_task_update_invalid_field_internal(self):
+        """Invalid field update raises InvalidFieldError."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("T", "D", "q")
+        with self.assertRaises(InvalidFieldError):
+            self.tm.task_update(task_id, "bogus", "v")
+
+    def test_task_comment_remove_not_found_internal(self):
+        """Removing missing comment raises CommentNotFoundError."""
+        self.tm.queue_add("q", "Queue", "desc")
+        task_id = self.tm.task_add("T", "D", "q")
+        with self.assertRaises(CommentNotFoundError):
+            self.tm.task_comment_remove(task_id, 1)
+
+    def test_task_link_remove_not_found_internal(self):
+        """Removing absent link raises LinkNotFoundError."""
+        self.tm.queue_add("q", "Queue", "desc")
+        self.tm.task_add("A", "B", "q")
+        self.tm.task_add("C", "D", "q")
+        with self.assertRaises(LinkNotFoundError):
+            self.tm.task_link_remove("q-1", "q-2")
+
+    def test_task_delete_nonexistent_internal(self):
+        """Deleting a missing task raises TaskNotFoundError."""
+        with self.assertRaises(TaskNotFoundError):
+            self.tm.task_delete("q-99")
 
 
 if __name__ == '__main__':
