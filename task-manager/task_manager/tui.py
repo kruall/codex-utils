@@ -135,8 +135,9 @@ def launch_tui(tm: "TaskManager") -> None:
             elif button_id == "task_delete":
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
-                    self.manager.task_delete(task_id)
-                self.show_tasks()
+                    self.body.mount(Static(f"Are you sure you want to delete task '{task_id}'?", id="confirm_delete"))
+                    self.body.mount(Button("Yes", id="confirm_yes"))
+                    self.body.mount(Button("No", id="confirm_no"))
             elif button_id == "create_queue":
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
