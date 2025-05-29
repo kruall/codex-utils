@@ -79,3 +79,13 @@ Generate an HTML dashboard listing all tasks:
 
 The page is written to `docs/index.html` and can be published with GitHub Pages.
 
+
+### React Dashboard
+A Next.js frontend under `react-dashboard/` renders tasks in both table and kanban views.
+To develop locally:
+```bash
+cd react-dashboard
+npm install
+npm run dev
+```
+Use `npm run build` to generate a static site in `out/` for GitHub Pages deployment.
