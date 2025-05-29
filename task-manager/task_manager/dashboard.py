@@ -48,7 +48,7 @@ def generate_dashboard(tasks_root: str = ".tasks", output: str = "docs/index.htm
 <table>
 <thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Queue</th></tr></thead>
 <tbody>
-{''.join(rows)}
+{'\n'.join(rows)}
 </tbody>
 </table>
 </body>
