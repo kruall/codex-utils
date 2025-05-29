@@ -2,14 +2,29 @@
   "id": "DEV-9",
   "title": "Review tm script",
   "description": "Check pushd/popd usage and handle failures cleanly",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Update tm to ensure clean exit on errors and improve comments.",
       "created_at": 1748521738.6394048
+    },
+    {
+      "id": 2,
+      "text": "Started task and read AGENTS instructions.",
+      "created_at": 1748522073.6515613
+    },
+    {
+      "id": 3,
+      "text": "Implemented cleanup trap for pushd/popd in scripts.",
+      "created_at": 1748522148.013668
+    },
+    {
+      "id": 4,
+      "text": "Finished implementing improvements.",
+      "created_at": 1748522164.5088303
     }
   ],
   "created_at": 1748521737.6656857,
-  "updated_at": 1748521738.6394389
+  "updated_at": 1748522164.5088532
 }
