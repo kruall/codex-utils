@@ -40,10 +40,8 @@ def main() -> int:
         return 0
 
     pr = event["pull_request"]
-    action = event.get("action")
     title = pr.get("title", "")
-    merged = pr.get("merged", False)
-    
+
     # Get base branch SHA to check status before PR
     base_sha = pr.get("base", {}).get("sha")
     if not base_sha:
