@@ -2,7 +2,7 @@
   "id": "DEV-3",
   "title": "Add CI check for PR task status validation",
   "description": "Implement CI workflow to verify that PRs with [<task-id>] format in title have corresponding tasks that were 'todo' or 'in_progress' before PR creation and become 'done' after PR merge. This ensures proper task workflow compliance.",
-  "status": "in_progress",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -41,5 +41,5 @@
     }
   ],
   "created_at": 1748516017.53114,
-  "updated_at": 1748516311.7427423
+  "updated_at": 1748524451.91905
 }
