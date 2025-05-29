@@ -1,0 +1,12 @@
+{
+  "id": "DEV-19",
+  "title": "Code review and refactoring plan for TM core",
+  "description": "Review the core task manager (TM) codebase to identify areas for improvement. Analyze code quality, architecture, performance bottlenecks, and technical debt. Create specific refactoring tasks based on findings.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748553168.43776,
+  "updated_at": 1748553168.43776,
+  "started_at": null,
+  "closed_at": null
+}

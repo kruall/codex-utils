@@ -1,0 +1,12 @@
+{
+  "id": "DEV-21",
+  "title": "Code review and refactoring plan for TM_WEB",
+  "description": "Review the TM_WEB (React dashboard) codebase to identify areas for improvement. Analyze React components, state management, performance optimization, code structure, and user experience. Create specific refactoring tasks for web dashboard improvements.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748553176.382174,
+  "updated_at": 1748553176.382174,
+  "started_at": null,
+  "closed_at": null
+}

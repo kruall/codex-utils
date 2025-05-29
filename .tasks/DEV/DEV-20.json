@@ -1,0 +1,12 @@
+{
+  "id": "DEV-20",
+  "title": "Code review and refactoring plan for TM_TUI",
+  "description": "Review the TM_TUI (terminal user interface) codebase to identify areas for improvement. Analyze UI/UX patterns, code organization, performance issues, and maintainability. Create specific refactoring tasks for TUI improvements.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748553172.1730292,
+  "updated_at": 1748553172.1730292,
+  "started_at": null,
+  "closed_at": null
+}
