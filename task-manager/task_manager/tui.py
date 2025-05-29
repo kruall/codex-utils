@@ -58,6 +58,9 @@ def launch_tui(tm: "TaskManager") -> None:
             for q in self.manager.queue_list():
                 table.add_row(q["name"], q["title"], q["description"])
             self.body.mount(table)
+            # Input and button for deleting a queue
+            self.body.mount(Input(placeholder="Queue name", id="del_queue_name"))
+            self.body.mount(Button("Delete Queue", id="queue_delete"))
             self.body.mount(Button("Add Queue", id="queue_add"))
             self.body.mount(Button("Back", id="main"))
 
@@ -71,6 +74,7 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.mount(table)
             self.body.mount(Input(placeholder="Task ID", id="task_id"))
             self.body.mount(Button("View Comments", id="view_comments"))
+            self.body.mount(Button("Delete Task", id="task_delete"))
             self.body.mount(Button("Back", id="main"))
 
         def show_comments(self, task_id: str) -> None:
@@ -121,6 +125,16 @@ def launch_tui(tm: "TaskManager") -> None:
                 if comment:
                     self.manager.task_comment_add(self.current_task_id, comment)
                 self.show_comments(self.current_task_id)
+            elif button_id == "queue_delete":
+                name = self.query_one("#del_queue_name", Input).value
+                if name:
+                    self.manager.queue_delete(name)
+                self.show_queues()
+            elif button_id == "task_delete":
+                task_id = self.query_one("#task_id", Input).value
+                if task_id:
+                    self.manager.task_delete(task_id)
+                self.show_tasks()
             elif button_id == "create_queue":
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
