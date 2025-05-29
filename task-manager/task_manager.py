@@ -352,6 +352,9 @@ def launch_tui(tm: "TaskManager") -> None:
             yield Footer()
             self.body = Vertical()
             yield self.body
+
+        def on_mount(self) -> None:
+            """Called when the app is mounted and ready."""
             self.show_main()
 
         def show_main(self) -> None:
