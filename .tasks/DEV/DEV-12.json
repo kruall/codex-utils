@@ -1,0 +1,60 @@
+{
+  "id": "DEV-12",
+  "title": "Create GitHub Pages dashboard for task management",
+  "description": "Build a GitHub Pages site that displays current tasks from multiple repositories using GitHub API",
+  "status": "in_progress",
+  "comments": [
+    {
+      "id": 1,
+      "text": "REQUIREMENT: Create a GitHub Pages site that aggregates and displays tasks from multiple repositories",
+      "created_at": 1748524850.048191
+    },
+    {
+      "id": 2,
+      "text": "ARCHITECTURE: Frontend SPA that reads task files via GitHub REST API /repos/{owner}/{repo}/contents/... and generates a convenient table/kanban board",
+      "created_at": 1748524857.647404
+    },
+    {
+      "id": 3,
+      "text": "FEATURES: 1) Read task files from .tasks/ directories across repos 2) Display tasks in table/kanban format 3) Filter by status, queue, repository 4) Edit tasks via GitHub web UI links 5) Create new tasks via GitHub new file URLs",
+      "created_at": 1748524862.8914108
+    },
+    {
+      "id": 4,
+      "text": "TECH STACK: Next.js/React SPA + @octokit/rest for GitHub API + GitHub Pages for hosting + GitHub Actions for optional static generation",
+      "created_at": 1748524866.4310558
+    },
+    {
+      "id": 5,
+      "text": "IMPLEMENTATION PHASES: 1) Setup Next.js project with GitHub Pages deployment 2) Implement GitHub API integration to scan repositories 3) Parse task files and extract metadata 4) Create responsive UI with table and kanban views 5) Add filtering and search functionality 6) Implement edit/create task links to GitHub web UI",
+      "created_at": 1748524870.789284
+    },
+    {
+      "id": 6,
+      "text": "API INTEGRATION: Use GitHub REST API to recursively scan repositories for task files matching pattern ^.tasks/.*\\.json$ and parse task metadata including id, title, status, queue, assignee, due date",
+      "created_at": 1748524875.180592
+    },
+    {
+      "id": 7,
+      "text": "USER EXPERIENCE: Modern, responsive design with dark/light theme support. Kanban board view with drag-and-drop (read-only). Table view with sorting and filtering. Search functionality across all tasks. Repository selector to focus on specific repos.",
+      "created_at": 1748524880.096585
+    },
+    {
+      "id": 8,
+      "text": "AUTHENTICATION: Support GitHub OAuth for accessing private repositories. Store token in sessionStorage. Respect GitHub API rate limits (5000 requests/hour for authenticated users).",
+      "created_at": 1748524883.9278028
+    },
+    {
+      "id": 9,
+      "text": "DEPLOYMENT: Configure GitHub Actions workflow for automatic deployment to GitHub Pages. Support both static site generation and client-side rendering modes. Include environment variables for GitHub App configuration.",
+      "created_at": 1748524887.568955
+    },
+    {
+      "id": 10,
+      "text": "FUTURE ENHANCEMENTS: 1) GraphQL v4 API for better performance 2) Real-time updates via webhooks 3) Mermaid diagrams for task dependencies 4) Bulk operations support 5) Task analytics and reporting 6) Integration with GitHub Issues",
+      "created_at": 1748524892.36869
+    }
+  ],
+  "created_at": 1748524842.33008,
+  "updated_at": 1748524892.368703
+}
