@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ def launch_tui(tm: "TaskManager") -> None:
             super().__init__()
             self.manager = manager
             self.body: Vertical | None = None
+            self.current_task_id: str | None = None
 
         def compose(self) -> ComposeResult:
             yield Header(show_clock=True)
@@ -67,7 +69,26 @@ def launch_tui(tm: "TaskManager") -> None:
             for t in self.manager.task_list():
                 table.add_row(t["id"], t["title"], t["status"])
             self.body.mount(table)
+            self.body.mount(Input(placeholder="Task ID", id="task_id"))
+            self.body.mount(Button("View Comments", id="view_comments"))
             self.body.mount(Button("Back", id="main"))
+
+        def show_comments(self, task_id: str) -> None:
+            assert self.body
+            self.body.remove_children()
+            self.current_task_id = task_id
+            self.body.mount(Static(f"Comments for {task_id}", classes="title"))
+            comments = self.manager.task_comment_list(task_id) or []
+            for c in comments:
+                created = time.strftime(
+                    "%Y-%m-%d %H:%M:%S", time.localtime(c.get("created_at", 0))
+                )
+                self.body.mount(
+                    Static(f"[{c.get('id')}] {created}: {c.get('text')}")
+                )
+            self.body.mount(Input(placeholder="New comment", id="new_comment"))
+            self.body.mount(Button("Add Comment", id="add_comment"))
+            self.body.mount(Button("Back", id="tasks"))
 
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
             button_id = event.button.id
@@ -90,6 +111,16 @@ def launch_tui(tm: "TaskManager") -> None:
                 self.body.mount(desc_in)
                 self.body.mount(Button("Create", id="create_queue"))
                 self.body.mount(Button("Back", id="queues"))
+            elif button_id == "view_comments":
+                task_id = self.query_one("#task_id", Input).value
+                if task_id:
+                    self.show_comments(task_id)
+            elif button_id == "add_comment":
+                assert self.current_task_id
+                comment = self.query_one("#new_comment", Input).value
+                if comment:
+                    self.manager.task_comment_add(self.current_task_id, comment)
+                self.show_comments(self.current_task_id)
             elif button_id == "create_queue":
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
