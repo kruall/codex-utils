@@ -4,6 +4,7 @@ from .core import TaskManager
 from .tui import launch_tui
 from .utils import format_timestamp
 from .dashboard import generate_dashboard
+from .github_api import fetch_github_tasks
 
 __version__ = "0.1.0"
 
@@ -14,6 +15,7 @@ __all__ = [
     "launch_tui",
     "format_timestamp",
     "generate_dashboard",
+    "fetch_github_tasks",
     "main",
     "__version__",
 ]

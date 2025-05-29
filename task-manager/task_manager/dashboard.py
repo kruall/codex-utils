@@ -6,9 +6,15 @@ from pathlib import Path
 import html
 
 from .core import TaskManager
+from .github_api import fetch_github_tasks
 
 
-def generate_dashboard(tasks_root: str = ".tasks", output: str = "docs/index.html") -> Path:
+def generate_dashboard(
+    tasks_root: str = ".tasks",
+    output: str = "docs/index.html",
+    repos: list[str] | None = None,
+    token: str | None = None,
+) -> Path:
     """Create an HTML page listing all tasks.
 
     Parameters
@@ -17,6 +23,10 @@ def generate_dashboard(tasks_root: str = ".tasks", output: str = "docs/index.htm
         Directory containing task queues.
     output:
         Path to the HTML file that will be generated.
+    repos:
+        Optional list of remote repositories to include using GitHub API.
+    token:
+        GitHub token used for authenticated requests when fetching remote tasks.
 
     Returns
     -------
@@ -25,6 +35,8 @@ def generate_dashboard(tasks_root: str = ".tasks", output: str = "docs/index.htm
     """
     tm = TaskManager(tasks_root)
     tasks = tm.task_list()
+    if repos:
+        tasks.extend(fetch_github_tasks(repos, token))
 
     rows = [
         "<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>".format(
