@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-2",
+  "title": "Edit and delete comments in web",
+  "description": "Allow editing and deleting comments from the dashboard",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-2"
+    ]
+  },
+  "created_at": 1748540594.3079424,
+  "updated_at": 1748540609.974294,
+  "started_at": null,
+  "closed_at": null
+}

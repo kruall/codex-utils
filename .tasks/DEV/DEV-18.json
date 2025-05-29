@@ -1,0 +1,23 @@
+{
+  "id": "DEV-18",
+  "title": "Create tasks for deletion/comment features",
+  "description": "Add tasks in TM, TM_TUI, and TM_WEB queues",
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Created tasks in TM, TM_TUI, and TM_WEB queues",
+      "created_at": 1748540636.4972794
+    },
+    {
+      "id": 2,
+      "text": "Closing task after creating tasks for deletion/comment features",
+      "created_at": 1748540904.46206
+    }
+  ],
+  "links": {},
+  "created_at": 1748540631.587383,
+  "updated_at": 1748540904.6041026,
+  "started_at": 1748540634.0282278,
+  "closed_at": 1748540904.6040514
+}
