@@ -4,6 +4,11 @@
 
 The task manager (`./tm`) is used to organize work into queues and tasks. All data is stored in `.tasks/` directory.
 
+**📝 Note**: For detailed task requirements, specifications, and progress updates, use task comments instead of adding them to this file:
+```bash
+./tm task comment add --id <task-id> --comment "Detailed requirement or update"
+```
+
 ### Queue Management
 ```bash
 # List all queues
