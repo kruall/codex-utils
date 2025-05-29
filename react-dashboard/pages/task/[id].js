@@ -52,7 +52,7 @@ export default function TaskPage({ task }) {
         body: JSON.stringify({ id: task.id, updates: { title, status } })
       })
       if (!res.ok) {
-        throw new Error('Request failed')
+        throw new Error(`Request failed: ${res.status} ${res.statusText}`)
       }
       const data = await res.json()
       if (data.task) {
