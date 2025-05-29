@@ -327,3 +327,81 @@ class TaskManager:
 
         return task_data.comments
 
+    def task_link_add(
+        self, task_id: str, target_id: str, link_type: str = "related"
+    ) -> bool:
+        """Add a link between two tasks."""
+        task_data = self._load_task(task_id)
+        target_data = self._load_task(target_id)
+        if not task_data or not target_data:
+            missing = task_id if not task_data else target_id
+            logger.error(f"Error: Task '{missing}' not found")
+            return False
+
+        links = task_data.links.setdefault(link_type, [])
+        if target_id not in links:
+            links.append(target_id)
+
+        target_links = target_data.links.setdefault(link_type, [])
+        if task_id not in target_links:
+            target_links.append(task_id)
+
+        if self._save_task(task_data) and self._save_task(target_data):
+            logger.info(
+                f"Link added between {task_id} and {target_id} (type: {link_type})"
+            )
+            return True
+        logger.error(
+            f"Error: Failed to add link between {task_id} and {target_id}"
+        )
+        return False
+
+    def task_link_remove(
+        self, task_id: str, target_id: str, link_type: str = "related"
+    ) -> bool:
+        """Remove a link between two tasks."""
+        task_data = self._load_task(task_id)
+        target_data = self._load_task(target_id)
+        if not task_data or not target_data:
+            missing = task_id if not task_data else target_id
+            logger.error(f"Error: Task '{missing}' not found")
+            return False
+
+        removed = False
+
+        if target_id in task_data.links.get(link_type, []):
+            task_data.links[link_type].remove(target_id)
+            if not task_data.links[link_type]:
+                del task_data.links[link_type]
+            removed = True
+
+        if task_id in target_data.links.get(link_type, []):
+            target_data.links[link_type].remove(task_id)
+            if not target_data.links[link_type]:
+                del target_data.links[link_type]
+            removed = True
+
+        if not removed:
+            logger.error(
+                f"Error: Link between {task_id} and {target_id} not found"
+            )
+            return False
+
+        if self._save_task(task_data) and self._save_task(target_data):
+            logger.info(
+                f"Link removed between {task_id} and {target_id} (type: {link_type})"
+            )
+            return True
+        logger.error(
+            f"Error: Failed to remove link between {task_id} and {target_id}"
+        )
+        return False
+
+    def task_link_list(self, task_id: str) -> Optional[Dict[str, List[str]]]:
+        """List links for a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            logger.error(f"Error: Task '{task_id}' not found")
+            return None
+        return task_data.links
+

@@ -30,6 +30,7 @@ class Task:
     description: str
     status: str = "todo"
     comments: List[Dict[str, Any]] = field(default_factory=list)
+    links: Dict[str, List[str]] = field(default_factory=dict)
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
     started_at: float | None = None

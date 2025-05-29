@@ -495,6 +495,109 @@ class TestTaskManagement(unittest.TestCase):
         self.assertIn("test-queue-2", result.stdout)
         self.assertIn("test-queue-3", result.stdout)
 
+    def test_task_link_add_list_remove(self):
+        """Test adding, listing, and removing task links."""
+        # Create two tasks
+        self.run_task_manager([
+            "task",
+            "add",
+            "--title",
+            "Task 1",
+            "--description",
+            "Desc",
+            "--queue",
+            "test-queue",
+        ])
+        self.run_task_manager([
+            "task",
+            "add",
+            "--title",
+            "Task 2",
+            "--description",
+            "Desc",
+            "--queue",
+            "test-queue",
+        ])
+
+        # Add link
+        result = self.run_task_manager([
+            "task",
+            "link",
+            "add",
+            "--id",
+            "test-queue-1",
+            "--target-id",
+            "test-queue-2",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(
+            "Link added between test-queue-1 and test-queue-2",
+            result.stdout,
+        )
+
+        # List links
+        result = self.run_task_manager([
+            "task",
+            "link",
+            "list",
+            "--id",
+            "test-queue-1",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("related: test-queue-2", result.stdout)
+
+        # Remove link
+        result = self.run_task_manager([
+            "task",
+            "link",
+            "remove",
+            "--id",
+            "test-queue-1",
+            "--target-id",
+            "test-queue-2",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(
+            "Link removed between test-queue-1 and test-queue-2",
+            result.stdout,
+        )
+
+        # Verify link removed
+        result = self.run_task_manager([
+            "task",
+            "link",
+            "list",
+            "--id",
+            "test-queue-1",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("No links found", result.stdout)
+
+    def test_task_link_nonexistent(self):
+        """Test link operations with non-existent tasks."""
+        self.run_task_manager([
+            "task",
+            "add",
+            "--title",
+            "Task",
+            "--description",
+            "Desc",
+            "--queue",
+            "test-queue",
+        ])
+
+        result = self.run_task_manager([
+            "task",
+            "link",
+            "add",
+            "--id",
+            "test-queue-1",
+            "--target-id",
+            "nonexistent-1",
+        ])
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Error: Task 'nonexistent-1' not found", result.stderr)
+
 
 if __name__ == '__main__':
     unittest.main() 
