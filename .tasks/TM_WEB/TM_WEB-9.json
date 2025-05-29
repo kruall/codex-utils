@@ -2,7 +2,7 @@
   "id": "TM_WEB-9",
   "title": "Replace inline styles with CSS modules",
   "description": "Improve maintainability by migrating component styling to CSS modules",
-  "status": "in_progress",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -21,7 +21,7 @@
     ]
   },
   "created_at": 1748553430.2685616,
-  "updated_at": 1748555828.4713094,
+  "updated_at": 1748556034.241406,
   "started_at": 1748555638.5866306,
-  "closed_at": null
+  "closed_at": 1748556034.2413938
 }
