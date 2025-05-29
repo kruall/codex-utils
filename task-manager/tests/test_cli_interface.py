@@ -13,7 +13,7 @@ class TestCLIInterface(unittest.TestCase):
         """Set up test environment with temporary directory."""
         self.test_dir = tempfile.mkdtemp()
         self.tasks_root = Path(self.test_dir) / "test_tasks"
-        self.task_manager_path = Path(__file__).parent.parent.parent / "task_manager.py"
+        self.task_manager_path = Path(__file__).parent.parent / "task_manager.py"
 
     def tearDown(self):
         """Clean up test environment."""
@@ -60,11 +60,11 @@ class TestCLIInterface(unittest.TestCase):
         self.assertIn("--title", result.stdout)
         self.assertIn("--description", result.stdout)
 
-    def test_task_command_placeholder(self):
-        """Test that task commands show not implemented message."""
+    def test_task_command_implemented(self):
+        """Test that task commands are now implemented."""
         result = self.run_task_manager(["task", "list"])
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("Task management not implemented yet", result.stderr)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("No tasks found", result.stdout)
 
     def test_custom_tasks_root(self):
         """Test using custom tasks root directory."""

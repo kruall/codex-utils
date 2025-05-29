@@ -10,7 +10,7 @@ import sys
 import os
 
 # Add the parent directory to the path to import task_manager
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from task_manager import TaskManager
 
 

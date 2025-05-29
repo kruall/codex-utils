@@ -6,8 +6,9 @@ Task Manager CLI tool for managing queues and tasks.
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 class TaskManager:
@@ -71,6 +72,237 @@ class TaskManager:
             print(f"Error creating queue '{name}': {e}", file=sys.stderr)
             return False
 
+    def _get_next_task_number(self, queue_name: str) -> int:
+        """Get the next available task number for a queue."""
+        queue_dir = self.tasks_root / queue_name
+        if not queue_dir.exists():
+            return 1
+        
+        max_num = 0
+        for task_file in queue_dir.glob(f"{queue_name}-*.json"):
+            try:
+                # Extract number from filename like "queue-name-123.json"
+                filename = task_file.stem
+                if filename.startswith(f"{queue_name}-"):
+                    num_str = filename[len(queue_name) + 1:]
+                    num = int(num_str)
+                    max_num = max(max_num, num)
+            except ValueError:
+                continue
+        
+        return max_num + 1
+
+    def task_add(self, title: str, description: str, queue: str) -> Optional[str]:
+        """Add a new task to a queue."""
+        queue_dir = self.tasks_root / queue
+        
+        if not queue_dir.exists():
+            print(f"Error: Queue '{queue}' does not exist", file=sys.stderr)
+            return None
+        
+        try:
+            task_num = self._get_next_task_number(queue)
+            task_id = f"{queue}-{task_num}"
+            task_file = queue_dir / f"{task_id}.json"
+            
+            task_data = {
+                'id': task_id,
+                'title': title,
+                'description': description,
+                'status': 'todo',
+                'comments': [],
+                'created_at': time.time(),
+                'updated_at': time.time()
+            }
+            
+            with open(task_file, 'w') as f:
+                json.dump(task_data, f, indent=2)
+            
+            print(f"Task '{task_id}' created successfully")
+            return task_id
+            
+        except (OSError, IOError) as e:
+            print(f"Error creating task: {e}", file=sys.stderr)
+            return None
+
+    def _find_task_file(self, task_id: str) -> Optional[Path]:
+        """Find the task file for a given task ID."""
+        if '-' not in task_id:
+            return None
+        
+        queue_name = task_id.rsplit('-', 1)[0]
+        queue_dir = self.tasks_root / queue_name
+        task_file = queue_dir / f"{task_id}.json"
+        
+        if task_file.exists():
+            return task_file
+        return None
+
+    def _load_task(self, task_id: str) -> Optional[Dict]:
+        """Load task data from file."""
+        task_file = self._find_task_file(task_id)
+        if not task_file:
+            return None
+        
+        try:
+            with open(task_file, 'r') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return None
+
+    def _save_task(self, task_data: Dict) -> bool:
+        """Save task data to file."""
+        task_id = task_data['id']
+        task_file = self._find_task_file(task_id)
+        if not task_file:
+            return False
+        
+        try:
+            task_data['updated_at'] = time.time()
+            with open(task_file, 'w') as f:
+                json.dump(task_data, f, indent=2)
+            return True
+        except (OSError, IOError):
+            return False
+
+    def task_list(self, status: Optional[str] = None, queue: Optional[str] = None) -> List[Dict]:
+        """List tasks with optional filtering."""
+        tasks = []
+        
+        # Determine which queues to search
+        if queue:
+            queue_dirs = [self.tasks_root / queue] if (self.tasks_root / queue).exists() else []
+        else:
+            queue_dirs = [d for d in self.tasks_root.iterdir() if d.is_dir()]
+        
+        for queue_dir in queue_dirs:
+            for task_file in queue_dir.glob("*.json"):
+                if task_file.name == "meta.json":
+                    continue
+                
+                try:
+                    with open(task_file, 'r') as f:
+                        task_data = json.load(f)
+                    
+                    # Filter by status if specified
+                    if status and task_data.get('status') != status:
+                        continue
+                    
+                    tasks.append(task_data)
+                except (json.JSONDecodeError, IOError):
+                    continue
+        
+        # Sort by creation time
+        tasks.sort(key=lambda t: t.get('created_at', 0))
+        return tasks
+
+    def task_show(self, task_id: str) -> Optional[Dict]:
+        """Show detailed information about a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            return None
+        
+        return task_data
+
+    def task_update(self, task_id: str, field: str, value: str) -> bool:
+        """Update a specific field of a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            return False
+        
+        # Validate field
+        allowed_fields = ['title', 'description', 'status']
+        if field not in allowed_fields:
+            print(f"Error: Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}", file=sys.stderr)
+            return False
+        
+        task_data[field] = value
+        
+        if self._save_task(task_data):
+            print(f"Task '{task_id}' updated successfully")
+            return True
+        else:
+            print(f"Error: Failed to update task '{task_id}'", file=sys.stderr)
+            return False
+
+    def task_start(self, task_id: str) -> bool:
+        """Start a task (set status to 'in_progress')."""
+        return self.task_update(task_id, 'status', 'in_progress')
+
+    def task_done(self, task_id: str) -> bool:
+        """Mark a task as done (set status to 'done')."""
+        return self.task_update(task_id, 'status', 'done')
+
+    def task_comment_add(self, task_id: str, comment: str) -> bool:
+        """Add a comment to a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            return False
+        
+        # Generate comment ID
+        existing_ids = [c.get('id', 0) for c in task_data.get('comments', [])]
+        comment_id = max(existing_ids, default=0) + 1
+        
+        comment_data = {
+            'id': comment_id,
+            'text': comment,
+            'created_at': time.time()
+        }
+        
+        if 'comments' not in task_data:
+            task_data['comments'] = []
+        
+        task_data['comments'].append(comment_data)
+        
+        if self._save_task(task_data):
+            print(f"Comment added to task '{task_id}' with ID {comment_id}")
+            return True
+        else:
+            print(f"Error: Failed to add comment to task '{task_id}'", file=sys.stderr)
+            return False
+
+    def task_comment_remove(self, task_id: str, comment_id: int) -> bool:
+        """Remove a comment from a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            return False
+        
+        comments = task_data.get('comments', [])
+        original_count = len(comments)
+        
+        # Remove comment with matching ID
+        task_data['comments'] = [c for c in comments if c.get('id') != comment_id]
+        
+        if len(task_data['comments']) == original_count:
+            print(f"Error: Comment with ID {comment_id} not found in task '{task_id}'", file=sys.stderr)
+            return False
+        
+        if self._save_task(task_data):
+            print(f"Comment {comment_id} removed from task '{task_id}'")
+            return True
+        else:
+            print(f"Error: Failed to remove comment from task '{task_id}'", file=sys.stderr)
+            return False
+
+    def task_comment_list(self, task_id: str) -> Optional[List[Dict]]:
+        """List all comments for a task."""
+        task_data = self._load_task(task_id)
+        if not task_data:
+            print(f"Error: Task '{task_id}' not found", file=sys.stderr)
+            return None
+        
+        return task_data.get('comments', [])
+
+
+def format_timestamp(timestamp: float) -> str:
+    """Format timestamp for display."""
+    import datetime
+    return datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
 
 def main():
     parser = argparse.ArgumentParser(description="Task Manager CLI")
@@ -92,7 +324,7 @@ def main():
     queue_add_parser.add_argument("--title", required=True, help="Queue title")
     queue_add_parser.add_argument("--description", required=True, help="Queue description")
     
-    # Task commands (placeholder for future implementation)
+    # Task commands
     task_parser = subparsers.add_parser("task", help="Task management")
     task_subparsers = task_parser.add_subparsers(dest="task_action", help="Task actions")
     
@@ -107,10 +339,15 @@ def main():
     task_add_parser.add_argument("--description", required=True, help="Task description")
     task_add_parser.add_argument("--queue", required=True, help="Queue name")
     
+    # task show
+    task_show_parser = task_subparsers.add_parser("show", help="Show task details")
+    task_show_parser.add_argument("--id", required=True, help="Task ID")
+    
     # task update
     task_update_parser = task_subparsers.add_parser("update", help="Update a task")
     task_update_parser.add_argument("--id", required=True, help="Task ID")
-    task_update_parser.add_argument("--field", help="Field to update")
+    task_update_parser.add_argument("--field", required=True, help="Field to update")
+    task_update_parser.add_argument("--value", required=True, help="New value")
     
     # task start
     task_start_parser = task_subparsers.add_parser("start", help="Start a task")
@@ -119,6 +356,24 @@ def main():
     # task done
     task_done_parser = task_subparsers.add_parser("done", help="Mark task as done")
     task_done_parser.add_argument("--id", required=True, help="Task ID")
+    
+    # task comment commands
+    task_comment_parser = task_subparsers.add_parser("comment", help="Task comment management")
+    task_comment_subparsers = task_comment_parser.add_subparsers(dest="comment_action", help="Comment actions")
+    
+    # task comment add
+    task_comment_add_parser = task_comment_subparsers.add_parser("add", help="Add a comment to task")
+    task_comment_add_parser.add_argument("--id", required=True, help="Task ID")
+    task_comment_add_parser.add_argument("--comment", required=True, help="Comment text")
+    
+    # task comment remove
+    task_comment_remove_parser = task_comment_subparsers.add_parser("remove", help="Remove a comment from task")
+    task_comment_remove_parser.add_argument("--id", required=True, help="Task ID")
+    task_comment_remove_parser.add_argument("--comment-id", type=int, required=True, help="Comment ID")
+    
+    # task comment list
+    task_comment_list_parser = task_comment_subparsers.add_parser("list", help="List task comments")
+    task_comment_list_parser.add_argument("--id", required=True, help="Task ID")
     
     args = parser.parse_args()
     
@@ -148,8 +403,86 @@ def main():
             return 1
     
     elif args.command == "task":
-        print("Task management not implemented yet", file=sys.stderr)
-        return 1
+        if args.task_action == "list":
+            tasks = tm.task_list(args.status, args.queue)
+            if not tasks:
+                print("No tasks found")
+            else:
+                print(f"{'ID':<15} {'Title':<30} {'Status':<12} {'Queue':<15} {'Created'}")
+                print("-" * 90)
+                for task in tasks:
+                    queue_name = task['id'].rsplit('-', 1)[0]
+                    created = format_timestamp(task.get('created_at', 0))
+                    print(f"{task['id']:<15} {task['title']:<30} {task['status']:<12} {queue_name:<15} {created}")
+        
+        elif args.task_action == "add":
+            task_id = tm.task_add(args.title, args.description, args.queue)
+            return 0 if task_id else 1
+        
+        elif args.task_action == "show":
+            task_data = tm.task_show(args.id)
+            if task_data:
+                print(f"ID: {task_data['id']}")
+                print(f"Title: {task_data['title']}")
+                print(f"Description: {task_data['description']}")
+                print(f"Status: {task_data['status']}")
+                print(f"Created: {format_timestamp(task_data.get('created_at', 0))}")
+                print(f"Updated: {format_timestamp(task_data.get('updated_at', 0))}")
+                
+                comments = task_data.get('comments', [])
+                if comments:
+                    print(f"\nComments ({len(comments)}):")
+                    for comment in comments:
+                        created = format_timestamp(comment.get('created_at', 0))
+                        print(f"  [{comment['id']}] {created}: {comment['text']}")
+                else:
+                    print("\nNo comments")
+                return 0
+            else:
+                return 1
+        
+        elif args.task_action == "update":
+            success = tm.task_update(args.id, args.field, args.value)
+            return 0 if success else 1
+        
+        elif args.task_action == "start":
+            success = tm.task_start(args.id)
+            return 0 if success else 1
+        
+        elif args.task_action == "done":
+            success = tm.task_done(args.id)
+            return 0 if success else 1
+        
+        elif args.task_action == "comment":
+            if args.comment_action == "add":
+                success = tm.task_comment_add(args.id, args.comment)
+                return 0 if success else 1
+            
+            elif args.comment_action == "remove":
+                success = tm.task_comment_remove(args.id, getattr(args, 'comment_id'))
+                return 0 if success else 1
+            
+            elif args.comment_action == "list":
+                comments = tm.task_comment_list(args.id)
+                if comments is not None:
+                    if not comments:
+                        print("No comments found")
+                    else:
+                        print(f"Comments for task {args.id}:")
+                        for comment in comments:
+                            created = format_timestamp(comment.get('created_at', 0))
+                            print(f"  [{comment['id']}] {created}: {comment['text']}")
+                    return 0
+                else:
+                    return 1
+            
+            else:
+                task_comment_parser.print_help()
+                return 1
+        
+        else:
+            task_parser.print_help()
+            return 1
     
     else:
         parser.print_help()

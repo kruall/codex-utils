@@ -14,7 +14,7 @@ class TestQueueManagement(unittest.TestCase):
         """Set up test environment with temporary directory."""
         self.test_dir = tempfile.mkdtemp()
         self.tasks_root = Path(self.test_dir) / "test_tasks"
-        self.task_manager_path = Path(__file__).parent.parent.parent / "task_manager.py"
+        self.task_manager_path = Path(__file__).parent.parent / "task_manager.py"
 
     def tearDown(self):
         """Clean up test environment."""
