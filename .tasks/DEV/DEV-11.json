@@ -1,0 +1,15 @@
+{
+  "id": "DEV-11",
+  "title": "Add --version option",
+  "description": "Show version and config path via CLI",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Support output of CLI version and tasks directory.",
+      "created_at": 1748521742.468148
+    }
+  ],
+  "created_at": 1748521741.5078592,
+  "updated_at": 1748521742.4681802
+}

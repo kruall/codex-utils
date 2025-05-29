@@ -1,0 +1,15 @@
+{
+  "id": "DEV-7",
+  "title": "Implement logging",
+  "description": "Switch from print statements to logging with levels",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Use logging module with info/warning/error levels instead of print.",
+      "created_at": 1748521733.388382
+    }
+  ],
+  "created_at": 1748521732.5266454,
+  "updated_at": 1748521733.3884168
+}

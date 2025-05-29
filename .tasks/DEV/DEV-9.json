@@ -1,0 +1,15 @@
+{
+  "id": "DEV-9",
+  "title": "Review tm script",
+  "description": "Check pushd/popd usage and handle failures cleanly",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Update tm to ensure clean exit on errors and improve comments.",
+      "created_at": 1748521738.6394048
+    }
+  ],
+  "created_at": 1748521737.6656857,
+  "updated_at": 1748521738.6394389
+}
