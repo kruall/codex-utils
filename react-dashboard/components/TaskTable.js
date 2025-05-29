@@ -1,13 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+
 
 export default function TaskTable({ tasks }) {
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(0)
+  const [statusFilter, setStatusFilter] = useState('')
+  const [queueFilter, setQueueFilter] = useState('')
+  const [search, setSearch] = useState('')
 
-  const pageCount = Math.ceil(tasks.length / pageSize)
+  const queues = useMemo(
+    () => Array.from(new Set(tasks.map(t => (t.id || '').split('-')[0]))),
+    [tasks]
+  )
+
+  const filteredTasks = tasks.filter(t => {
+    if (statusFilter && t.status !== statusFilter) return false
+    if (queueFilter && !(t.id || '').startsWith(queueFilter + '-')) return false
+    if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
+    return true
+  })
+
+  const pageCount = Math.ceil(filteredTasks.length / pageSize)
   const start = page * pageSize
-  const pagedTasks = tasks.slice(start, start + pageSize)
+  const pagedTasks = filteredTasks.slice(start, start + pageSize)
 
   const handlePrev = () => setPage(p => Math.max(0, p - 1))
   const handleNext = () => setPage(p => Math.min(pageCount - 1, p + 1))
@@ -16,10 +32,53 @@ export default function TaskTable({ tasks }) {
     setPage(0)
   }
 
+  useEffect(() => {
+    setPage(0)
+  }, [statusFilter, queueFilter, search])
+
   return (
     <div>
-      <div style={{ marginBottom: 8 }}>
+      <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
         <label>
+          Preset:
+          <select onChange={e => {
+            const preset = e.target.value
+            if (preset === 'todo' || preset === 'in_progress' || preset === 'done') {
+              setStatusFilter(preset)
+            } else {
+              setStatusFilter('')
+            }
+            setQueueFilter('')
+          }} style={{ marginLeft: 4 }}>
+            <option value="all">All</option>
+            <option value="todo">Todo</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+        <label>
+          Status:
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ marginLeft: 4 }}>
+            <option value="">All</option>
+            <option value="todo">Todo</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+        <label>
+          Queue:
+          <select value={queueFilter} onChange={e => setQueueFilter(e.target.value)} style={{ marginLeft: 4 }}>
+            <option value="">All</option>
+            {queues.map(q => (
+              <option key={q} value={q}>{q}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Search:
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} style={{ marginLeft: 4 }} />
+        </label>
+        <label style={{ marginLeft: 'auto' }}>
           Page size:
           <select value={pageSize} onChange={handlePageSizeChange} style={{ marginLeft: 4 }}>
             <option value={5}>5</option>
