@@ -2,14 +2,24 @@
   "id": "DEV-5",
   "title": "Use dataclasses for Task and Queue",
   "description": "Create dataclass models for serializing tasks and queues",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Introduce dataclasses for Task and Queue classes to simplify storage.",
       "created_at": 1748521729.700304
+    },
+    {
+      "id": 2,
+      "text": "Start implementing dataclasses for Task and Queue",
+      "created_at": 1748522075.0030138
+    },
+    {
+      "id": 3,
+      "text": "Implement dataclasses and update core",
+      "created_at": 1748522197.4400792
     }
   ],
   "created_at": 1748521728.8537605,
-  "updated_at": 1748521729.7003374
+  "updated_at": 1748522198.414399
 }
