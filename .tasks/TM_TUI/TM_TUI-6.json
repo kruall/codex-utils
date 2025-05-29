@@ -1,0 +1,12 @@
+{
+  "id": "TM_TUI-6",
+  "title": "Add tests for TUI",
+  "description": "Use textual's test utilities to cover basic workflows",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748553504.270316,
+  "updated_at": 1748553504.2703166,
+  "started_at": null,
+  "closed_at": null
+}
