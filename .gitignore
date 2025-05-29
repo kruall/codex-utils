@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Node build artifacts
+react-dashboard/node_modules/
+react-dashboard/out/
