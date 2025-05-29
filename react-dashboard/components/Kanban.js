@@ -1,4 +1,5 @@
 import React from 'react'
+import useTasks from '../hooks/useTasks'
 import styles from './Kanban.module.css'
 
 function Column({ title, tasks }) {
@@ -16,7 +17,8 @@ function Column({ title, tasks }) {
   )
 }
 
-export default function Kanban({ tasks }) {
+export default function Kanban() {
+  const tasks = useTasks()
   const columns = {
     todo: tasks.filter(t => t.status === 'todo'),
     in_progress: tasks.filter(t => t.status === 'in_progress'),
