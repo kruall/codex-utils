@@ -35,14 +35,19 @@ QUEUE_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
 }
 
 
+def print_queue_help(args: argparse.Namespace) -> None:
+    """Print the help message for the queue command."""
+    print(args.parser_queue.format_help())
+
+
 def handle_queue(args: argparse.Namespace, tm: TaskManager) -> int:
     action = args.queue_action
     if not action:
-        print(args.parser_queue.format_help())
+        print_queue_help(args)
         return 1
     func = QUEUE_ACTIONS.get(action)
     if not func:
-        print(args.parser_queue.format_help())
+        print_queue_help(args)
         return 1
     return func(args, tm)
 
@@ -112,7 +117,7 @@ def comment_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
 
 
 def comment_remove_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_comment_remove(args.id, getattr(args, 'comment_id'))
+    success = tm.task_comment_remove(args.id, args.comment_id)
     return 0 if success else 1
 
 
