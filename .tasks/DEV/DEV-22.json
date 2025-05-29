@@ -1,0 +1,16 @@
+{
+  "id": "DEV-22",
+  "title": "Add React testing to CI pipeline",
+  "description": "Integrate React testing into the continuous integration pipeline. Configure automated test execution, coverage reporting, and quality gates for React components in TM_WEB.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-17"
+    ]
+  },
+  "created_at": 1748556909.140626,
+  "updated_at": 1748556919.824061,
+  "started_at": null,
+  "closed_at": null
+}
