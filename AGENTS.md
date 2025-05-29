@@ -1,6 +1,6 @@
-#### Task Management
+## Task Management
 
-## Basic Usage
+### Basic Usage
 
 The task manager (`./tm`) is used to organize work into queues and tasks. All data is stored in `.tasks/` directory.
 
@@ -9,7 +9,25 @@ The task manager (`./tm`) is used to organize work into queues and tasks. All da
 ./tm task comment add --id <task-id> --comment "Detailed requirement or update"
 ```
 
-### Queue Management
+### Available Interfaces
+
+The task manager provides multiple interfaces for different use cases:
+
+- **TM (CLI)**: Command-line interface for scripting and automation (`./tm`)
+- **TM_TUI**: Interactive terminal UI for visual task management (`./tm ui`)
+- **TM_WEB**: React-based web dashboard for browser access (`cd react-dashboard && npm run dev`)
+
+**⚠️ IMPORTANT**: Any serious structural changes to TM must create corresponding tasks in TM_TUI and TM_WEB queues with links to the original task:
+```bash
+# Example: If working on task TM-1, create linked tasks:
+./tm task add --title "Update TUI for new TM feature" --queue TM_TUI --description "Adapt TUI interface for changes in TM-1"
+./tm task link add --id TM_TUI-X --target-id TM-1
+
+./tm task add --title "Update Web dashboard for new TM feature" --queue TM_WEB --description "Adapt web interface for changes in TM-1"
+./tm task link add --id TM_WEB-X --target-id TM-1
+```
+
+#### Queue Management
 ```bash
 # List all queues
 ./tm queue list
@@ -18,7 +36,7 @@ The task manager (`./tm`) is used to organize work into queues and tasks. All da
 ./tm queue add --name "feature-queue" --title "Feature Development" --description "Queue for new features"
 ```
 
-### Task Management
+#### Task Management
 ```bash
 # List all tasks
 ./tm task list
@@ -44,7 +62,7 @@ The task manager (`./tm`) is used to organize work into queues and tasks. All da
 ./tm task done --id feature-queue-1
 ```
 
-### Comment System
+#### Comment System
 ```bash
 # Add a comment to a task
 ./tm task comment add --id feature-queue-1 --comment "Started implementation"
@@ -54,6 +72,18 @@ The task manager (`./tm`) is used to organize work into queues and tasks. All da
 
 # Remove a specific comment
 ./tm task comment remove --id feature-queue-1 --comment-id 1
+```
+
+#### Task Links
+```bash
+# Add a related link between tasks
+./tm task link add --id feature-queue-1 --target-id feature-queue-2
+
+# List links for a task
+./tm task link list --id feature-queue-1
+
+# Remove a link
+./tm task link remove --id feature-queue-1 --target-id feature-queue-2
 ```
 
 ### Task Workflow
@@ -66,7 +96,7 @@ The task manager (`./tm`) is used to organize work into queues and tasks. All da
 
 #### PR Instructions
 
-* Title format: `[<task-id>] <Concise description>`.
+* Title format: `[<task-id>] <Task title>`.
 * PR description must include:
 
   1. **What** changed and **why**.
