@@ -104,6 +104,13 @@ def launch_tui(tm: "TaskManager") -> None:
                 )
             self.body.mount(Input(placeholder="New comment", id="new_comment"))
             self.body.mount(Button("Add Comment", id="add_comment"))
+            # Inputs for editing a comment
+            self.body.mount(Input(placeholder="Comment ID", id="edit_comment_id"))
+            self.body.mount(Input(placeholder="Updated text", id="edit_comment_text"))
+            self.body.mount(Button("Edit Comment", id="edit_comment"))
+            # Inputs for removing a comment
+            self.body.mount(Input(placeholder="Comment ID", id="remove_comment_id"))
+            self.body.mount(Button("Remove Comment", id="remove_comment"))
             self.body.mount(Button("Back", id="tasks"))
 
         def action_queues(self) -> None:
@@ -147,6 +154,33 @@ def launch_tui(tm: "TaskManager") -> None:
                 comment = self.query_one("#new_comment", Input).value
                 if comment:
                     self.manager.task_comment_add(self.current_task_id, comment)
+                self.show_comments(self.current_task_id)
+            elif button_id == "edit_comment":
+                if self.current_task_id is None:
+                    raise RuntimeError("Current task ID is not set")
+                cid = self.query_one("#edit_comment_id", Input).value
+                text = self.query_one("#edit_comment_text", Input).value
+                if cid and text:
+                    try:
+                        cid_int = int(cid)
+                    except ValueError:
+                        cid_int = None
+                    if cid_int is not None:
+                        self.manager.task_comment_edit(
+                            self.current_task_id, cid_int, text
+                        )
+                self.show_comments(self.current_task_id)
+            elif button_id == "remove_comment":
+                if self.current_task_id is None:
+                    raise RuntimeError("Current task ID is not set")
+                cid = self.query_one("#remove_comment_id", Input).value
+                if cid:
+                    try:
+                        cid_int = int(cid)
+                    except ValueError:
+                        cid_int = None
+                    if cid_int is not None:
+                        self.manager.task_comment_remove(self.current_task_id, cid_int)
                 self.show_comments(self.current_task_id)
             elif button_id == "queue_delete":
                 name = self.query_one("#del_queue_name", Input).value

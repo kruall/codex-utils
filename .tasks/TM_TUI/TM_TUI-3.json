@@ -2,15 +2,31 @@
   "id": "TM_TUI-3",
   "title": "Edit and remove comments",
   "description": "Allow editing and deleting comments from the TUI",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start work on TM_TUI-3",
+      "created_at": 1748555689.4304013
+    },
+    {
+      "id": 2,
+      "text": "Add edit and remove comment actions",
+      "created_at": 1748555768.2067528
+    },
+    {
+      "id": 3,
+      "text": "Run tests and style checks",
+      "created_at": 1748555770.1937706
+    }
+  ],
   "links": {
     "related": [
       "TM-2"
     ]
   },
   "created_at": 1748540588.2582066,
-  "updated_at": 1748540609.028882,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748555771.9582553,
+  "started_at": 1748555687.635283,
+  "closed_at": 1748555771.9582314
 }
