@@ -19,6 +19,7 @@ The dashboard reads local task files during build time using `getStaticProps`.
 - `/table` - task list view
 - `/kanban` - kanban board view
 - `/todo` - page showing only tasks with a `todo` status
+- `/task/[id]` - view and edit an individual task
 
 To generate a static site for GitHub Pages run:
 
