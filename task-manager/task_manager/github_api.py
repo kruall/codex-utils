@@ -36,7 +36,10 @@ def fetch_github_tasks(repos: List[str], token: Optional[str] = None) -> List[Di
             req.add_header("Authorization", f"token {token}")
         try:
             with urlopen(req) as resp:
-                dir_listing = json.load(resp)
+                try:
+                    dir_listing = json.load(resp)
+                except json.JSONDecodeError:
+                    continue
         except URLError:
             continue
 
