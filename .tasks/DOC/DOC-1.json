@@ -2,8 +2,19 @@
   "id": "DOC-1",
   "title": "Make documentation tm",
   "description": "Need to make documentation about cli api",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Patched init_venv to allow offline use",
+      "created_at": 1748512521.5275545
+    },
+    {
+      "id": 2,
+      "text": "Wrote README with tm CLI instructions",
+      "created_at": 1748512522.802094
+    }
+  ],
   "created_at": 1748511306.164309,
-  "updated_at": 1748511306.16431
+  "updated_at": 1748512523.909568
 }

@@ -44,7 +44,16 @@ class TaskManager:
             return False
         
         queue_dir = self.tasks_root / name
-        
+
+        # Check write permissions on tasks root
+        try:
+            if self.tasks_root.stat().st_mode & 0o222 == 0:
+                print(f"Error creating queue '{name}': Permission denied", file=sys.stderr)
+                return False
+        except OSError as e:
+            print(f"Error creating queue '{name}': {e}", file=sys.stderr)
+            return False
+
         try:
             if queue_dir.exists():
                 print(f"Error: Queue '{name}' already exists", file=sys.stderr)
