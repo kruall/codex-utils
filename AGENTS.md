@@ -1,3 +1,7 @@
+## AI Agent Requirements
+
+**🤖 CRITICAL REQUIREMENT**: All AI agents working on this project must conduct their reasoning, thinking, and internal analysis in English. This ensures consistency and clarity across all development activities.
+
 ## Task Management
 
 ### Basic Usage
