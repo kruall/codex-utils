@@ -149,6 +149,13 @@ class TestCLIInterface(unittest.TestCase):
         self.assertEqual(meta['title'], long_string)
         self.assertEqual(meta['description'], long_string)
 
+    def test_version_option(self):
+        """Test the --version option outputs version and tasks directory."""
+        result = self.run_task_manager(["--version"])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("version", result.stdout.lower())
+        self.assertIn(str(self.tasks_root.resolve()), result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main() 
