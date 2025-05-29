@@ -115,7 +115,9 @@ class TaskManager:
 
             task_obj = Task(id=task_id, title=title, description=description)
 
-            save_json(task_file, task_obj.to_dict())
+            if not save_json(task_file, task_obj.to_dict()):
+                log_error(f"Error: Failed to save task '{task_id}' to file")
+                return None
 
             logger.info(f"Task '{task_id}' created successfully")
             return task_id
