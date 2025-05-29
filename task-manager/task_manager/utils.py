@@ -47,5 +47,10 @@ def setup_logging(level: int = logging.INFO) -> None:
     logger.addHandler(stderr_handler)
 
 
+def log_error(message: str) -> None:
+    """Log an error message using the root logger."""
+    logging.getLogger(__name__).error(message)
+
+
 
 
