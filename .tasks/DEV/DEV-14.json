@@ -1,0 +1,15 @@
+{
+  "id": "DEV-14",
+  "title": "Create React dashboard frontend",
+  "description": "Use Next.js to render tasks in kanban and table views",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Build React components for task table and kanban board",
+      "created_at": 1748525155.4904478
+    }
+  ],
+  "created_at": 1748525154.3372107,
+  "updated_at": 1748525155.4904807
+}

@@ -1,0 +1,15 @@
+{
+  "id": "DEV-15",
+  "title": "Setup GitHub Pages deployment",
+  "description": "Use GitHub Actions to publish dashboard",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Create workflow to deploy docs/ directory to GitHub Pages",
+      "created_at": 1748525157.5010235
+    }
+  ],
+  "created_at": 1748525156.492567,
+  "updated_at": 1748525157.5010588
+}

@@ -70,3 +70,12 @@ Set `TM_NO_INSTALL=1` when invoking the script to skip package installation in o
 TM_NO_INSTALL=1 ./tm task list
 ```
 
+### Static Dashboard
+Generate an HTML dashboard listing all tasks:
+
+```bash
+./tm dashboard
+```
+
+The page is written to `docs/index.html` and can be published with GitHub Pages.
+
