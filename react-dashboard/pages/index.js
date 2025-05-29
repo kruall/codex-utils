@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import TaskTable from '../components/TaskTable'
 import Kanban from '../components/Kanban'
+import Navigation from '../components/Navigation'
 
 export async function getStaticProps() {
   const tasksDir = path.join(process.cwd(), '..', '.tasks')
@@ -28,6 +29,7 @@ export async function getStaticProps() {
 export default function Home({ tasks }) {
   return (
     <div style={{ padding: 16 }}>
+      <Navigation />
       <h1>Task Dashboard</h1>
       <h2>Table View</h2>
       <TaskTable tasks={tasks} />

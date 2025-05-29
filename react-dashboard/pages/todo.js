@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import TaskTable from '../components/TaskTable'
+import Navigation from '../components/Navigation'
 
 export async function getStaticProps() {
   const tasksDir = path.join(process.cwd(), '..', '.tasks')
@@ -27,6 +28,7 @@ export async function getStaticProps() {
 export default function TodoPage({ tasks }) {
   return (
     <div style={{ padding: 16 }}>
+      <Navigation />
       <h1>Todo Tasks</h1>
       <TaskTable tasks={tasks} />
     </div>
