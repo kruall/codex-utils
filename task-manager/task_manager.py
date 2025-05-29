@@ -9,7 +9,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 
 class TaskManager:
@@ -46,10 +46,16 @@ class TaskManager:
         
         queue_dir = self.tasks_root / name
 
-        # Check write permissions on tasks root
+        # Check write permissions on tasks root by inspecting mode bits
         try:
-            if not os.access(self.tasks_root, os.W_OK):
-                print(f"Error creating queue '{name}': Permission denied", file=sys.stderr)
+            import stat
+            mode = os.stat(self.tasks_root).st_mode
+            write_bits = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
+            if not (mode & write_bits):
+                print(
+                    f"Error creating queue '{name}': Permission denied",
+                    file=sys.stderr,
+                )
                 return False
         except OSError as e:
             print(f"Error creating queue '{name}': {e}", file=sys.stderr)
@@ -314,12 +320,109 @@ def format_timestamp(timestamp: float) -> str:
     return datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
 
+def launch_tui(tm: "TaskManager") -> None:
+    """Launch the Textual TUI for the task manager."""
+    if TYPE_CHECKING:  # pragma: no cover - type hints only
+        from textual.app import App, ComposeResult  # type: ignore
+        from textual.widgets import Header, Footer, Button, Static, Input, DataTable  # type: ignore
+        from textual.containers import Vertical  # type: ignore
+
+    try:
+        from textual.app import App, ComposeResult  # type: ignore
+        from textual.widgets import Header, Footer, Button, Static, Input, DataTable  # type: ignore
+        from textual.containers import Vertical  # type: ignore
+    except Exception:  # pragma: no cover - optional dependency
+        print(
+            "Textual is required for the UI. Install with 'pip install textual'",
+            file=sys.stderr,
+        )
+        return
+
+    class TMApp(App):
+        TITLE = "Task Manager"
+        BINDINGS = [("q", "quit", "Quit")]
+
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__()
+            self.manager = manager
+            self.body: Vertical | None = None
+
+        def compose(self) -> ComposeResult:
+            yield Header(show_clock=True)
+            yield Footer()
+            self.body = Vertical()
+            yield self.body
+            self.show_main()
+
+        def show_main(self) -> None:
+            assert self.body
+            self.body.clear()
+            self.body.mount(Static("Task Manager", classes="title"))
+            self.body.mount(Button("Queues", id="queues"))
+            self.body.mount(Button("Tasks", id="tasks"))
+            self.body.mount(Button("Quit", id="quit"))
+
+        def show_queues(self) -> None:
+            assert self.body
+            self.body.clear()
+            table = DataTable()
+            table.add_columns("Name", "Title", "Description")
+            for q in self.manager.queue_list():
+                table.add_row(q["name"], q["title"], q["description"])
+            self.body.mount(table)
+            self.body.mount(Button("Add Queue", id="queue_add"))
+            self.body.mount(Button("Back", id="main"))
+
+        def show_tasks(self) -> None:
+            assert self.body
+            self.body.clear()
+            table = DataTable()
+            table.add_columns("ID", "Title", "Status")
+            for t in self.manager.task_list():
+                table.add_row(t["id"], t["title"], t["status"])
+            self.body.mount(table)
+            self.body.mount(Button("Back", id="main"))
+
+        def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            button_id = event.button.id
+            if button_id == "quit":
+                self.exit()
+            elif button_id == "queues":
+                self.show_queues()
+            elif button_id == "tasks":
+                self.show_tasks()
+            elif button_id == "main":
+                self.show_main()
+            elif button_id == "queue_add":
+                assert self.body
+                self.body.clear()
+                name_in = Input(placeholder="Queue name", id="q_name")
+                title_in = Input(placeholder="Queue title", id="q_title")
+                desc_in = Input(placeholder="Description", id="q_desc")
+                self.body.mount(name_in)
+                self.body.mount(title_in)
+                self.body.mount(desc_in)
+                self.body.mount(Button("Create", id="create_queue"))
+                self.body.mount(Button("Back", id="queues"))
+            elif button_id == "create_queue":
+                name = self.query_one("#q_name", Input).value
+                title = self.query_one("#q_title", Input).value
+                desc = self.query_one("#q_desc", Input).value
+                self.manager.queue_add(name, title, desc)
+                self.show_queues()
+
+    TMApp(tm).run()
+
+
 def main():
     parser = argparse.ArgumentParser(description="Task Manager CLI")
     parser.add_argument("--tasks-root", default=".tasks", 
                        help="Root directory for tasks storage (default: .tasks)")
     
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # UI command
+    subparsers.add_parser("ui", help="Launch interactive Textual UI")
     
     # Queue commands
     queue_parser = subparsers.add_parser("queue", help="Queue management")
@@ -494,6 +597,9 @@ def main():
             task_parser.print_help()
             return 1
     
+    elif args.command == "ui":
+        launch_tui(tm)
+        return 0
     else:
         parser.print_help()
         return 1

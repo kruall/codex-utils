@@ -6,6 +6,12 @@ A collection of tools for managing development tasks.
 
 The `tm` script provides a lightweight interface for tracking work. All data is stored in the `.tasks/` directory.
 
+### Textual UI
+Launch the interactive Textual interface:
+```bash
+./tm ui
+```
+
 ### Queue Management
 ```bash
 # List available queues
