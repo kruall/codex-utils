@@ -2,7 +2,7 @@
   "id": "DEV-1",
   "title": "Create TUI interface with Textual",
   "description": "Implement a text-based user interface for the task manager using the Textual library. Add 'ui' subcommand to task_manager.py that launches an interactive TUI for managing queues, tasks, and comments.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -31,5 +31,5 @@
     }
   ],
   "created_at": 1748513645.185745,
-  "updated_at": 1748513761.635085
+  "updated_at": 1748524577.539104
 }
