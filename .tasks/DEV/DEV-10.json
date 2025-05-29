@@ -1,0 +1,15 @@
+{
+  "id": "DEV-10",
+  "title": "Centralize error handling",
+  "description": "Factor out repeated error prints into function or exceptions",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Use custom exceptions or helper to unify error outputs.",
+      "created_at": 1748521740.518379
+    }
+  ],
+  "created_at": 1748521739.646104,
+  "updated_at": 1748521740.5184145
+}

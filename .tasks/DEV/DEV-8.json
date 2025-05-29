@@ -1,0 +1,15 @@
+{
+  "id": "DEV-8",
+  "title": "Expand tests after refactor",
+  "description": "Add unit tests for new modules and dataclasses",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Cover dataclass serialization and CLI wrapper functions in tests.",
+      "created_at": 1748521736.6619318
+    }
+  ],
+  "created_at": 1748521734.4381368,
+  "updated_at": 1748521736.6619656
+}
