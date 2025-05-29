@@ -1,12 +1,13 @@
 import React from 'react'
+import styles from './Kanban.module.css'
 
 function Column({ title, tasks }) {
   return (
-    <div style={{ flex: 1, padding: '0 8px' }}>
+    <div className={styles.column}>
       <h3>{title}</h3>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <ul className={styles.list}>
         {tasks.map(t => (
-          <li key={t.id} style={{ border: '1px solid #ccc', marginBottom: 4, padding: 4 }}>
+          <li key={t.id} className={styles.item}>
             {t.title}
           </li>
         ))}
@@ -23,7 +24,7 @@ export default function Kanban({ tasks }) {
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className={styles.container}>
       <Column title="Todo" tasks={columns.todo} />
       <Column title="In Progress" tasks={columns.in_progress} />
       <Column title="Done" tasks={columns.done} />

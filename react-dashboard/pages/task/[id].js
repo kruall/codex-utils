@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { useState } from 'react'
 import Navigation from '../../components/Navigation'
+import styles from '../Page.module.css'
 
 export async function getStaticPaths() {
   const tasksDir = path.join(process.cwd(), '..', '.tasks')
@@ -45,26 +46,26 @@ export default function TaskPage({ task }) {
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className={styles.container}>
       <Navigation />
       <h1>{task.id}</h1>
-      <div style={{ marginBottom: 8 }}>
+      <div className={styles.marginBottom}>
         <label>
           Title:
-          <input value={title} onChange={e => setTitle(e.target.value)} style={{ marginLeft: 4 }} />
+          <input value={title} onChange={e => setTitle(e.target.value)} className={styles.inline} />
         </label>
       </div>
-      <div style={{ marginBottom: 8 }}>
+      <div className={styles.marginBottom}>
         <label>
           Status:
-          <select value={status} onChange={e => setStatus(e.target.value)} style={{ marginLeft: 4 }}>
+          <select value={status} onChange={e => setStatus(e.target.value)} className={styles.inline}>
             <option value="todo">todo</option>
             <option value="in_progress">in_progress</option>
             <option value="done">done</option>
           </select>
         </label>
       </div>
-      <button onClick={save} style={{ marginBottom: 16 }}>Save</button>
+      <button onClick={save} className={styles.marginBottomLarge}>Save</button>
       <h2>Description</h2>
       <p>{task.description}</p>
       <h2>Comments</h2>

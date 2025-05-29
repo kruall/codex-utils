@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import styles from './TaskTable.module.css'
 
 
 export default function TaskTable({ tasks }) {
@@ -38,7 +39,7 @@ export default function TaskTable({ tasks }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+      <div className={styles.filterControls}>
         <label>
           Preset:
           <select onChange={e => {
@@ -49,7 +50,7 @@ export default function TaskTable({ tasks }) {
               setStatusFilter('')
             }
             setQueueFilter('')
-          }} style={{ marginLeft: 4 }}>
+          }} className={styles.inline}>
             <option value="all">All</option>
             <option value="todo">Todo</option>
             <option value="in_progress">In Progress</option>
@@ -58,7 +59,7 @@ export default function TaskTable({ tasks }) {
         </label>
         <label>
           Status:
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ marginLeft: 4 }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={styles.inline}>
             <option value="">All</option>
             <option value="todo">Todo</option>
             <option value="in_progress">In Progress</option>
@@ -67,7 +68,7 @@ export default function TaskTable({ tasks }) {
         </label>
         <label>
           Queue:
-          <select value={queueFilter} onChange={e => setQueueFilter(e.target.value)} style={{ marginLeft: 4 }}>
+          <select value={queueFilter} onChange={e => setQueueFilter(e.target.value)} className={styles.inline}>
             <option value="">All</option>
             {queues.map(q => (
               <option key={q} value={q}>{q}</option>
@@ -76,18 +77,18 @@ export default function TaskTable({ tasks }) {
         </label>
         <label>
           Search:
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} style={{ marginLeft: 4 }} />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} className={styles.inline} />
         </label>
-        <label style={{ marginLeft: 'auto' }}>
+        <label className={styles.pageSize}>
           Page size:
-          <select value={pageSize} onChange={handlePageSizeChange} style={{ marginLeft: 4 }}>
+          <select value={pageSize} onChange={handlePageSizeChange} className={styles.inline}>
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
           </select>
         </label>
       </div>
-      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>ID</th>
@@ -100,7 +101,7 @@ export default function TaskTable({ tasks }) {
           {pagedTasks.map(task => (
             <tr key={task.id}>
               <td>
-                <Link href={`/task/${task.id}`} style={{ color: '#0070f3' }}>
+                <Link href={`/task/${task.id}`} className={styles.link}>
                   {task.id}
                 </Link>
               </td>
@@ -111,11 +112,11 @@ export default function TaskTable({ tasks }) {
           ))}
         </tbody>
       </table>
-      <div style={{ marginTop: 8 }}>
-        <button onClick={handlePrev} disabled={page === 0} style={{ marginRight: 8 }}>
+      <div className={styles.pagination}>
+        <button onClick={handlePrev} disabled={page === 0} className={styles.marginRight}>
           Previous
         </button>
-        <span style={{ marginRight: 8 }}>
+        <span className={styles.marginRight}>
           Page {page + 1} of {pageCount}
         </span>
         <button onClick={handleNext} disabled={page >= pageCount - 1}>

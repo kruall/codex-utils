@@ -1,43 +1,24 @@
 import React from 'react'
 import Link from 'next/link'
+import styles from './Navigation.module.css'
 
 export default function Navigation() {
   return (
-    <nav style={{ 
-      padding: '16px 0', 
-      borderBottom: '1px solid #eee', 
-      marginBottom: '16px' 
-    }}>
-      <div style={{ display: 'flex', gap: '16px' }}>
-        <Link href="/" style={{
-          color: '#0070f3',
-          textDecoration: 'none',
-          fontWeight: 'bold'
-        }}>
+    <nav className={styles.nav}>
+      <div className={styles.links}>
+        <Link href="/" className={styles.link}>
           🏠 Home
         </Link>
-        <Link href="/table" style={{
-          color: '#0070f3',
-          textDecoration: 'none',
-          fontWeight: 'bold'
-        }}>
+        <Link href="/table" className={styles.link}>
           📋 Task List
         </Link>
-        <Link href="/kanban" style={{
-          color: '#0070f3',
-          textDecoration: 'none',
-          fontWeight: 'bold'
-        }}>
+        <Link href="/kanban" className={styles.link}>
           🗂 Kanban Board
         </Link>
-        <Link href="/todo" style={{
-          color: '#0070f3',
-          textDecoration: 'none',
-          fontWeight: 'bold'
-        }}>
+        <Link href="/todo" className={styles.link}>
           ✅ TODO Tasks
         </Link>
       </div>
     </nav>
   )
-} 
+}
