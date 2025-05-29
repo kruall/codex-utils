@@ -1,0 +1,35 @@
+{
+  "id": "DEV-3",
+  "title": "Add CI check for PR task status validation",
+  "description": "Implement CI workflow to verify that PRs with [<task-id>] format in title have corresponding tasks that were 'todo' or 'in_progress' before PR creation and become 'done' after PR merge. This ensures proper task workflow compliance.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Implementation requirements: 1) Parse PR title to extract task-id using regex pattern \\[([^\\]]+)\\], 2) Check task status before PR creation (should be 'todo' or 'in_progress'), 3) Verify task status after PR merge (should be 'done'), 4) Fail CI if task workflow is not followed properly",
+      "created_at": 1748516023.6185799
+    },
+    {
+      "id": 2,
+      "text": "GitHub Actions workflow structure: 1) .github/workflows/pr-task-check.yml - trigger on PR open/merge, 2) Script to validate task status using ./tm commands, 3) Check task exists and was started before work began, 4) Ensure task is marked done when PR is merged",
+      "created_at": 1748516028.558944
+    },
+    {
+      "id": 3,
+      "text": "Error scenarios to handle: 1) PR title has [task-id] but task doesn't exist, 2) Task was never started (status still 'todo'), 3) Task was already 'done' before PR creation, 4) Task not marked 'done' after PR merge, 5) Invalid task-id format in PR title",
+      "created_at": 1748516033.251381
+    },
+    {
+      "id": 4,
+      "text": "Technical approach: 1) Use GitHub API to get PR details and timeline, 2) Parse .tasks/ directory to check task status history, 3) Compare timestamps: task start time < PR creation time < PR merge time < task done time, 4) Exit with error code if validation fails",
+      "created_at": 1748516038.058034
+    },
+    {
+      "id": 5,
+      "text": "Example PR titles to validate: '[DEV-1] Add user authentication', '[DOC-5] Update API documentation', '[FEATURE-123] Implement search functionality'. Should extract task-ids: DEV-1, DOC-5, FEATURE-123 respectively.",
+      "created_at": 1748516043.4902668
+    }
+  ],
+  "created_at": 1748516017.53114,
+  "updated_at": 1748516043.4902809
+}
