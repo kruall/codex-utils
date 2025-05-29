@@ -1,0 +1,13 @@
+name: PR Task Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, closed]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run task status validation
+        run: python .github/scripts/check_pr_task.py
