@@ -2,11 +2,32 @@
   "id": "TM_WEB-3",
   "title": "Add TODO-only page to web dashboard",
   "description": "Create a dedicated page in the web dashboard that displays only tasks with 'todo' status for better focus and task management",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on TODO-only page",
+      "created_at": 1748542070.6581237
+    },
+    {
+      "id": 2,
+      "text": "Implemented todo page",
+      "created_at": 1748542096.8133965
+    },
+    {
+      "id": 3,
+      "text": "tests pass",
+      "created_at": 1748542132.3809605
+    },
+    {
+      "id": 4,
+      "text": "Task completed",
+      "created_at": 1748542140.484019
+    }
+  ],
   "links": {},
   "created_at": 1748541967.916279,
-  "updated_at": 1748541967.916279,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748542140.4840515,
+  "started_at": 1748542068.4539707,
+  "closed_at": 1748542137.7808175
 }
