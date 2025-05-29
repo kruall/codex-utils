@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from .models import Queue, Task
+from .utils import log_error
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class TaskManager:
         """Add a new queue."""
         # Validate queue name
         if not name or not name.strip():
-            logger.error("Error: Queue name cannot be empty")
+            log_error("Error: Queue name cannot be empty")
             return False
         
         queue_dir = self.tasks_root / name
@@ -47,15 +48,15 @@ class TaskManager:
             mode = os.stat(self.tasks_root).st_mode
             write_bits = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
             if not (mode & write_bits):
-                logger.error(f"Error creating queue '{name}': Permission denied")
+                log_error(f"Error creating queue '{name}': Permission denied")
                 return False
         except OSError as e:
-            logger.error(f"Error creating queue '{name}': {e}")
+            log_error(f"Error creating queue '{name}': {e}")
             return False
 
         try:
             if queue_dir.exists():
-                logger.error(f"Error: Queue '{name}' already exists")
+                log_error(f"Error: Queue '{name}' already exists")
                 return False
         except (OSError, PermissionError):
             # If we can't check if it exists due to permissions, try to create anyway
@@ -78,7 +79,7 @@ class TaskManager:
             return True
             
         except (OSError, IOError) as e:
-            logger.error(f"Error creating queue '{name}': {e}")
+            log_error(f"Error creating queue '{name}': {e}")
             return False
 
     def _get_next_task_number(self, queue_name: str) -> int:
@@ -106,7 +107,7 @@ class TaskManager:
         queue_dir = self.tasks_root / queue
 
         if not queue_dir.exists():
-            logger.error(f"Error: Queue '{queue}' does not exist")
+            log_error(f"Error: Queue '{queue}' does not exist")
             return None
 
         try:
@@ -123,7 +124,7 @@ class TaskManager:
             return task_id
 
         except (OSError, IOError) as e:
-            logger.error(f"Error creating task: {e}")
+            log_error(f"Error creating task: {e}")
             return None
 
     def _find_task_file(self, task_id: str) -> Optional[Path]:
@@ -203,7 +204,7 @@ class TaskManager:
         """Show detailed information about a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return None
 
         return task_data.to_dict()
@@ -212,13 +213,13 @@ class TaskManager:
         """Update a specific field of a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return False
         
         # Validate field
         allowed_fields = ['title', 'description', 'status']
         if field not in allowed_fields:
-            logger.error(
+            log_error(
                 f"Error: Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}"
             )
             return False
@@ -229,14 +230,14 @@ class TaskManager:
             logger.info(f"Task '{task_id}' updated successfully")
             return True
         else:
-            logger.error(f"Error: Failed to update task '{task_id}'")
+            log_error(f"Error: Failed to update task '{task_id}'")
             return False
 
     def task_start(self, task_id: str) -> bool:
         """Start a task (set status to 'in_progress' and record time)."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return False
 
         task_data.status = 'in_progress'
@@ -247,14 +248,14 @@ class TaskManager:
             logger.info(f"Task '{task_id}' updated successfully")
             return True
         else:
-            logger.error(f"Error: Failed to update task '{task_id}'")
+            log_error(f"Error: Failed to update task '{task_id}'")
             return False
 
     def task_done(self, task_id: str) -> bool:
         """Mark a task as done (set status to 'done' and record time)."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return False
 
         task_data.status = 'done'
@@ -265,14 +266,14 @@ class TaskManager:
             logger.info(f"Task '{task_id}' updated successfully")
             return True
         else:
-            logger.error(f"Error: Failed to update task '{task_id}'")
+            log_error(f"Error: Failed to update task '{task_id}'")
             return False
 
     def task_comment_add(self, task_id: str, comment: str) -> bool:
         """Add a comment to a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return False
         
         # Generate comment ID
@@ -291,14 +292,14 @@ class TaskManager:
             logger.info(f"Comment added to task '{task_id}' with ID {comment_id}")
             return True
         else:
-            logger.error(f"Error: Failed to add comment to task '{task_id}'")
+            log_error(f"Error: Failed to add comment to task '{task_id}'")
             return False
 
     def task_comment_remove(self, task_id: str, comment_id: int) -> bool:
         """Remove a comment from a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return False
 
         comments = task_data.comments
@@ -308,21 +309,21 @@ class TaskManager:
         task_data.comments = [c for c in comments if c.get("id") != comment_id]
         
         if len(task_data.comments) == original_count:
-            logger.error(f"Error: Comment with ID {comment_id} not found in task '{task_id}'")
+            log_error(f"Error: Comment with ID {comment_id} not found in task '{task_id}'")
             return False
         
         if self._save_task(task_data):
             logger.info(f"Comment {comment_id} removed from task '{task_id}'")
             return True
         else:
-            logger.error(f"Error: Failed to remove comment from task '{task_id}'")
+            log_error(f"Error: Failed to remove comment from task '{task_id}'")
             return False
 
     def task_comment_list(self, task_id: str) -> Optional[List[Dict]]:
         """List all comments for a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return None
 
         return task_data.comments
@@ -335,7 +336,7 @@ class TaskManager:
         target_data = self._load_task(target_id)
         if not task_data or not target_data:
             missing = task_id if not task_data else target_id
-            logger.error(f"Error: Task '{missing}' not found")
+            log_error(f"Error: Task '{missing}' not found")
             return False
 
         links = task_data.links.setdefault(link_type, [])
@@ -351,7 +352,7 @@ class TaskManager:
                 f"Link added between {task_id} and {target_id} (type: {link_type})"
             )
             return True
-        logger.error(
+        log_error(
             f"Error: Failed to add link between {task_id} and {target_id}"
         )
         return False
@@ -364,7 +365,7 @@ class TaskManager:
         target_data = self._load_task(target_id)
         if not task_data or not target_data:
             missing = task_id if not task_data else target_id
-            logger.error(f"Error: Task '{missing}' not found")
+            log_error(f"Error: Task '{missing}' not found")
             return False
 
         removed = False
@@ -382,7 +383,7 @@ class TaskManager:
             removed = True
 
         if not removed:
-            logger.error(
+            log_error(
                 f"Error: Link between {task_id} and {target_id} not found"
             )
             return False
@@ -392,7 +393,7 @@ class TaskManager:
                 f"Link removed between {task_id} and {target_id} (type: {link_type})"
             )
             return True
-        logger.error(
+        log_error(
             f"Error: Failed to remove link between {task_id} and {target_id}"
         )
         return False
@@ -401,7 +402,7 @@ class TaskManager:
         """List links for a task."""
         task_data = self._load_task(task_id)
         if not task_data:
-            logger.error(f"Error: Task '{task_id}' not found")
+            log_error(f"Error: Task '{task_id}' not found")
             return None
         return task_data.links
 
