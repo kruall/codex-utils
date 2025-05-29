@@ -1,0 +1,25 @@
+{
+  "id": "DEV-2",
+  "title": "Refactor task_manager.py code structure",
+  "description": "Split the monolithic task_manager.py file into smaller, more maintainable modules. Separate concerns like TaskManager class, CLI parsing, TUI interface, and utility functions into different files.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Suggested file structure: 1) task_manager/core.py - TaskManager class and core logic, 2) task_manager/cli.py - CLI argument parsing and command handlers, 3) task_manager/tui.py - Textual TUI interface, 4) task_manager/utils.py - utility functions like format_timestamp, 5) task_manager/__main__.py - entry point",
+      "created_at": 1748515932.6247098
+    },
+    {
+      "id": 2,
+      "text": "Benefits: 1) Improved maintainability - easier to find and modify specific functionality, 2) Better testability - can test individual components in isolation, 3) Cleaner imports - reduce circular dependencies, 4) Single responsibility principle - each module has a clear purpose",
+      "created_at": 1748515937.027926
+    },
+    {
+      "id": 3,
+      "text": "Current file is 611 lines - too large for a single module. Key areas to extract: TaskManager class (~300 lines), CLI parsing (~200 lines), TUI interface (~100 lines), utility functions (~20 lines)",
+      "created_at": 1748515941.752537
+    }
+  ],
+  "created_at": 1748515927.1541288,
+  "updated_at": 1748515941.75255
+}
