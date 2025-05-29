@@ -3,10 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm run generate-tasks && next dev",
+    "build": "npm run generate-tasks && next build",
     "start": "next start",
-    "export": "next build"
+    "export": "npm run generate-tasks && next build",
+    "generate-tasks": "node scripts/generate-tasks.js"
   },
   "dependencies": {
     "next": "14.2.0",

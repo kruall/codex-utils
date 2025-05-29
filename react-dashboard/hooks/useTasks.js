@@ -6,9 +6,10 @@ export default function useTasks() {
   useEffect(() => {
     async function fetchTasks() {
       try {
-        const res = await fetch('/api/tasks')
+        // For static export, we need to load tasks from a pre-generated JSON file
+        const res = await fetch('/codex-utils/tasks.json')
         const data = await res.json()
-        setTasks(data.tasks || [])
+        setTasks(data || [])
       } catch {
         setTasks([])
       }
