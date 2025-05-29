@@ -3,7 +3,7 @@ import glob
 import os
 import re
 import subprocess
-from typing import Dict, Any, Optional
+from typing import Optional
 
 
 def get_task_status_from_commit(task_file: str, commit_hash: str) -> Optional[str]:
