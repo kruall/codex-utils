@@ -9,5 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to compare before/after PR
       - name: Run task status validation
         run: python .github/scripts/check_pr_task.py
