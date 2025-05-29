@@ -24,7 +24,12 @@ def launch_tui(tm: "TaskManager") -> None:
 
     class TMApp(App):
         TITLE = "Task Manager"
-        BINDINGS = [("q", "quit", "Quit")]
+        BINDINGS = [
+            ("q", "quit", "Quit"),
+            ("1", "queues", "Queues"),
+            ("2", "tasks", "Tasks"),
+            ("escape", "main", "Back"),
+        ]
 
         def __init__(self, manager: "TaskManager") -> None:
             super().__init__()
@@ -50,6 +55,7 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.mount(Button("Queues", id="queues"))
             self.body.mount(Button("Tasks", id="tasks"))
             self.body.mount(Button("Quit", id="quit"))
+            self.set_focus(self.query_one("#queues"))
 
         def show_queues(self) -> None:
             if self.body is None:
@@ -60,6 +66,7 @@ def launch_tui(tm: "TaskManager") -> None:
             for q in self.manager.queue_list():
                 table.add_row(q["name"], q["title"], q["description"])
             self.body.mount(table)
+            self.set_focus(table)
             # Input and button for deleting a queue
             self.body.mount(Input(placeholder="Queue name", id="del_queue_name"))
             self.body.mount(Button("Delete Queue", id="queue_delete"))
@@ -75,6 +82,7 @@ def launch_tui(tm: "TaskManager") -> None:
             for t in self.manager.task_list():
                 table.add_row(t["id"], t["title"], t["status"])
             self.body.mount(table)
+            self.set_focus(table)
             self.body.mount(Input(placeholder="Task ID", id="task_id"))
             self.body.mount(Button("View Comments", id="view_comments"))
             self.body.mount(Button("Delete Task", id="task_delete"))
@@ -97,6 +105,15 @@ def launch_tui(tm: "TaskManager") -> None:
             self.body.mount(Input(placeholder="New comment", id="new_comment"))
             self.body.mount(Button("Add Comment", id="add_comment"))
             self.body.mount(Button("Back", id="tasks"))
+
+        def action_queues(self) -> None:
+            self.show_queues()
+
+        def action_tasks(self) -> None:
+            self.show_tasks()
+
+        def action_main(self) -> None:
+            self.show_main()
 
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
             button_id = event.button.id
