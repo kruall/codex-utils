@@ -1,0 +1,12 @@
+{
+  "id": "TM_WEB-7",
+  "title": "Add filtering functionality to task table",
+  "description": "Implement filtering capabilities for the task table in the web dashboard. Users should be able to filter tasks by status, queue, title, and other relevant fields. Include search functionality and filter presets.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748552143.196875,
+  "updated_at": 1748552143.196876,
+  "started_at": null,
+  "closed_at": null
+}

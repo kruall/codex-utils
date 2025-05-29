@@ -1,0 +1,12 @@
+{
+  "id": "TM_WEB-6",
+  "title": "Add individual task view in dashboard",
+  "description": "Implement functionality to open and view individual tasks in a detailed view within the web dashboard. This should include task details, comments, links, and allow editing of task properties.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748552139.404376,
+  "updated_at": 1748552139.404377,
+  "started_at": null,
+  "closed_at": null
+}
