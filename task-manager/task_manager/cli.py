@@ -5,7 +5,8 @@ from typing import Callable
 from .core import TaskManager
 from .dashboard import generate_dashboard
 from .tui import launch_tui
-from .utils import format_timestamp, setup_logging
+from .utils import format_timestamp, setup_logging, log_error
+from .exceptions import TaskManagerError
 from . import __version__
 
 
@@ -28,14 +29,22 @@ def queue_list(args: argparse.Namespace, tm: TaskManager) -> int:
 
 def queue_add(args: argparse.Namespace, tm: TaskManager) -> int:
     """Handle `queue add` command."""
-    success = tm.queue_add(args.name, args.title, args.description)
-    return 0 if success else 1
+    try:
+        tm.queue_add(args.name, args.title, args.description)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def queue_delete(args: argparse.Namespace, tm: TaskManager) -> int:
     """Handle `queue delete` command."""
-    success = tm.queue_delete(args.name)
-    return 0 if success else 1
+    try:
+        tm.queue_delete(args.name)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 QUEUE_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
@@ -82,19 +91,27 @@ def task_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
 
 
 def task_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    task_id = tm.task_add(args.title, args.description, args.queue)
-    return 0 if task_id else 1
+    try:
+        tm.task_add(args.title, args.description, args.queue)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def task_delete_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
     """Handle `task delete` command."""
-    success = tm.task_delete(args.id)
-    return 0 if success else 1
+    try:
+        tm.task_delete(args.id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    task_data = tm.task_show(args.id)
-    if task_data:
+    try:
+        task_data = tm.task_show(args.id)
         print(f"ID: {task_data['id']}")
         print(f"Title: {task_data['title']}")
         print(f"Description: {task_data['description']}")
@@ -115,42 +132,68 @@ def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
         else:
             print("\nNo comments")
         return 0
-    return 1
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def task_update_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_update(args.id, args.field, args.value)
-    return 0 if success else 1
+    try:
+        tm.task_update(args.id, args.field, args.value)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def task_start_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_start(args.id)
-    return 0 if success else 1
+    try:
+        tm.task_start(args.id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def task_done_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_done(args.id)
-    return 0 if success else 1
+    try:
+        tm.task_done(args.id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def comment_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_comment_add(args.id, args.comment)
-    return 0 if success else 1
+    try:
+        tm.task_comment_add(args.id, args.comment)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def comment_edit_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_comment_edit(args.id, args.comment_id, args.comment)
-    return 0 if success else 1
+    try:
+        tm.task_comment_edit(args.id, args.comment_id, args.comment)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def comment_remove_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_comment_remove(args.id, args.comment_id)
-    return 0 if success else 1
+    try:
+        tm.task_comment_remove(args.id, args.comment_id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def comment_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    comments = tm.task_comment_list(args.id)
-    if comments is not None:
+    try:
+        comments = tm.task_comment_list(args.id)
         if not comments:
             print("No comments found")
         else:
@@ -159,7 +202,9 @@ def comment_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
                 created = format_timestamp(comment.get('created_at', 0))
                 print(f"  [{comment['id']}] {created}: {comment['text']}")
         return 0
-    return 1
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 COMMENT_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
@@ -171,18 +216,26 @@ COMMENT_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
 
 
 def link_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_link_add(args.id, args.target_id, args.type)
-    return 0 if success else 1
+    try:
+        tm.task_link_add(args.id, args.target_id, args.type)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def link_remove_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    success = tm.task_link_remove(args.id, args.target_id, args.type)
-    return 0 if success else 1
+    try:
+        tm.task_link_remove(args.id, args.target_id, args.type)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 def link_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    links = tm.task_link_list(args.id)
-    if links is not None:
+    try:
+        links = tm.task_link_list(args.id)
         if not links:
             print("No links found")
         else:
@@ -191,7 +244,9 @@ def link_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
                 for target in targets:
                     print(f"  {link_type}: {target}")
         return 0
-    return 1
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
 
 
 LINK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {

@@ -8,6 +8,15 @@ from typing import Dict, List, Optional
 from .models import Queue, Task
 from .utils import log_error
 from .storage import load_json, save_json
+from .exceptions import (
+    QueueExistsError,
+    QueueNotFoundError,
+    TaskNotFoundError,
+    InvalidFieldError,
+    CommentNotFoundError,
+    LinkNotFoundError,
+    StorageError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,12 +40,10 @@ class TaskManager:
                     queues.append(queue.to_dict())
         return queues
 
-    def queue_add(self, name: str, title: str, description: str) -> bool:
+    def queue_add(self, name: str, title: str, description: str) -> None:
         """Add a new queue."""
-        # Validate queue name
         if not name or not name.strip():
-            log_error("Error: Queue name cannot be empty")
-            return False
+            raise ValueError("Queue name cannot be empty")
         
         queue_dir = self.tasks_root / name
 
@@ -46,16 +53,13 @@ class TaskManager:
             mode = os.stat(self.tasks_root).st_mode
             write_bits = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
             if not (mode & write_bits):
-                log_error(f"Error creating queue '{name}': Permission denied")
-                return False
+                raise StorageError(f"Error creating queue '{name}': Permission denied")
         except OSError as e:
-            log_error(f"Error creating queue '{name}': {e}")
-            return False
+            raise StorageError(f"Error creating queue '{name}': {e}")
 
         try:
             if queue_dir.exists():
-                log_error(f"Error: Queue '{name}' already exists")
-                return False
+                raise QueueExistsError(f"Queue '{name}' already exists")
         except (OSError, PermissionError):
             # If we can't check if it exists due to permissions, try to create anyway
             pass
@@ -71,15 +75,12 @@ class TaskManager:
             }
 
             if not save_json(meta_file, meta_data):
-                log_error(f"Error saving metadata for queue '{name}'")
-                return False
+                raise StorageError(f"Error saving metadata for queue '{name}'")
 
             logger.info(f"Queue '{name}' created successfully")
-            return True
             
         except (OSError, IOError) as e:
-            log_error(f"Error creating queue '{name}': {e}")
-            return False
+            raise StorageError(f"Error creating queue '{name}': {e}")
 
     def _get_next_task_number(self, queue_name: str) -> int:
         """Get the next available task number for a queue."""
@@ -101,13 +102,12 @@ class TaskManager:
         
         return max_num + 1
 
-    def task_add(self, title: str, description: str, queue: str) -> Optional[str]:
+    def task_add(self, title: str, description: str, queue: str) -> str:
         """Add a new task to a queue."""
         queue_dir = self.tasks_root / queue
 
         if not queue_dir.exists():
-            log_error(f"Error: Queue '{queue}' does not exist")
-            return None
+            raise QueueNotFoundError(f"Queue '{queue}' does not exist")
 
         try:
             task_num = self._get_next_task_number(queue)
@@ -117,15 +117,13 @@ class TaskManager:
             task_obj = Task(id=task_id, title=title, description=description)
 
             if not save_json(task_file, task_obj.to_dict()):
-                log_error(f"Error: Failed to save task '{task_id}' to file")
-                return None
+                raise StorageError(f"Failed to save task '{task_id}' to file")
 
             logger.info(f"Task '{task_id}' created successfully")
             return task_id
 
         except (OSError, IOError) as e:
-            log_error(f"Error creating task: {e}")
-            return None
+            raise StorageError(f"Error creating task: {e}")
 
     def _find_task_file(self, task_id: str) -> Optional[Path]:
         """Find the task file for a given task ID."""
@@ -140,26 +138,27 @@ class TaskManager:
             return task_file
         return None
 
-    def _load_task(self, task_id: str) -> Optional[Task]:
+    def _load_task(self, task_id: str) -> Task:
         """Load task data from file."""
         task_file = self._find_task_file(task_id)
         if not task_file:
-            return None
+            raise TaskNotFoundError(f"Task '{task_id}' not found")
 
         data = load_json(task_file)
         if data is None:
-            return None
+            raise StorageError(f"Failed to read task '{task_id}'")
         return Task.from_dict(data)
 
-    def _save_task(self, task_data: Task) -> bool:
+    def _save_task(self, task_data: Task) -> None:
         """Save task data to file."""
         task_id = task_data.id
         task_file = self._find_task_file(task_id)
         if not task_file:
-            return False
+            raise TaskNotFoundError(f"Task '{task_id}' not found")
 
         task_data.updated_at = time.time()
-        return save_json(task_file, task_data.to_dict())
+        if not save_json(task_file, task_data.to_dict()):
+            raise StorageError(f"Failed to save task '{task_id}'")
 
     def task_list(self, status: Optional[str] = None, queue: Optional[str] = None) -> List[Dict]:
         """List tasks with optional filtering."""
@@ -195,81 +194,52 @@ class TaskManager:
         tasks.sort(key=lambda t: t.get("created_at", 0))
         return tasks
 
-    def task_show(self, task_id: str) -> Optional[Dict]:
+    def task_show(self, task_id: str) -> Dict:
         """Show detailed information about a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return None
-
         return task_data.to_dict()
 
-    def task_update(self, task_id: str, field: str, value: str) -> bool:
+    def task_update(self, task_id: str, field: str, value: str) -> None:
         """Update a specific field of a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
         
         # Validate field
         allowed_fields = ['title', 'description', 'status']
         if field not in allowed_fields:
-            log_error(
-                f"Error: Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}"
+            raise InvalidFieldError(
+                f"Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}"
             )
-            return False
         
         setattr(task_data, field, value)
 
-        if self._save_task(task_data):
-            logger.info(f"Task '{task_id}' updated successfully")
-            return True
-        else:
-            log_error(f"Error: Failed to update task '{task_id}'")
-            return False
+        self._save_task(task_data)
+        logger.info(f"Task '{task_id}' updated successfully")
 
-    def task_start(self, task_id: str) -> bool:
+    def task_start(self, task_id: str) -> None:
         """Start a task (set status to 'in_progress' and record time)."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
 
         task_data.status = 'in_progress'
         if task_data.started_at is None:
             task_data.started_at = time.time()
 
-        if self._save_task(task_data):
-            logger.info(f"Task '{task_id}' updated successfully")
-            return True
-        else:
-            log_error(f"Error: Failed to update task '{task_id}'")
-            return False
+        self._save_task(task_data)
+        logger.info(f"Task '{task_id}' updated successfully")
 
-    def task_done(self, task_id: str) -> bool:
+    def task_done(self, task_id: str) -> None:
         """Mark a task as done (set status to 'done' and record time)."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
 
         task_data.status = 'done'
         if task_data.closed_at is None:
             task_data.closed_at = time.time()
 
-        if self._save_task(task_data):
-            logger.info(f"Task '{task_id}' updated successfully")
-            return True
-        else:
-            log_error(f"Error: Failed to update task '{task_id}'")
-            return False
+        self._save_task(task_data)
+        logger.info(f"Task '{task_id}' updated successfully")
 
-    def task_comment_add(self, task_id: str, comment: str) -> bool:
+    def task_comment_add(self, task_id: str, comment: str) -> int:
         """Add a comment to a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
         
         # Generate comment ID
         existing_ids = [c.get("id", 0) for c in task_data.comments]
@@ -283,19 +253,13 @@ class TaskManager:
 
         task_data.comments.append(comment_data)
         
-        if self._save_task(task_data):
-            logger.info(f"Comment added to task '{task_id}' with ID {comment_id}")
-            return True
-        else:
-            log_error(f"Error: Failed to add comment to task '{task_id}'")
-            return False
+        self._save_task(task_data)
+        logger.info(f"Comment added to task '{task_id}' with ID {comment_id}")
+        return comment_id
 
-    def task_comment_edit(self, task_id: str, comment_id: int, text: str) -> bool:
+    def task_comment_edit(self, task_id: str, comment_id: int, text: str) -> None:
         """Edit a comment on a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
 
         for comment in task_data.comments:
             if comment.get("id") == comment_id:
@@ -303,24 +267,16 @@ class TaskManager:
                 comment["updated_at"] = time.time()
                 break
         else:
-            log_error(
-                f"Error: Comment with ID {comment_id} not found in task '{task_id}'"
+            raise CommentNotFoundError(
+                f"Comment with ID {comment_id} not found in task '{task_id}'"
             )
-            return False
 
-        if self._save_task(task_data):
-            logger.info(f"Comment {comment_id} edited in task '{task_id}'")
-            return True
+        self._save_task(task_data)
+        logger.info(f"Comment {comment_id} edited in task '{task_id}'")
 
-        log_error(f"Error: Failed to edit comment in task '{task_id}'")
-        return False
-
-    def task_comment_remove(self, task_id: str, comment_id: int) -> bool:
+    def task_comment_remove(self, task_id: str, comment_id: int) -> None:
         """Remove a comment from a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
 
         comments = task_data.comments
         original_count = len(comments)
@@ -329,35 +285,24 @@ class TaskManager:
         task_data.comments = [c for c in comments if c.get("id") != comment_id]
         
         if len(task_data.comments) == original_count:
-            log_error(f"Error: Comment with ID {comment_id} not found in task '{task_id}'")
-            return False
+            raise CommentNotFoundError(
+                f"Comment with ID {comment_id} not found in task '{task_id}'"
+            )
         
-        if self._save_task(task_data):
-            logger.info(f"Comment {comment_id} removed from task '{task_id}'")
-            return True
-        else:
-            log_error(f"Error: Failed to remove comment from task '{task_id}'")
-            return False
+        self._save_task(task_data)
+        logger.info(f"Comment {comment_id} removed from task '{task_id}'")
 
-    def task_comment_list(self, task_id: str) -> Optional[List[Dict]]:
+    def task_comment_list(self, task_id: str) -> List[Dict]:
         """List all comments for a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return None
-
         return task_data.comments
 
     def task_link_add(
         self, task_id: str, target_id: str, link_type: str = "related"
-    ) -> bool:
+    ) -> None:
         """Add a link between two tasks."""
         task_data = self._load_task(task_id)
         target_data = self._load_task(target_id)
-        if not task_data or not target_data:
-            missing = task_id if not task_data else target_id
-            log_error(f"Error: Task '{missing}' not found")
-            return False
 
         links = task_data.links.setdefault(link_type, [])
         if target_id not in links:
@@ -367,26 +312,18 @@ class TaskManager:
         if task_id not in target_links:
             target_links.append(task_id)
 
-        if self._save_task(task_data) and self._save_task(target_data):
-            logger.info(
-                f"Link added between {task_id} and {target_id} (type: {link_type})"
-            )
-            return True
-        log_error(
-            f"Error: Failed to add link between {task_id} and {target_id}"
+        self._save_task(task_data)
+        self._save_task(target_data)
+        logger.info(
+            f"Link added between {task_id} and {target_id} (type: {link_type})"
         )
-        return False
 
     def task_link_remove(
         self, task_id: str, target_id: str, link_type: str = "related"
-    ) -> bool:
+    ) -> None:
         """Remove a link between two tasks."""
         task_data = self._load_task(task_id)
         target_data = self._load_task(target_id)
-        if not task_data or not target_data:
-            missing = task_id if not task_data else target_id
-            log_error(f"Error: Task '{missing}' not found")
-            return False
 
         removed = False
 
@@ -403,58 +340,44 @@ class TaskManager:
             removed = True
 
         if not removed:
-            log_error(
-                f"Error: Link between {task_id} and {target_id} not found"
+            raise LinkNotFoundError(
+                f"Link between {task_id} and {target_id} not found"
             )
-            return False
 
-        if self._save_task(task_data) and self._save_task(target_data):
-            logger.info(
-                f"Link removed between {task_id} and {target_id} (type: {link_type})"
-            )
-            return True
-        log_error(
-            f"Error: Failed to remove link between {task_id} and {target_id}"
+        self._save_task(task_data)
+        self._save_task(target_data)
+        logger.info(
+            f"Link removed between {task_id} and {target_id} (type: {link_type})"
         )
-        return False
 
-    def task_link_list(self, task_id: str) -> Optional[Dict[str, List[str]]]:
+    def task_link_list(self, task_id: str) -> Dict[str, List[str]]:
         """List links for a task."""
         task_data = self._load_task(task_id)
-        if not task_data:
-            log_error(f"Error: Task '{task_id}' not found")
-            return None
         return task_data.links
 
-    def queue_delete(self, name: str) -> bool:
+    def queue_delete(self, name: str) -> None:
         """Delete an entire queue and all its tasks."""
         queue_dir = self.tasks_root / name
         if not queue_dir.exists() or not queue_dir.is_dir():
-            log_error(f"Error: Queue '{name}' not found")
-            return False
+            raise QueueNotFoundError(f"Queue '{name}' not found")
 
         try:
             import shutil
 
             shutil.rmtree(queue_dir)
             logger.info(f"Queue '{name}' deleted successfully")
-            return True
         except (OSError, IOError) as e:
-            log_error(f"Error deleting queue '{name}': {e}")
-            return False
+            raise StorageError(f"Error deleting queue '{name}': {e}")
 
-    def task_delete(self, task_id: str) -> bool:
+    def task_delete(self, task_id: str) -> None:
         """Delete a task file from its queue."""
         task_file = self._find_task_file(task_id)
         if not task_file or not task_file.exists():
-            log_error(f"Error: Task '{task_id}' not found")
-            return False
+            raise TaskNotFoundError(f"Task '{task_id}' not found")
 
         try:
             task_file.unlink()
             logger.info(f"Task '{task_id}' deleted successfully")
-            return True
         except (OSError, IOError) as e:
-            log_error(f"Error deleting task '{task_id}': {e}")
-            return False
+            raise StorageError(f"Error deleting task '{task_id}': {e}")
 
