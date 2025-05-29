@@ -1,0 +1,12 @@
+{
+  "id": "TM_WEB-5",
+  "title": "Implement table pagination",
+  "description": "Add pagination functionality to tables in the web interface to improve performance and user experience when dealing with large numbers of tasks. Include page size options and navigation controls.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748551386.865212,
+  "updated_at": 1748551386.865212,
+  "started_at": null,
+  "closed_at": null
+}
