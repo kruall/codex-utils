@@ -47,7 +47,7 @@ class TaskManager:
 
         # Check write permissions on tasks root
         try:
-            if self.tasks_root.stat().st_mode & 0o222 == 0:
+            if not os.access(self.tasks_root, os.W_OK):
                 print(f"Error creating queue '{name}': Permission denied", file=sys.stderr)
                 return False
         except OSError as e:
