@@ -1,0 +1,12 @@
+{
+  "id": "TM_TUI-7",
+  "title": "Use message objects for events",
+  "description": "Replace large on_button_pressed with custom message classes",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748553510.118547,
+  "updated_at": 1748553510.1185474,
+  "started_at": null,
+  "closed_at": null
+}
