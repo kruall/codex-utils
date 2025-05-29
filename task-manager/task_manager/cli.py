@@ -184,7 +184,12 @@ def handle_ui(args: argparse.Namespace, tm: TaskManager) -> int:
 
 
 def handle_dashboard(args: argparse.Namespace, tm: TaskManager) -> int:
-    path = generate_dashboard(args.tasks_root, args.output)
+    path = generate_dashboard(
+        args.tasks_root,
+        args.output,
+        repos=args.repo,
+        token=args.token,
+    )
     print(f"Dashboard generated at {path}")
     return 0
 
@@ -222,6 +227,15 @@ def main():
         "--output",
         default="docs/index.html",
         help="Output HTML file (default: docs/index.html)",
+    )
+    dashboard_parser.add_argument(
+        "--repo",
+        action="append",
+        help="GitHub repository in owner/repo format (can be used multiple times)",
+    )
+    dashboard_parser.add_argument(
+        "--token",
+        help="GitHub token for authenticated requests",
     )
     
     # Queue commands

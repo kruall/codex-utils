@@ -2,14 +2,24 @@
   "id": "DEV-13",
   "title": "Add GitHub API integration",
   "description": "Fetch tasks from multiple repositories to build dashboard",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Implement GitHub API client to load task JSON files from remote repositories",
       "created_at": 1748525152.1609848
+    },
+    {
+      "id": 2,
+      "text": "Starting GitHub API integration implementation",
+      "created_at": 1748529089.2015843
+    },
+    {
+      "id": 3,
+      "text": "Implemented GitHub API integration and tests",
+      "created_at": 1748529273.7945743
     }
   ],
   "created_at": 1748525151.031295,
-  "updated_at": 1748525152.1610193
+  "updated_at": 1748529273.7946
 }
