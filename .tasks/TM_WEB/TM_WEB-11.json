@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-11",
+  "title": "Improve task update error handling",
+  "description": "Show user-friendly errors and loading states when updating tasks via API",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "DEV-21"
+    ]
+  },
+  "created_at": 1748553433.926326,
+  "updated_at": 1748553444.155677,
+  "started_at": null,
+  "closed_at": null
+}
