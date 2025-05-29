@@ -11,7 +11,14 @@ npm install
 npm run dev
 ```
 
-The dashboard reads local task files during build time using `getStaticProps`. To generate a static site for GitHub Pages run:
+The dashboard reads local task files during build time using `getStaticProps`.
+
+### Pages
+
+- `/` - main dashboard with table and kanban views
+- `/todo` - page showing only tasks with a `todo` status
+
+To generate a static site for GitHub Pages run:
 
 ```bash
 npm run build
