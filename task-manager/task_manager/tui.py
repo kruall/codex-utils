@@ -45,6 +45,12 @@ else:
             self.body = Vertical()
             yield self.body
 
+        def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            """Handle common navigation actions."""
+            bid = event.button.id
+            if bid == "back":
+                self.app.pop_screen()
+
     class MainScreen(BaseScreen):
         def on_mount(self) -> None:
             assert self.body is not None
@@ -70,7 +76,7 @@ else:
         def refresh_screen(self) -> None:
             assert self.body is not None
             self.body.remove_children()
-            table = DataTable()
+            table: DataTable = DataTable()
             table.add_columns("Name", "Title", "Description")
             for q in self.manager.queue_list():
                 table.add_row(q["name"], q["title"], q["description"])
@@ -82,6 +88,7 @@ else:
             self.body.mount(Button("Back", id="back"))
 
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)  # Handle common actions
             bid = event.button.id
             if bid == "back":
                 self.app.pop_screen()
@@ -116,9 +123,9 @@ else:
                     self.body.mount(Button("No", id="cancel"))
                     self._delete_target = name
             elif bid == "confirm_delete":
-                name = getattr(self, "_delete_target", None)
-                if name:
-                    self.manager.queue_delete(name)
+                delete_name: str | None = getattr(self, "_delete_target", None)
+                if delete_name:
+                    self.manager.queue_delete(delete_name)
                 self.refresh_screen()
 
     class TasksScreen(BaseScreen):
@@ -128,7 +135,7 @@ else:
         def refresh_screen(self) -> None:
             assert self.body is not None
             self.body.remove_children()
-            table = DataTable()
+            table: DataTable = DataTable()
             table.add_columns("ID", "Title", "Status")
             for t in self.manager.task_list():
                 table.add_row(t["id"], t["title"], t["status"])
@@ -140,6 +147,7 @@ else:
             self.body.mount(Button("Back", id="back"))
 
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)  # Handle common actions
             bid = event.button.id
             if bid == "back":
                 self.app.pop_screen()
@@ -151,6 +159,7 @@ else:
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
                     assert self.body is not None
+                    self.body.remove_children()
                     self.body.mount(
                         Static(
                             f"Are you sure you want to delete task '{task_id}'?",
@@ -161,7 +170,7 @@ else:
                     self.body.mount(Button("No", id="cancel"))
                     self._delete_target = task_id
             elif bid == "confirm_task_delete":
-                tid = getattr(self, "_delete_target", None)
+                tid: str | None = getattr(self, "_delete_target", None)
                 if tid:
                     self.manager.task_delete(tid)
                 self.refresh_screen()
