@@ -2,15 +2,26 @@
   "id": "TM-5",
   "title": "Implement caching for task and queue lists",
   "description": "Cache list results to improve performance with large datasets",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on caching.",
+      "created_at": 1748615131.0922077
+    },
+    {
+      "id": 2,
+      "text": "Implemented caching and tests.",
+      "created_at": 1748615293.4572637
+    }
+  ],
   "links": {
     "related": [
       "DEV-19"
     ]
   },
   "created_at": 1748553478.0440648,
-  "updated_at": 1748553484.6664433,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748615294.6203852,
+  "started_at": 1748615128.7236488,
+  "closed_at": 1748615294.6203594
 }

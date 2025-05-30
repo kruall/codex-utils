@@ -346,6 +346,34 @@ class TestTaskManagerInternal(unittest.TestCase):
         with self.assertRaises(TaskNotFoundError):
             self.tm.task_delete("q-99")
 
+    def test_queue_list_caching(self) -> None:
+        """queue_list results are cached and invalidated on changes."""
+        self.tm.queue_add("c1", "Cache", "desc")
+        first = self.tm.queue_list()
+        self.assertIs(first, self.tm._queue_list_cache)
+        second = self.tm.queue_list()
+        self.assertIs(first, second)
+
+        self.tm.queue_add("c2", "Cache2", "desc")
+        self.assertIsNone(self.tm._queue_list_cache)
+        updated = self.tm.queue_list()
+        self.assertEqual(len(updated), 2)
+
+    def test_task_list_caching(self) -> None:
+        """task_list results are cached and invalidated on changes."""
+        self.tm.queue_add("qc", "Q", "d")
+        self.tm.task_add("t1", "d1", "qc")
+        tasks_first = self.tm.task_list()
+        cache_key = (None, None)
+        self.assertIs(tasks_first, self.tm._task_list_cache[cache_key])
+        tasks_second = self.tm.task_list()
+        self.assertIs(tasks_first, tasks_second)
+
+        self.tm.task_add("t2", "d2", "qc")
+        self.assertFalse(self.tm._task_list_cache)
+        tasks_updated = self.tm.task_list()
+        self.assertEqual(len(tasks_updated), 2)
+
 
 if __name__ == '__main__':
     unittest.main() 
