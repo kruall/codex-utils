@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Always restore working directory on exit
+cleanup() {
+    popd >/dev/null || true
+}
+
+pushd "$(dirname "$0")"/react-dashboard >/dev/null
+trap cleanup EXIT
+
+npm install
