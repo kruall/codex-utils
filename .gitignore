@@ -180,3 +180,5 @@ react-dashboard/out/
 react-dashboard/.next/
 _next/
 react-dashboard/coverage/
+
+react-dashboard/public/tasks.json
