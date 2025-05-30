@@ -1,0 +1,12 @@
+{
+  "id": "TM_WEB-18",
+  "title": "Remove KANBAN board functionality",
+  "description": "Remove the KANBAN board feature from the web dashboard interface. This includes removing related components, routes, and any associated UI elements.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748620239.657114,
+  "updated_at": 1748620239.657114,
+  "started_at": null,
+  "closed_at": null
+}
