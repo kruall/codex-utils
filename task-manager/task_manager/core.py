@@ -25,10 +25,21 @@ class TaskManager:
     def __init__(self, tasks_root: str = ".tasks"):
         self.tasks_root = Path(tasks_root)
         self.tasks_root.mkdir(exist_ok=True)
+        self._queue_list_cache: List[Dict[str, str]] | None = None
+        self._task_list_cache: dict[tuple[Optional[str], Optional[str]], List[Dict]] = {}
+
+    def _invalidate_queue_cache(self) -> None:
+        self._queue_list_cache = None
+
+    def _invalidate_task_cache(self) -> None:
+        self._task_list_cache.clear()
 
     def queue_list(self) -> List[Dict[str, str]]:
         """List all queues."""
-        queues = []
+        if self._queue_list_cache is not None:
+            return self._queue_list_cache
+
+        queues: List[Dict[str, str]] = []
         for queue_dir in self.tasks_root.iterdir():
             if queue_dir.is_dir():
                 meta_file = queue_dir / "meta.json"
@@ -38,6 +49,8 @@ class TaskManager:
                         continue
                     queue = Queue.from_meta(queue_dir.name, meta)
                     queues.append(queue.to_dict())
+
+        self._queue_list_cache = queues
         return queues
 
     def queue_add(self, name: str, title: str, description: str) -> None:
@@ -78,7 +91,9 @@ class TaskManager:
                 raise StorageError(f"Error saving metadata for queue '{name}'")
 
             logger.info(f"Queue '{name}' created successfully")
-            
+            self._invalidate_queue_cache()
+            self._invalidate_task_cache()
+
         except (OSError, IOError) as e:
             raise StorageError(f"Error creating queue '{name}': {e}")
 
@@ -120,6 +135,7 @@ class TaskManager:
                 raise StorageError(f"Failed to save task '{task_id}' to file")
 
             logger.info(f"Task '{task_id}' created successfully")
+            self._invalidate_task_cache()
             return task_id
 
         except (OSError, IOError) as e:
@@ -159,10 +175,15 @@ class TaskManager:
         task_data.updated_at = time.time()
         if not save_json(task_file, task_data.to_dict()):
             raise StorageError(f"Failed to save task '{task_id}'")
+        self._invalidate_task_cache()
 
     def task_list(self, status: Optional[str] = None, queue: Optional[str] = None) -> List[Dict]:
         """List tasks with optional filtering."""
-        tasks = []
+        cache_key = (status, queue)
+        if cache_key in self._task_list_cache:
+            return self._task_list_cache[cache_key]
+
+        tasks: List[Dict] = []
         
         # Determine which queues to search
         if queue:
@@ -192,6 +213,7 @@ class TaskManager:
         
         # Sort by creation time
         tasks.sort(key=lambda t: t.get("created_at", 0))
+        self._task_list_cache[cache_key] = tasks
         return tasks
 
     def task_show(self, task_id: str) -> Dict:
@@ -366,6 +388,8 @@ class TaskManager:
 
             shutil.rmtree(queue_dir)
             logger.info(f"Queue '{name}' deleted successfully")
+            self._invalidate_queue_cache()
+            self._invalidate_task_cache()
         except (OSError, IOError) as e:
             raise StorageError(f"Error deleting queue '{name}': {e}")
 
@@ -378,6 +402,7 @@ class TaskManager:
         try:
             task_file.unlink()
             logger.info(f"Task '{task_id}' deleted successfully")
+            self._invalidate_task_cache()
         except (OSError, IOError) as e:
             raise StorageError(f"Error deleting task '{task_id}': {e}")
 
