@@ -1,13 +1,23 @@
 import fs from 'fs'
 import path from 'path'
-import { useState } from 'react'
+import { useState, ChangeEvent } from 'react'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import { useTaskContext } from '../../context/TaskContext'
 import Navigation from '../../components/Navigation'
 import styles from '../Page.module.css'
+import { Task } from '../../types'
 
-export async function getStaticPaths() {
+interface TaskPageProps {
+  task: Task & {
+    description?: string;
+    comments?: Array<{ id: string; text: string }>;
+    links?: Record<string, string[]>;
+  };
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
   const tasksDir = path.join(process.cwd(), '..', '.tasks')
-  const paths = []
+  const paths: Array<{ params: { id: string } }> = []
   try {
     const queues = fs.readdirSync(tasksDir)
     for (const q of queues) {
@@ -25,23 +35,27 @@ export async function getStaticPaths() {
   return { paths, fallback: false }
 }
 
-export async function getStaticProps({ params }) {
-  const { id } = params
+export const getStaticProps: GetStaticProps<TaskPageProps> = async ({ params }) => {
+  if (!params || !params.id) {
+    return { notFound: true }
+  }
+  
+  const id = params.id as string
   const queue = id.split('-')[0]
   const file = path.join(process.cwd(), '..', '.tasks', queue, `${id}.json`)
   const task = JSON.parse(fs.readFileSync(file, 'utf8'))
   return { props: { task } }
 }
 
-export default function TaskPage({ task }) {
-  const [title, setTitle] = useState(task.title)
-  const [status, setStatus] = useState(task.status)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+export default function TaskPage({ task }: TaskPageProps) {
+  const [title, setTitle] = useState<string>(task.title)
+  const [status, setStatus] = useState<string>(task.status)
+  const [saving, setSaving] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
+  const [success, setSuccess] = useState<boolean>(false)
   const { setTasks } = useTaskContext()
 
-  const save = async () => {
+  const save = async (): Promise<void> => {
     setSaving(true)
     setError('')
     setSuccess(false)
@@ -56,7 +70,7 @@ export default function TaskPage({ task }) {
       }
       const data = await res.json()
       if (data.task) {
-        setTasks(ts => ts.map(t => (t.id === task.id ? { ...t, ...data.task } : t)))
+        setTasks((ts: Task[]) => ts.map((t: Task) => (t.id === task.id ? { ...t, ...data.task } : t)))
       }
       setSuccess(true)
     } catch {
@@ -75,13 +89,13 @@ export default function TaskPage({ task }) {
       <div className={styles.marginBottom}>
         <label>
           Title:
-          <input value={title} onChange={e => setTitle(e.target.value)} className={styles.inline} />
+          <input value={title} onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} className={styles.inline} />
         </label>
       </div>
       <div className={styles.marginBottom}>
         <label>
           Status:
-          <select value={status} onChange={e => setStatus(e.target.value)} className={styles.inline}>
+          <select value={status} onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatus(e.target.value)} className={styles.inline}>
             <option value="todo">todo</option>
             <option value="in_progress">in_progress</option>
             <option value="done">done</option>
@@ -95,16 +109,16 @@ export default function TaskPage({ task }) {
       <p>{task.description}</p>
       <h2>Comments</h2>
       <ul>
-        {(task.comments || []).map(c => (
+        {(task.comments || []).map((c) => (
           <li key={c.id}>{c.text}</li>
         ))}
       </ul>
       <h2>Links</h2>
       <ul>
         {Object.entries(task.links || {}).flatMap(([rel, list]) =>
-          list.map(l => <li key={`${rel}-${l}`}>{rel}: {l}</li>)
+          list.map((l: string) => <li key={`${rel}-${l}`}>{rel}: {l}</li>)
         )}
       </ul>
     </div>
   )
-}
+} 

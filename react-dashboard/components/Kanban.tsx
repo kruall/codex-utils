@@ -1,13 +1,14 @@
 import React from 'react'
 import useTasks from '../hooks/useTasks'
 import styles from './Kanban.module.css'
+import { KanbanColumnProps, Task } from '../types'
 
-function Column({ title, tasks }) {
+function Column({ title, tasks }: KanbanColumnProps) {
   return (
     <div className={styles.column}>
       <h3>{title}</h3>
       <ul className={styles.list}>
-        {tasks.map(t => (
+        {tasks.map((t: Task) => (
           <li key={t.id} className={styles.item}>
             {t.title}
           </li>
@@ -20,9 +21,9 @@ function Column({ title, tasks }) {
 export default function Kanban() {
   const tasks = useTasks()
   const columns = {
-    todo: tasks.filter(t => t.status === 'todo'),
-    in_progress: tasks.filter(t => t.status === 'in_progress'),
-    done: tasks.filter(t => t.status === 'done')
+    todo: tasks.filter((t: Task) => t.status === 'todo'),
+    in_progress: tasks.filter((t: Task) => t.status === 'in_progress'),
+    done: tasks.filter((t: Task) => t.status === 'done')
   }
 
   return (
@@ -32,4 +33,4 @@ export default function Kanban() {
       <Column title="Done" tasks={columns.done} />
     </div>
   )
-}
+} 

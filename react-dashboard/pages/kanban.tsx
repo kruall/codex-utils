@@ -1,12 +1,13 @@
+import Kanban from '../components/Kanban'
 import Navigation from '../components/Navigation'
 import styles from './Page.module.css'
 
-export default function Home() {
+export default function KanbanPage() {
   return (
     <div className={styles.container}>
       <Navigation />
-      <h1>Codex Dashboard</h1>
-      <p>Select a view from the navigation menu.</p>
+      <h1>Kanban Board</h1>
+      <Kanban />
     </div>
   )
-}
+} 

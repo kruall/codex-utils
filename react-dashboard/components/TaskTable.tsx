@@ -1,23 +1,23 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, ChangeEvent } from 'react'
 import Link from 'next/link'
 import useTasks from '../hooks/useTasks'
 import styles from './TaskTable.module.css'
+import { TaskTableProps, Task } from '../types'
 
-
-export default function TaskTable({ tasks: tasksProp }) {
+export default function TaskTable({ tasks: tasksProp }: TaskTableProps) {
   const tasks = tasksProp ?? useTasks()
-  const [pageSize, setPageSize] = useState(10)
-  const [page, setPage] = useState(0)
-  const [statusFilter, setStatusFilter] = useState('')
-  const [queueFilter, setQueueFilter] = useState('')
-  const [search, setSearch] = useState('')
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [page, setPage] = useState<number>(0)
+  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [queueFilter, setQueueFilter] = useState<string>('')
+  const [search, setSearch] = useState<string>('')
 
   const queues = useMemo(
-    () => Array.from(new Set(tasks.map(t => (t.id || '').split('-')[0]))),
+    () => Array.from(new Set(tasks.map((t: Task) => (t.id || '').split('-')[0]))),
     [tasks]
   )
 
-  const filteredTasks = tasks.filter(t => {
+  const filteredTasks = tasks.filter((t: Task) => {
     if (statusFilter && t.status !== statusFilter) return false
     if (queueFilter && !(t.id || '').startsWith(queueFilter + '-')) return false
     if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
@@ -28,9 +28,9 @@ export default function TaskTable({ tasks: tasksProp }) {
   const start = page * pageSize
   const pagedTasks = filteredTasks.slice(start, start + pageSize)
 
-  const handlePrev = () => setPage(p => Math.max(0, p - 1))
-  const handleNext = () => setPage(p => Math.min(pageCount - 1, p + 1))
-  const handlePageSizeChange = e => {
+  const handlePrev = (): void => setPage(p => Math.max(0, p - 1))
+  const handleNext = (): void => setPage(p => Math.min(pageCount - 1, p + 1))
+  const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>): void => {
     setPageSize(Number(e.target.value))
     setPage(0)
   }
@@ -44,7 +44,7 @@ export default function TaskTable({ tasks: tasksProp }) {
       <div className={styles.filterControls}>
         <label>
           Preset:
-          <select onChange={e => {
+          <select onChange={(e: ChangeEvent<HTMLSelectElement>) => {
             const preset = e.target.value
             if (preset === 'todo' || preset === 'in_progress' || preset === 'done') {
               setStatusFilter(preset)
@@ -61,7 +61,7 @@ export default function TaskTable({ tasks: tasksProp }) {
         </label>
         <label>
           Status:
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={styles.inline}>
+          <select value={statusFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)} className={styles.inline}>
             <option value="">All</option>
             <option value="todo">Todo</option>
             <option value="in_progress">In Progress</option>
@@ -70,16 +70,16 @@ export default function TaskTable({ tasks: tasksProp }) {
         </label>
         <label>
           Queue:
-          <select value={queueFilter} onChange={e => setQueueFilter(e.target.value)} className={styles.inline}>
+          <select value={queueFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setQueueFilter(e.target.value)} className={styles.inline}>
             <option value="">All</option>
-            {queues.map(q => (
+            {queues.map((q: string) => (
               <option key={q} value={q}>{q}</option>
             ))}
           </select>
         </label>
         <label>
           Search:
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} className={styles.inline} />
+          <input type="text" value={search} onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} className={styles.inline} />
         </label>
         <label className={styles.pageSize}>
           Page size:
@@ -100,7 +100,7 @@ export default function TaskTable({ tasks: tasksProp }) {
           </tr>
         </thead>
         <tbody>
-          {pagedTasks.map(task => (
+          {pagedTasks.map((task: Task) => (
             <tr key={task.id}>
               <td>
                 <Link href={`/task/${task.id}`} className={styles.link}>
@@ -127,4 +127,4 @@ export default function TaskTable({ tasks: tasksProp }) {
       </div>
     </div>
   )
-}
+} 
