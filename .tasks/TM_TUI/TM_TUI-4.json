@@ -2,11 +2,22 @@
   "id": "TM_TUI-4",
   "title": "Refactor TUI into screen classes",
   "description": "Split TMApp into separate Textual screens and components for easier maintenance",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start refactoring TUI into screen classes",
+      "created_at": 1748615173.2745767
+    },
+    {
+      "id": 2,
+      "text": "Refactor complete and tests pass",
+      "created_at": 1748615272.618164
+    }
+  ],
   "links": {},
   "created_at": 1748553493.7485814,
-  "updated_at": 1748553493.748582,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748615275.7103128,
+  "started_at": 1748615170.8864288,
+  "closed_at": 1748615275.7102861
 }
