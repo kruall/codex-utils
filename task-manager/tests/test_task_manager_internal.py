@@ -14,6 +14,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from task_manager import (
     TaskManager,
     QueueExistsError,
+    QueueNotFoundError,
+    TaskNotFoundError,
+    InvalidFieldError,
+    CommentNotFoundError,
+    LinkNotFoundError,
     StorageError,
 )
 
@@ -29,6 +34,27 @@ class TestTaskManagerInternal(unittest.TestCase):
         """Clean up test environment."""
         import shutil
         shutil.rmtree(self.test_dir)
+
+    def _create_basic_queue(self, name="q", title="Queue", description="desc"):
+        """Helper method to create a basic queue."""
+        self.tm.queue_add(name, title, description)
+        return name
+
+    def _create_queue_with_task(self, queue_name="q", queue_title="Queue", queue_desc="desc",
+                               task_title="Task", task_desc="Desc"):
+        """Helper method to create a queue with a single task."""
+        self.tm.queue_add(queue_name, queue_title, queue_desc)
+        task_id = self.tm.task_add(task_title, task_desc, queue_name)
+        return queue_name, task_id
+
+    def _create_multiple_tasks(self, queue_name="q", task_count=2):
+        """Helper method to create a queue with multiple tasks."""
+        self.tm.queue_add(queue_name, "Queue", "desc")
+        task_ids = []
+        for i in range(task_count):
+            task_id = self.tm.task_add(f"Task{i+1}", f"Description{i+1}", queue_name)
+            task_ids.append(task_id)
+        return queue_name, task_ids
 
     def test_task_manager_initialization(self):
         """Test TaskManager initialization."""
@@ -205,8 +231,7 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_task_add_and_show_internal(self):
         """Test adding a task and showing its details."""
-        self.tm.queue_add("q", "Queue", "desc")
-        task_id = self.tm.task_add("Task", "Desc", "q")
+        queue_name, task_id = self._create_queue_with_task()
         self.assertEqual(task_id, "q-1")
 
         task = self.tm.task_show(task_id)
@@ -217,8 +242,7 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_task_update_and_status_changes(self):
         """Test task update, start and done status changes."""
-        self.tm.queue_add("q", "Queue", "desc")
-        task_id = self.tm.task_add("Task", "Desc", "q")
+        queue_name, task_id = self._create_queue_with_task()
         self.tm.task_update(task_id, "title", "New Title")
         self.tm.task_start(task_id)
         self.tm.task_done(task_id)
@@ -229,8 +253,7 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_task_comments_internal(self):
         """Test adding, listing and removing task comments."""
-        self.tm.queue_add("q", "Queue", "desc")
-        task_id = self.tm.task_add("Task", "Desc", "q")
+        queue_name, task_id = self._create_queue_with_task()
 
         self.tm.task_comment_add(task_id, "c1")
         self.tm.task_comment_add(task_id, "c2")
@@ -244,8 +267,7 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_task_comment_edit_internal(self):
         """Test editing task comments."""
-        self.tm.queue_add("q", "Queue", "desc")
-        task_id = self.tm.task_add("Task", "Desc", "q")
+        queue_name, task_id = self._create_queue_with_task()
 
         self.tm.task_comment_add(task_id, "old")
         self.tm.task_comment_edit(task_id, 1, "new")
@@ -256,23 +278,73 @@ class TestTaskManagerInternal(unittest.TestCase):
 
     def test_queue_delete_internal(self):
         """Test deleting a queue via TaskManager."""
-        self.tm.queue_add("del", "Del", "desc")
-        self.tm.queue_delete("del")
+        queue_name = self._create_basic_queue("del", "Del", "desc")
+        self.tm.queue_delete(queue_name)
         self.assertEqual(self.tm.queue_list(), [])
 
     def test_task_delete_internal(self):
         """Test deleting a task via TaskManager."""
-        self.tm.queue_add("q", "Queue", "desc")
-        task_id = self.tm.task_add("Task", "Desc", "q")
+        queue_name, task_id = self._create_queue_with_task()
         self.tm.task_delete(task_id)
         self.assertEqual(self.tm.task_list(), [])
 
     def test_get_next_task_number_internal(self):
         """Test internal task numbering logic."""
+        queue_name = self._create_basic_queue()
+        self.assertEqual(self.tm._get_next_task_number(queue_name), 1)
+        self.tm.task_add("A", "B", queue_name)
+        self.assertEqual(self.tm._get_next_task_number(queue_name), 2)
+
+    def test_queue_add_empty_name_internal(self):
+        """Queue name cannot be empty."""
+        with self.assertRaises(ValueError):
+            self.tm.queue_add("", "T", "D")
+
+    def test_queue_delete_nonexistent_internal(self):
+        """Deleting a missing queue raises QueueNotFoundError."""
+        with self.assertRaises(QueueNotFoundError):
+            self.tm.queue_delete("missing")
+
+    def test_task_add_nonexistent_queue_internal(self):
+        """Adding a task to a missing queue raises QueueNotFoundError."""
+        with self.assertRaises(QueueNotFoundError):
+            self.tm.task_add("T", "D", "missing")
+
+    def test_task_show_nonexistent_internal(self):
+        """Showing a non-existent task raises TaskNotFoundError."""
+        with self.assertRaises(TaskNotFoundError):
+            self.tm.task_show("missing-1")
+
+    def test_task_show_invalid_json_internal(self):
+        """Invalid task file content triggers StorageError."""
         self.tm.queue_add("q", "Queue", "desc")
-        self.assertEqual(self.tm._get_next_task_number("q"), 1)
-        self.tm.task_add("A", "B", "q")
-        self.assertEqual(self.tm._get_next_task_number("q"), 2)
+        bad_file = Path(self.tasks_root) / "q" / "q-1.json"
+        bad_file.write_text("not json", encoding="utf-8")
+        with self.assertRaises(StorageError):
+            self.tm.task_show("q-1")
+
+    def test_task_update_invalid_field_internal(self):
+        """Invalid field update raises InvalidFieldError."""
+        queue_name, task_id = self._create_queue_with_task("q", "Queue", "desc", "T", "D")
+        with self.assertRaises(InvalidFieldError):
+            self.tm.task_update(task_id, "bogus", "v")
+
+    def test_task_comment_remove_not_found_internal(self):
+        """Removing missing comment raises CommentNotFoundError."""
+        queue_name, task_id = self._create_queue_with_task("q", "Queue", "desc", "T", "D")
+        with self.assertRaises(CommentNotFoundError):
+            self.tm.task_comment_remove(task_id, 1)
+
+    def test_task_link_remove_not_found_internal(self):
+        """Removing absent link raises LinkNotFoundError."""
+        queue_name, task_ids = self._create_multiple_tasks("q", 2)
+        with self.assertRaises(LinkNotFoundError):
+            self.tm.task_link_remove(task_ids[0], task_ids[1])
+
+    def test_task_delete_nonexistent_internal(self):
+        """Deleting a missing task raises TaskNotFoundError."""
+        with self.assertRaises(TaskNotFoundError):
+            self.tm.task_delete("q-99")
 
 
 if __name__ == '__main__':
