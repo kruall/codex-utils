@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { useState } from 'react'
+import { useTaskContext } from '../../context/TaskContext'
 import Navigation from '../../components/Navigation'
 import styles from '../Page.module.css'
 
@@ -35,20 +36,42 @@ export async function getStaticProps({ params }) {
 export default function TaskPage({ task }) {
   const [title, setTitle] = useState(task.title)
   const [status, setStatus] = useState(task.status)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const { setTasks } = useTaskContext()
 
   const save = async () => {
-    await fetch('/api/update-task', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: task.id, updates: { title, status } })
-    })
-    alert('Task updated')
+    setSaving(true)
+    setError('')
+    setSuccess(false)
+    try {
+      const res = await fetch('/api/update-task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: task.id, updates: { title, status } })
+      })
+      if (!res.ok) {
+        throw new Error(`Request failed: ${res.status} ${res.statusText}`)
+      }
+      const data = await res.json()
+      if (data.task) {
+        setTasks(ts => ts.map(t => (t.id === task.id ? { ...t, ...data.task } : t)))
+      }
+      setSuccess(true)
+    } catch {
+      setError('Failed to update task')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <div className={styles.container}>
       <Navigation />
       <h1>{task.id}</h1>
+      {error && <p className={styles.error} role="alert">{error}</p>}
+      {success && <p className={styles.success}>Task updated</p>}
       <div className={styles.marginBottom}>
         <label>
           Title:
@@ -65,7 +88,9 @@ export default function TaskPage({ task }) {
           </select>
         </label>
       </div>
-      <button onClick={save} className={styles.marginBottomLarge}>Save</button>
+      <button onClick={save} disabled={saving} className={styles.marginBottomLarge}>
+        {saving ? 'Saving...' : 'Save'}
+      </button>
       <h2>Description</h2>
       <p>{task.description}</p>
       <h2>Comments</h2>
