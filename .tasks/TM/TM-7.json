@@ -1,0 +1,38 @@
+{
+  "id": "TM-7",
+  "title": "Add tm verify command for AI agent verification",
+  "description": "Create a new 'tm verify' command that helps AI agents check they haven't forgotten anything before ending their work session. Initial implementation should check for tasks left in 'in_progress' status and provide clear feedback.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "REQUIREMENT: Create './tm verify' command that acts as a checklist tool for AI agents to ensure they haven't forgotten any critical steps before ending their work session.",
+      "created_at": 1748891087.027482
+    },
+    {
+      "id": 2,
+      "text": "INITIAL IMPLEMENTATION: Check for tasks in 'in_progress' status. Command should: 1) List any tasks with status='in_progress' 2) Show clear warning if any found 3) Return exit code 0 if all good, 1 if issues found 4) Provide actionable feedback",
+      "created_at": 1748891091.739019
+    },
+    {
+      "id": 3,
+      "text": "FUTURE ENHANCEMENTS: After initial implementation, extend to check: 1) Uncommitted git changes 2) Test failures (pytest, ruff, mypy, npm test) 3) Unsaved files 4) Missing task comments 5) Integration with AGENTS.md checklist",
+      "created_at": 1748891096.776084
+    },
+    {
+      "id": 4,
+      "text": "EXAMPLE OUTPUT: '\u2705 No tasks in progress' or '\u274c Found 2 tasks in progress: TM-5, TM_WEB-10. Run: ./tm task done --id <task-id> to close them.' Should be clear and actionable for AI agents.",
+      "created_at": 1748891102.33671
+    },
+    {
+      "id": 5,
+      "text": "IMPLEMENTATION LOCATION: Add to task-manager/cli.py as new subcommand. Follow existing pattern like 'task list --status in_progress' but with better formatting and exit codes for automation.",
+      "created_at": 1748891107.1996129
+    }
+  ],
+  "links": {},
+  "created_at": 1748891082.1824582,
+  "updated_at": 1748891107.199651,
+  "started_at": null,
+  "closed_at": null
+}
