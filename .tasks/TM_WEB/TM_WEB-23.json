@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-23",
+  "title": "Implement task synchronization with GitHub repository",
+  "description": "Create functionality to read tasks from GitHub repository files (.tasks/ directory) and sync with local task manager data. Handle file parsing and data mapping.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-22"
+    ]
+  },
+  "created_at": 1748887663.91928,
+  "updated_at": 1748887697.1609879,
+  "started_at": null,
+  "closed_at": null
+}

@@ -1,0 +1,12 @@
+{
+  "id": "TM_WEB-29",
+  "title": "Add security and token management",
+  "description": "Implement secure token storage, token refresh mechanisms, and proper CORS handling. Add security measures against CSRF attacks and implement token expiration handling.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748887689.774667,
+  "updated_at": 1748887689.774667,
+  "started_at": null,
+  "closed_at": null
+}

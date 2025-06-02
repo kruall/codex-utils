@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-24",
+  "title": "Add task creation via GitHub API",
+  "description": "Implement functionality to create new tasks by writing to GitHub repository using createOrUpdateFileContents API. Handle file content generation and commit messages.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-22"
+    ]
+  },
+  "created_at": 1748887668.6957572,
+  "updated_at": 1748887701.01073,
+  "started_at": null,
+  "closed_at": null
+}

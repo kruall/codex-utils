@@ -1,0 +1,12 @@
+{
+  "id": "TM_WEB-28",
+  "title": "Add error handling and offline mode",
+  "description": "Implement comprehensive error handling for GitHub API failures, rate limiting, and network issues. Add offline mode with local storage fallback when GitHub API is unavailable.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "created_at": 1748887684.805411,
+  "updated_at": 1748887684.805411,
+  "started_at": null,
+  "closed_at": null
+}

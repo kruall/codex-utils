@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-26",
+  "title": "Add queue management via GitHub API",
+  "description": "Implement queue creation, deletion, and modification through GitHub API. Handle queue file operations and maintain queue-task relationships in repository structure.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-22"
+    ]
+  },
+  "created_at": 1748887676.921186,
+  "updated_at": 1748887701.357137,
+  "started_at": null,
+  "closed_at": null
+}

@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-21",
+  "title": "Add GitHub OAuth authentication",
+  "description": "Implement GitHub OAuth Web flow for user authentication. Add login/logout functionality and store access token securely in session storage.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-22"
+    ]
+  },
+  "created_at": 1748887654.93889,
+  "updated_at": 1748887693.6621199,
+  "started_at": null,
+  "closed_at": null
+}

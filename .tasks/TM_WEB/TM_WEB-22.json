@@ -1,0 +1,20 @@
+{
+  "id": "TM_WEB-22",
+  "title": "Integrate Octokit client for GitHub API",
+  "description": "Add @octokit/rest dependency and create GitHub API client wrapper. Implement basic connection and error handling for GitHub API calls.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-21",
+      "TM_WEB-23",
+      "TM_WEB-24",
+      "TM_WEB-25",
+      "TM_WEB-26"
+    ]
+  },
+  "created_at": 1748887659.222373,
+  "updated_at": 1748887701.357419,
+  "started_at": null,
+  "closed_at": null
+}

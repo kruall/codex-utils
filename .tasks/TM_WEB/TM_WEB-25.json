@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-25",
+  "title": "Add task updates via GitHub API",
+  "description": "Implement task editing functionality through GitHub API. Handle task status changes, field updates, and comment additions by updating repository files.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM_WEB-22"
+    ]
+  },
+  "created_at": 1748887672.629698,
+  "updated_at": 1748887701.179368,
+  "started_at": null,
+  "closed_at": null
+}
