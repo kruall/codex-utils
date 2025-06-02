@@ -1,0 +1,23 @@
+{
+  "id": "TM-11",
+  "title": "Implement Epic status validation logic",
+  "description": "Create logic to automatically manage Epic status based on child tasks/epics. Epic can only be marked 'done' if ALL child tasks and epics are 'done'. Implement validation and auto-status updates.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "STATUS VALIDATION LOGIC: 1) Epic can only transition to 'done' if ALL child tasks have status='done' AND ALL child epics have status='done' 2) When child item status changes, check if parent epic can be auto-completed 3) Prevent manual status changes that violate rules",
+      "created_at": 1748891454.9806788
+    }
+  ],
+  "links": {
+    "related": [
+      "TM-9",
+      "TM-12"
+    ]
+  },
+  "created_at": 1748891414.815446,
+  "updated_at": 1748891454.980691,
+  "started_at": null,
+  "closed_at": null
+}
