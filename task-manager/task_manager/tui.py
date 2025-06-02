@@ -22,6 +22,7 @@ except Exception:  # pragma: no cover - optional dependency
     def launch_tui(tm: "TaskManager") -> None:
         return
 else:
+    from textual.message import Message
 
     def _parse_comment_id(cid_str: str) -> int | None:
         """Parse a comment ID string to int."""
@@ -31,6 +32,68 @@ else:
             return int(cid_str)
         except ValueError:
             return None
+
+    class Back(Message):
+        """Signal that the user requested to go back."""
+
+    class Quit(Message):
+        """Signal that the application should exit."""
+
+    class Queues(Message):
+        """Navigate to the queues screen."""
+
+    class Tasks(Message):
+        """Navigate to the tasks screen."""
+
+    class QueueAdd(Message):
+        """Show the add queue form."""
+
+    class CreateQueue(Message):
+        def __init__(self, name: str, title: str, desc: str) -> None:
+            super().__init__()
+            self.name = name
+            self.title = title
+            self.desc = desc
+
+    class Cancel(Message):
+        """Cancel the current action."""
+
+    class QueueDelete(Message):
+        def __init__(self, name: str) -> None:
+            super().__init__()
+            self.name = name
+
+    class ConfirmDelete(Message):
+        """Confirm queue deletion."""
+
+    class ViewComments(Message):
+        def __init__(self, task_id: str) -> None:
+            super().__init__()
+            self.task_id = task_id
+
+    class TaskDelete(Message):
+        def __init__(self, task_id: str) -> None:
+            super().__init__()
+            self.task_id = task_id
+
+    class ConfirmTaskDelete(Message):
+        """Confirm task deletion."""
+
+    class AddComment(Message):
+        def __init__(self, text: str) -> None:
+            super().__init__()
+            self.text = text
+
+    class EditComment(Message):
+        def __init__(self, cid: int, text: str) -> None:
+            super().__init__()
+            self.cid = cid
+            self.text = text
+
+    class RemoveComment(Message):
+        def __init__(self, cid: int) -> None:
+            super().__init__()
+            self.cid = cid
 
     class BaseScreen(Screen):
         def __init__(self, manager: "TaskManager") -> None:
@@ -47,9 +110,15 @@ else:
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
             bid = event.button.id
             if bid == "back":
-                self.app.pop_screen()
+                self.post_message(Back())
             elif bid == "quit":
-                self.app.exit()
+                self.post_message(Quit())
+
+        def on_back(self, message: Back) -> None:  # pragma: no cover - UI callbacks
+            self.app.pop_screen()
+
+        def on_quit(self, message: Quit) -> None:  # pragma: no cover - UI callbacks
+            self.app.exit()
 
         def show_error(self, message: str) -> None:
             # Simple error display - could be enhanced with a modal
@@ -74,15 +143,24 @@ else:
             self.set_focus(self.query_one("#queues"))
 
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)
             bid = event.button.id
             if bid == "queues":
-                self.app.push_screen(QueuesScreen(self.manager))
+                self.post_message(Queues())
             elif bid == "tasks":
-                self.app.push_screen(TasksScreen(self.manager))
-            elif bid == "quit":
-                self.app.exit()
+                self.post_message(Tasks())
+
+        def on_queues(self, message: Queues) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(QueuesScreen(self.manager))
+
+        def on_tasks(self, message: Tasks) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(TasksScreen(self.manager))
 
     class QueuesScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__(manager)
+            self._delete_target: str | None = None
+
         def on_mount(self) -> None:
             self.refresh_screen()
 
@@ -103,45 +181,65 @@ else:
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
             super().on_button_pressed(event)  # Handle common actions
             bid = event.button.id
-            if bid == "back":
-                self.app.pop_screen()
-            elif bid == "queue_add":
-                assert self.body is not None
-                self.body.remove_children()
-                self.body.mount(Input(placeholder="Queue name", id="q_name"))
-                self.body.mount(Input(placeholder="Queue title", id="q_title"))
-                self.body.mount(Input(placeholder="Description", id="q_desc"))
-                self.body.mount(Button("Create", id="create_queue"))
-                self.body.mount(Button("Back", id="cancel"))
+            if bid == "queue_add":
+                self.post_message(QueueAdd())
             elif bid == "create_queue":
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
                 desc = self.query_one("#q_desc", Input).value
-                self._handle_manager_operation(self.manager.queue_add, name, title, desc)
-                self.refresh_screen()
+                self.post_message(CreateQueue(name, title, desc))
             elif bid == "cancel":
-                self.refresh_screen()
+                self.post_message(Cancel())
             elif bid == "queue_delete":
                 name = self.query_one("#del_queue_name", Input).value
                 if name:
-                    assert self.body is not None
-                    self.body.remove_children()
-                    self.body.mount(
-                        Static(
-                            f"Are you sure you want to delete the queue '{name}'?",
-                            classes="confirmation",
-                        )
-                    )
-                    self.body.mount(Button("Yes", id="confirm_delete"))
-                    self.body.mount(Button("No", id="cancel"))
-                    self._delete_target = name
+                    self.post_message(QueueDelete(name))
             elif bid == "confirm_delete":
-                delete_name: str | None = getattr(self, "_delete_target", None)
-                if delete_name:
-                    self._handle_manager_operation(self.manager.queue_delete, delete_name)
-                self.refresh_screen()
+                self.post_message(ConfirmDelete())
+
+        def on_queue_add(self, message: QueueAdd) -> None:  # pragma: no cover - UI callbacks
+            assert self.body is not None
+            self.body.remove_children()
+            self.body.mount(Input(placeholder="Queue name", id="q_name"))
+            self.body.mount(Input(placeholder="Queue title", id="q_title"))
+            self.body.mount(Input(placeholder="Description", id="q_desc"))
+            self.body.mount(Button("Create", id="create_queue"))
+            self.body.mount(Button("Back", id="cancel"))
+
+        def on_create_queue(self, message: CreateQueue) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.queue_add, message.name, message.title, message.desc
+            )
+            self.refresh_screen()
+
+        def on_cancel(self, message: Cancel) -> None:  # pragma: no cover - UI callbacks
+            self.refresh_screen()
+
+        def on_queue_delete(self, message: QueueDelete) -> None:  # pragma: no cover - UI callbacks
+            assert self.body is not None
+            self.body.remove_children()
+            self.body.mount(
+                Static(
+                    f"Are you sure you want to delete the queue '{message.name}'?",
+                    classes="confirmation",
+                )
+            )
+            self.body.mount(Button("Yes", id="confirm_delete"))
+            self.body.mount(Button("No", id="cancel"))
+            self._delete_target = message.name
+
+        def on_confirm_delete(self, message: ConfirmDelete) -> None:  # pragma: no cover - UI callbacks
+            delete_name: str | None = getattr(self, "_delete_target", None)
+            if delete_name:
+                self._handle_manager_operation(self.manager.queue_delete, delete_name)
+            self._delete_target = None
+            self.refresh_screen()
 
     class TasksScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__(manager)
+            self._delete_target: str | None = None
+
         def on_mount(self) -> None:
             self.refresh_screen()
 
@@ -162,35 +260,42 @@ else:
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
             super().on_button_pressed(event)  # Handle common actions
             bid = event.button.id
-            if bid == "back":
-                self.app.pop_screen()
-            elif bid == "view_comments":
+            if bid == "view_comments":
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
-                    # Validate task exists before navigating
-                    if self._handle_manager_operation(self.manager.task_show, task_id) is not None:
-                        self.app.push_screen(CommentsScreen(self.manager, task_id))
+                    self.post_message(ViewComments(task_id))
             elif bid == "task_delete":
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
-                    assert self.body is not None
-                    self.body.remove_children()
-                    self.body.mount(
-                        Static(
-                            f"Are you sure you want to delete task '{task_id}'?",
-                            id="confirm_delete",
-                        )
-                    )
-                    self.body.mount(Button("Yes", id="confirm_task_delete"))
-                    self.body.mount(Button("No", id="cancel"))
-                    self._delete_target = task_id
+                    self.post_message(TaskDelete(task_id))
             elif bid == "confirm_task_delete":
-                tid: str | None = getattr(self, "_delete_target", None)
-                if tid:
-                    self._handle_manager_operation(self.manager.task_delete, tid)
-                self.refresh_screen()
+                self.post_message(ConfirmTaskDelete())
             elif bid == "cancel":
-                self.refresh_screen()
+                self.post_message(Cancel())
+
+        def on_view_comments(self, message: ViewComments) -> None:  # pragma: no cover - UI callbacks
+            if self._handle_manager_operation(self.manager.task_show, message.task_id) is not None:
+                self.app.push_screen(CommentsScreen(self.manager, message.task_id))
+
+        def on_task_delete(self, message: TaskDelete) -> None:  # pragma: no cover - UI callbacks
+            assert self.body is not None
+            self.body.remove_children()
+            self.body.mount(
+                Static(
+                    f"Are you sure you want to delete task '{message.task_id}'?",
+                    id="confirm_delete",
+                )
+            )
+            self.body.mount(Button("Yes", id="confirm_task_delete"))
+            self.body.mount(Button("No", id="cancel"))
+            self._delete_target = message.task_id
+
+        def on_confirm_task_delete(self, message: ConfirmTaskDelete) -> None:  # pragma: no cover - UI callbacks
+            tid: str | None = getattr(self, "_delete_target", None)
+            if tid:
+                self._handle_manager_operation(self.manager.task_delete, tid)
+            self._delete_target = None
+            self.refresh_screen()
 
     class CommentsScreen(BaseScreen):
         def __init__(self, manager: "TaskManager", task_id: str) -> None:
@@ -222,29 +327,43 @@ else:
             self.body.mount(Button("Back", id="back"))
 
         def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)
             bid = event.button.id
-            if bid == "back":
-                self.app.pop_screen()
-            elif bid == "add_comment":
+            if bid == "add_comment":
                 comment = self.query_one("#new_comment", Input).value
                 if comment:
-                    self._handle_manager_operation(self.manager.task_comment_add, self.task_id, comment)
-                self.refresh_screen()
+                    self.post_message(AddComment(comment))
             elif bid == "edit_comment":
                 cid = self.query_one("#edit_comment_id", Input).value
                 text = self.query_one("#edit_comment_text", Input).value
                 if cid and text:
                     cid_int = _parse_comment_id(cid)
                     if cid_int is not None:
-                        self._handle_manager_operation(self.manager.task_comment_edit, self.task_id, cid_int, text)
-                self.refresh_screen()
+                        self.post_message(EditComment(cid_int, text))
             elif bid == "remove_comment":
                 cid = self.query_one("#remove_comment_id", Input).value
                 if cid:
                     cid_int = _parse_comment_id(cid)
                     if cid_int is not None:
-                        self._handle_manager_operation(self.manager.task_comment_remove, self.task_id, cid_int)
-                self.refresh_screen()
+                        self.post_message(RemoveComment(cid_int))
+
+        def on_add_comment(self, message: AddComment) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.task_comment_add, self.task_id, message.text
+            )
+            self.refresh_screen()
+
+        def on_edit_comment(self, message: EditComment) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.task_comment_edit, self.task_id, message.cid, message.text
+            )
+            self.refresh_screen()
+
+        def on_remove_comment(self, message: RemoveComment) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.task_comment_remove, self.task_id, message.cid
+            )
+            self.refresh_screen()
 
     class TMApp(App):
         TITLE = "Task Manager"
