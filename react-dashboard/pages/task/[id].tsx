@@ -65,16 +65,26 @@ export default function TaskPage({ task }: TaskPageProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: task.id, updates: { title, status } })
       })
+
+      const data = await res.json().catch(() => null)
+
       if (!res.ok) {
-        throw new Error(`Request failed: ${res.status} ${res.statusText}`)
+        const message = data && typeof data.error === 'string'
+          ? data.error
+          : `Request failed: ${res.status} ${res.statusText}`
+        throw new Error(message)
       }
-      const data = await res.json()
-      if (data.task) {
+
+      if (data && data.task) {
         setTasks((ts: Task[]) => ts.map((t: Task) => (t.id === task.id ? { ...t, ...data.task } : t)))
       }
       setSuccess(true)
-    } catch {
-      setError('Failed to update task')
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Failed to update task')
+      }
     } finally {
       setSaving(false)
     }

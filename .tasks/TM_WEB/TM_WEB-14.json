@@ -2,8 +2,19 @@
   "id": "TM_WEB-14",
   "title": "Update Web dashboard for exception handling",
   "description": "Adapt web interface to display errors from core",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting TM_WEB-14",
+      "created_at": 1748620687.377212
+    },
+    {
+      "id": 2,
+      "text": "Display detailed API errors",
+      "created_at": 1748620802.4171083
+    }
+  ],
   "links": {
     "related": [
       "TM-4",
@@ -11,7 +22,7 @@
     ]
   },
   "created_at": 1748553472.921496,
-  "updated_at": 1748553491.5766253,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748620802.4171355,
+  "started_at": 1748620684.2745588,
+  "closed_at": 1748620799.116825
 }
