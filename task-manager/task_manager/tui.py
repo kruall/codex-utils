@@ -113,7 +113,7 @@ else:
                 desc = self.query_one("#q_desc", Input).value
                 try:
                     self.manager.queue_add(name, title, desc)
-                except TaskManagerError as e:
+                except (TaskManagerError, ValueError) as e:
                     self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "cancel":
@@ -137,7 +137,7 @@ else:
                 if delete_name:
                     try:
                         self.manager.queue_delete(delete_name)
-                    except TaskManagerError as e:
+                    except (TaskManagerError, ValueError) as e:
                         self.show_error(str(e))
                 self.refresh_screen()
 
@@ -169,7 +169,7 @@ else:
                 if task_id:
                     try:
                         self.manager.task_show(task_id)  # validate existence
-                    except TaskManagerError as e:
+                    except (TaskManagerError, ValueError) as e:
                         self.show_error(str(e))
                     else:
                         self.app.push_screen(CommentsScreen(self.manager, task_id))
@@ -192,7 +192,7 @@ else:
                 if tid:
                     try:
                         self.manager.task_delete(tid)
-                    except TaskManagerError as e:
+                    except (TaskManagerError, ValueError) as e:
                         self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "cancel":
@@ -212,7 +212,7 @@ else:
             self.body.mount(Static(f"Comments for {self.task_id}", classes="title"))
             try:
                 comments = self.manager.task_comment_list(self.task_id) or []
-            except TaskManagerError as e:
+            except (TaskManagerError, ValueError) as e:
                 self.show_error(str(e))
                 comments = []
             for c in comments:
@@ -240,7 +240,7 @@ else:
                 if comment:
                     try:
                         self.manager.task_comment_add(self.task_id, comment)
-                    except TaskManagerError as e:
+                    except (TaskManagerError, ValueError) as e:
                         self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "edit_comment":
@@ -251,7 +251,7 @@ else:
                     if cid_int is not None:
                         try:
                             self.manager.task_comment_edit(self.task_id, cid_int, text)
-                        except TaskManagerError as e:
+                        except (TaskManagerError, ValueError) as e:
                             self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "remove_comment":
@@ -261,7 +261,7 @@ else:
                     if cid_int is not None:
                         try:
                             self.manager.task_comment_remove(self.task_id, cid_int)
-                        except TaskManagerError as e:
+                        except (TaskManagerError, ValueError) as e:
                             self.show_error(str(e))
                 self.refresh_screen()
 

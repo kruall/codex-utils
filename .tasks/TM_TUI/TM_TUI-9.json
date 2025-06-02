@@ -2,8 +2,39 @@
   "id": "TM_TUI-9",
   "title": "Update TUI for exception handling",
   "description": "Adapt TUI to handle exceptions from core",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started TM_TUI-9",
+      "created_at": 1748888451.3432043
+    },
+    {
+      "id": 2,
+      "text": "Running baseline tests",
+      "created_at": 1748888454.9080951
+    },
+    {
+      "id": 3,
+      "text": "Baseline tests pass",
+      "created_at": 1748888511.0836768
+    },
+    {
+      "id": 4,
+      "text": "Updated TUI to catch ValueError and general exceptions",
+      "created_at": 1748888614.942675
+    },
+    {
+      "id": 5,
+      "text": "Tests pass",
+      "created_at": 1748888617.0906863
+    },
+    {
+      "id": 6,
+      "text": "Verified ruff, mypy, and pytest all pass",
+      "created_at": 1748888931.3946745
+    }
+  ],
   "links": {
     "related": [
       "TM-4",
@@ -11,7 +42,7 @@
     ]
   },
   "created_at": 1748553471.8673525,
-  "updated_at": 1748553490.5943837,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748888942.1672626,
+  "started_at": 1748888449.4261644,
+  "closed_at": 1748888942.1672387
 }
