@@ -2,7 +2,7 @@
   "id": "TM_WEB-20",
   "title": "Remove Todo page from web interface",
   "description": "Remove the Todo page from the web dashboard as it's no longer needed. Clean up related components, routes, and navigation references.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -33,11 +33,26 @@
       "id": 6,
       "text": "TESTING: After changes, verify: 1) Navigation menu has 3 links (Home, Task List, Kanban Board) 2) No broken links to /todo 3) Kanban and TaskTable still work with 'todo' status filtering 4) All pages load correctly 5) No console errors",
       "created_at": 1748887160.890861
+    },
+    {
+      "id": 7,
+      "text": "Start removing Todo page",
+      "created_at": 1748888267.5985363
+    },
+    {
+      "id": 8,
+      "text": "Updated Navigation and README; removed todo.tsx; tests failing due to import error",
+      "created_at": 1748888301.423425
+    },
+    {
+      "id": 9,
+      "text": "Built dashboard and verified no /todo output. Running ruff, mypy, and pytest all pass.",
+      "created_at": 1748888599.3376646
     }
   ],
   "links": {},
   "created_at": 1748887077.729089,
-  "updated_at": 1748887160.8908741,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748888604.0129247,
+  "started_at": 1748888264.759747,
+  "closed_at": 1748888604.0128996
 }
