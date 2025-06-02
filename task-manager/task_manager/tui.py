@@ -157,6 +157,10 @@ else:
             self.app.push_screen(TasksScreen(self.manager))
 
     class QueuesScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__(manager)
+            self._delete_target: str | None = None
+
         def on_mount(self) -> None:
             self.refresh_screen()
 
@@ -232,6 +236,10 @@ else:
             self.refresh_screen()
 
     class TasksScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__(manager)
+            self._delete_target: str | None = None
+
         def on_mount(self) -> None:
             self.refresh_screen()
 
