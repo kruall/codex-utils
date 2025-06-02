@@ -14,3 +14,11 @@
   text-decoration: none;
   font-weight: bold;
 }
+
+.button {
+  background: none;
+  border: none;
+  color: #0070f3;
+  font-weight: bold;
+  cursor: pointer;
+}

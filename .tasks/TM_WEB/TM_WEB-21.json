@@ -2,15 +2,26 @@
   "id": "TM_WEB-21",
   "title": "Add GitHub OAuth authentication",
   "description": "Implement GitHub OAuth Web flow for user authentication. Add login/logout functionality and store access token securely in session storage.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "PLAN: Implement GitHub OAuth using the OAuth implicit grant flow. Add login and logout buttons. Store the token in sessionStorage.",
+      "created_at": 1748888622.2969408
+    },
+    {
+      "id": 2,
+      "text": "Implemented AuthContext with device flow login, added login page and logout button.",
+      "created_at": 1748888703.0159347
+    }
+  ],
   "links": {
     "related": [
       "TM_WEB-22"
     ]
   },
   "created_at": 1748887654.93889,
-  "updated_at": 1748887693.6621199,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748888793.7534711,
+  "started_at": 1748888619.2239695,
+  "closed_at": 1748888793.7534394
 }
