@@ -21,7 +21,7 @@
     },
     {
       "id": 4,
-      "text": "Updated TUI to catch ValueError and general exceptions",
+      "text": "Updated TUI to catch TaskManagerError and ValueError exceptions",
       "created_at": 1748888614.942675
     },
     {
