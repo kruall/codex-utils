@@ -228,6 +228,7 @@ else:
             delete_name: str | None = getattr(self, "_delete_target", None)
             if delete_name:
                 self._handle_manager_operation(self.manager.queue_delete, delete_name)
+            self._delete_target = None
             self.refresh_screen()
 
     class TasksScreen(BaseScreen):
@@ -285,6 +286,7 @@ else:
             tid: str | None = getattr(self, "_delete_target", None)
             if tid:
                 self._handle_manager_operation(self.manager.task_delete, tid)
+            self._delete_target = None
             self.refresh_screen()
 
     class CommentsScreen(BaseScreen):
