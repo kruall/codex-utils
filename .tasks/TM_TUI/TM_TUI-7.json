@@ -2,11 +2,17 @@
   "id": "TM_TUI-7",
   "title": "Use message objects for events",
   "description": "Replace large on_button_pressed with custom message classes",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start implementing message objects and refactoring event handling",
+      "created_at": 1748890228.9331894
+    }
+  ],
   "links": {},
   "created_at": 1748553510.118547,
-  "updated_at": 1748553510.1185474,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748890415.1845357,
+  "started_at": 1748890226.3830624,
+  "closed_at": 1748890415.1845129
 }
