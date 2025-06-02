@@ -2,11 +2,32 @@
   "id": "TM_TUI-6",
   "title": "Add tests for TUI",
   "description": "Use textual's test utilities to cover basic workflows",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started implementing TUI tests",
+      "created_at": 1748620925.1069994
+    },
+    {
+      "id": 2,
+      "text": "Added basic navigation test with Textual run_test",
+      "created_at": 1748620928.3298776
+    },
+    {
+      "id": 3,
+      "text": "Verified ruff, mypy, pytest all pass",
+      "created_at": 1748620931.3414547
+    },
+    {
+      "id": 4,
+      "text": "Task completed",
+      "created_at": 1748620946.1025445
+    }
+  ],
   "links": {},
   "created_at": 1748553504.270316,
-  "updated_at": 1748553504.2703166,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748620946.1025808,
+  "started_at": 1748620921.6596541,
+  "closed_at": 1748620943.2239778
 }
