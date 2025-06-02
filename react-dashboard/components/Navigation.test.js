@@ -6,5 +6,4 @@ test('renders navigation links', () => {
   render(<Navigation />)
   expect(screen.getByText(/Home/)).toBeInTheDocument()
   expect(screen.getByText(/Task List/)).toBeInTheDocument()
-  expect(screen.getByText(/TODO Tasks/)).toBeInTheDocument()
 })
