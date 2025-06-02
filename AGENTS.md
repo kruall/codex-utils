@@ -2,6 +2,28 @@
 
 **🤖 CRITICAL REQUIREMENT**: All AI agents working on this project must conduct their reasoning, thinking, and internal analysis in English. This ensures consistency and clarity across all development activities.
 
+## Python Environment Requirements
+
+**🐍 CRITICAL REQUIREMENT**: All Python code execution must be performed with the activated virtual environment. Before running any Python scripts, tests, or commands, ensure the virtual environment is activated:
+
+```bash
+# Activate the virtual environment
+source .venv/bin/activate
+
+# Verify activation (should show .venv in the path)
+which python
+```
+
+**Required for all Python operations:**
+- Running `./tm` commands
+- Executing `pytest`
+- Running `ruff check .`
+- Running `mypy .`
+- Any Python script execution
+- Installing Python packages
+
+**⚠️ IMPORTANT**: The `./tm` script and `init_venv` script automatically handle virtual environment activation, but when running Python commands directly, always ensure `.venv` is activated first.
+
 ## Task Management
 
 ### Basic Usage
