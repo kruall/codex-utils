@@ -1,0 +1,2150 @@
+[
+  {
+    "id": "DOC-1",
+    "title": "Make documentation tm",
+    "description": "Need to make documentation about cli api",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Patched init_venv to allow offline use",
+        "created_at": 1748512521.5275545
+      },
+      {
+        "id": 2,
+        "text": "Wrote README with tm CLI instructions",
+        "created_at": 1748512522.802094
+      }
+    ],
+    "links": {},
+    "created_at": 1748511306.164309,
+    "updated_at": 1748512523.909568,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-1",
+    "title": "Create TUI interface with Textual",
+    "description": "Implement a text-based user interface for the task manager using the Textual library. Add 'ui' subcommand to task_manager.py that launches an interactive TUI for managing queues, tasks, and comments.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Requirements: Add textual dependency to requirements.txt",
+        "created_at": 1748513701.177484
+      },
+      {
+        "id": 2,
+        "text": "Implementation: Add 'ui' subcommand to task_manager.py that launches interactive TUI",
+        "created_at": 1748513707.511113
+      },
+      {
+        "id": 3,
+        "text": "Features needed: Queue management (list, create), Task management (list, create, update, start, done), Task details view with comments, Comment management (add, remove)",
+        "created_at": 1748513751.926084
+      },
+      {
+        "id": 4,
+        "text": "Technical: Use Textual widgets for modern TUI experience, maintain all existing CLI functionality",
+        "created_at": 1748513756.203052
+      },
+      {
+        "id": 5,
+        "text": "Usage: Should work as './tm ui' or 'python task-manager/task_manager.py ui'",
+        "created_at": 1748513761.635071
+      }
+    ],
+    "links": {},
+    "created_at": 1748513645.185745,
+    "updated_at": 1748524577.539104,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-2",
+    "title": "Refactor task_manager.py code structure",
+    "description": "Split the monolithic task_manager.py file into smaller, more maintainable modules. Separate concerns like TaskManager class, CLI parsing, TUI interface, and utility functions into different files.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Suggested file structure: 1) task_manager/core.py - TaskManager class and core logic, 2) task_manager/cli.py - CLI argument parsing and command handlers, 3) task_manager/tui.py - Textual TUI interface, 4) task_manager/utils.py - utility functions like format_timestamp, 5) task_manager/__main__.py - entry point",
+        "created_at": 1748515932.6247098
+      },
+      {
+        "id": 2,
+        "text": "Benefits: 1) Improved maintainability - easier to find and modify specific functionality, 2) Better testability - can test individual components in isolation, 3) Cleaner imports - reduce circular dependencies, 4) Single responsibility principle - each module has a clear purpose",
+        "created_at": 1748515937.027926
+      },
+      {
+        "id": 3,
+        "text": "Current file is 611 lines - too large for a single module. Key areas to extract: TaskManager class (~300 lines), CLI parsing (~200 lines), TUI interface (~100 lines), utility functions (~20 lines)",
+        "created_at": 1748515941.752537
+      },
+      {
+        "id": 4,
+        "text": "Started work on refactoring into modules",
+        "created_at": 1748516275.5507393
+      },
+      {
+        "id": 5,
+        "text": "Split monolithic script into package structure",
+        "created_at": 1748516411.547792
+      },
+      {
+        "id": 6,
+        "text": "Implemented core, utils, tui, cli modules",
+        "created_at": 1748516453.7397463
+      },
+      {
+        "id": 7,
+        "text": "All tests passing",
+        "created_at": 1748516472.1735702
+      }
+    ],
+    "links": {},
+    "created_at": 1748515927.1541288,
+    "updated_at": 1748524450.313299,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-3",
+    "title": "Add CI check for PR task status validation",
+    "description": "Implement CI workflow to verify that PRs with [<task-id>] format in title have corresponding tasks that were 'todo' or 'in_progress' before PR creation and become 'done' after PR merge. This ensures proper task workflow compliance.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Implementation requirements: 1) Parse PR title to extract task-id using regex pattern \\[([^\\]]+)\\], 2) Check task status before PR creation (should be 'todo' or 'in_progress'), 3) Verify task status after PR merge (should be 'done'), 4) Fail CI if task workflow is not followed properly",
+        "created_at": 1748516023.6185799
+      },
+      {
+        "id": 2,
+        "text": "GitHub Actions workflow structure: 1) .github/workflows/pr-task-check.yml - trigger on PR open/merge, 2) Script to validate task status using ./tm commands, 3) Check task exists and was started before work began, 4) Ensure task is marked done when PR is merged",
+        "created_at": 1748516028.558944
+      },
+      {
+        "id": 3,
+        "text": "Error scenarios to handle: 1) PR title has [task-id] but task doesn't exist, 2) Task was never started (status still 'todo'), 3) Task was already 'done' before PR creation, 4) Task not marked 'done' after PR merge, 5) Invalid task-id format in PR title",
+        "created_at": 1748516033.251381
+      },
+      {
+        "id": 4,
+        "text": "Technical approach: 1) Use GitHub API to get PR details and timeline, 2) Parse .tasks/ directory to check task status history, 3) Compare timestamps: task start time < PR creation time < PR merge time < task done time, 4) Exit with error code if validation fails",
+        "created_at": 1748516038.058034
+      },
+      {
+        "id": 5,
+        "text": "Example PR titles to validate: '[DEV-1] Add user authentication', '[DOC-5] Update API documentation', '[FEATURE-123] Implement search functionality'. Should extract task-ids: DEV-1, DOC-5, FEATURE-123 respectively.",
+        "created_at": 1748516043.4902668
+      },
+      {
+        "id": 6,
+        "text": "Starting implementation of CI workflow to validate task status",
+        "created_at": 1748516238.5826151
+      },
+      {
+        "id": 7,
+        "text": "Added workflow and script to check PR task status; fixed tests.yml",
+        "created_at": 1748516311.7427182
+      }
+    ],
+    "links": {},
+    "created_at": 1748516017.53114,
+    "updated_at": 1748524451.91905,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-4",
+    "title": "Split task_manager.py into modules",
+    "description": "Separate core logic and CLI into distinct modules",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Split internal logic and CLI into package files such as core.py and cli.py.",
+        "created_at": 1748521727.804441
+      },
+      {
+        "id": 2,
+        "text": "Investigate if this is duplicate of DEV-2",
+        "created_at": 1748522127.6805925
+      },
+      {
+        "id": 3,
+        "text": "Task description duplicates DEV-2. Closing as duplicate.",
+        "created_at": 1748522129.1390028
+      }
+    ],
+    "links": {},
+    "created_at": 1748521726.3978565,
+    "updated_at": 1748522131.372598,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-5",
+    "title": "Use dataclasses for Task and Queue",
+    "description": "Create dataclass models for serializing tasks and queues",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Introduce dataclasses for Task and Queue classes to simplify storage.",
+        "created_at": 1748521729.700304
+      },
+      {
+        "id": 2,
+        "text": "Start implementing dataclasses for Task and Queue",
+        "created_at": 1748522075.0030138
+      },
+      {
+        "id": 3,
+        "text": "Implement dataclasses and update core",
+        "created_at": 1748522197.4400792
+      }
+    ],
+    "links": {},
+    "created_at": 1748521728.8537605,
+    "updated_at": 1748522198.414399,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-6",
+    "title": "Extract CLI command functions",
+    "description": "Refactor main function to use command-to-function mapping",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Replace long if/elif chain in main CLI with dispatch table and functions.",
+        "created_at": 1748521731.6081297
+      },
+      {
+        "id": 2,
+        "text": "Started work on DEV-6",
+        "created_at": 1748524707.2139144
+      },
+      {
+        "id": 3,
+        "text": "Refactored CLI using dispatch table",
+        "created_at": 1748524902.9903128
+      }
+    ],
+    "links": {},
+    "created_at": 1748521730.7001925,
+    "updated_at": 1748524904.8413794,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-7",
+    "title": "Implement logging",
+    "description": "Switch from print statements to logging with levels",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Use logging module with info/warning/error levels instead of print.",
+        "created_at": 1748521733.388382
+      },
+      {
+        "id": 2,
+        "text": "Starting DEV-7 implement logging",
+        "created_at": 1748529050.9388082
+      },
+      {
+        "id": 3,
+        "text": "Implemented logging across modules and added setup function",
+        "created_at": 1748529266.9724383
+      },
+      {
+        "id": 4,
+        "text": "Completed DEV-7",
+        "created_at": 1748529277.0330784
+      },
+      {
+        "id": 5,
+        "text": "Addressing feedback: user-facing messages should use print, not logging",
+        "created_at": 1748534493.496091
+      }
+    ],
+    "links": {},
+    "created_at": 1748521732.5266454,
+    "updated_at": 1748534564.8647392,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-8",
+    "title": "Expand tests after refactor",
+    "description": "Add unit tests for new modules and dataclasses",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Cover dataclass serialization and CLI wrapper functions in tests.",
+        "created_at": 1748521736.6619318
+      },
+      {
+        "id": 2,
+        "text": "Planning new tests for TaskManager internal methods.",
+        "created_at": 1748536310.803575
+      },
+      {
+        "id": 3,
+        "text": "Running baseline tests before modifications.",
+        "created_at": 1748536333.0838432
+      },
+      {
+        "id": 4,
+        "text": "Added tests for task operations and verified passes.",
+        "created_at": 1748536379.9183688
+      },
+      {
+        "id": 5,
+        "text": "Added tests and closing task as done.",
+        "created_at": 1748537282.0829833
+      }
+    ],
+    "links": {},
+    "created_at": 1748521734.4381368,
+    "updated_at": 1748537283.8523223,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-9",
+    "title": "Review tm script",
+    "description": "Check pushd/popd usage and handle failures cleanly",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Update tm to ensure clean exit on errors and improve comments.",
+        "created_at": 1748521738.6394048
+      },
+      {
+        "id": 2,
+        "text": "Started task and read AGENTS instructions.",
+        "created_at": 1748522073.6515613
+      },
+      {
+        "id": 3,
+        "text": "Implemented cleanup trap for pushd/popd in scripts.",
+        "created_at": 1748522148.013668
+      },
+      {
+        "id": 4,
+        "text": "Finished implementing improvements.",
+        "created_at": 1748522164.5088303
+      }
+    ],
+    "links": {},
+    "created_at": 1748521737.6656857,
+    "updated_at": 1748522164.5088532,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-10",
+    "title": "Centralize error handling",
+    "description": "Factor out repeated error prints into function or exceptions",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Use custom exceptions or helper to unify error outputs.",
+        "created_at": 1748521740.518379
+      },
+      {
+        "id": 2,
+        "text": "\u041d\u0430\u0447\u0430\u043b \u0440\u0430\u0431\u043e\u0442\u0443 \u043d\u0430\u0434 \u0437\u0430\u0434\u0430\u0447\u0435\u0439. \u0418\u0437\u0443\u0447\u0430\u044e \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0439 \u043a\u043e\u0434 \u0434\u043b\u044f \u043f\u043e\u0432\u0442\u043e\u0440\u044f\u044e\u0449\u0438\u0445\u0441\u044f \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0439 \u043e\u0431 \u043e\u0448\u0438\u0431\u043a\u0430\u0445.",
+        "created_at": 1748540074.8022828
+      },
+      {
+        "id": 3,
+        "text": "\u0414\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0430 \u0444\u0443\u043d\u043a\u0446\u0438\u044f log_error \u0438 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u044b \u0432\u044b\u0437\u043e\u0432\u044b \u043e\u0448\u0438\u0431\u043e\u043a.",
+        "created_at": 1748540131.078803
+      }
+    ],
+    "links": {},
+    "created_at": 1748521739.646104,
+    "updated_at": 1748540133.6763952,
+    "started_at": 1748540071.9927375,
+    "closed_at": 1748540133.676362
+  },
+  {
+    "id": "DEV-11",
+    "title": "Add --version option",
+    "description": "Show version and config path via CLI",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Support output of CLI version and tasks directory.",
+        "created_at": 1748521742.468148
+      },
+      {
+        "id": 2,
+        "text": "Starting DEV-11 implementation",
+        "created_at": 1748522109.0078824
+      },
+      {
+        "id": 3,
+        "text": "Implemented version option and tests",
+        "created_at": 1748522248.6855245
+      }
+    ],
+    "links": {},
+    "created_at": 1748521741.5078592,
+    "updated_at": 1748523963.177461,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-12",
+    "title": "Create GitHub Pages dashboard for task management",
+    "description": "Build a GitHub Pages site that displays current tasks from multiple repositories using GitHub API",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "REQUIREMENT: Create a GitHub Pages site that aggregates and displays tasks from multiple repositories",
+        "created_at": 1748524850.048191
+      },
+      {
+        "id": 2,
+        "text": "ARCHITECTURE: Frontend SPA that reads task files via GitHub REST API /repos/{owner}/{repo}/contents/... and generates a convenient table/kanban board",
+        "created_at": 1748524857.647404
+      },
+      {
+        "id": 3,
+        "text": "FEATURES: 1) Read task files from .tasks/ directories across repos 2) Display tasks in table/kanban format 3) Filter by status, queue, repository 4) Edit tasks via GitHub web UI links 5) Create new tasks via GitHub new file URLs",
+        "created_at": 1748524862.8914108
+      },
+      {
+        "id": 4,
+        "text": "TECH STACK: Next.js/React SPA + @octokit/rest for GitHub API + GitHub Pages for hosting + GitHub Actions for optional static generation",
+        "created_at": 1748524866.4310558
+      },
+      {
+        "id": 5,
+        "text": "IMPLEMENTATION PHASES: 1) Setup Next.js project with GitHub Pages deployment 2) Implement GitHub API integration to scan repositories 3) Parse task files and extract metadata 4) Create responsive UI with table and kanban views 5) Add filtering and search functionality 6) Implement edit/create task links to GitHub web UI",
+        "created_at": 1748524870.789284
+      },
+      {
+        "id": 6,
+        "text": "API INTEGRATION: Use GitHub REST API to recursively scan repositories for task files matching pattern ^.tasks/.*\\.json$ and parse task metadata including id, title, status, queue, assignee, due date",
+        "created_at": 1748524875.180592
+      },
+      {
+        "id": 7,
+        "text": "USER EXPERIENCE: Modern, responsive design with dark/light theme support. Kanban board view with drag-and-drop (read-only). Table view with sorting and filtering. Search functionality across all tasks. Repository selector to focus on specific repos.",
+        "created_at": 1748524880.096585
+      },
+      {
+        "id": 8,
+        "text": "AUTHENTICATION: Support GitHub OAuth for accessing private repositories. Store token in sessionStorage. Respect GitHub API rate limits (5000 requests/hour for authenticated users).",
+        "created_at": 1748524883.9278028
+      },
+      {
+        "id": 9,
+        "text": "DEPLOYMENT: Configure GitHub Actions workflow for automatic deployment to GitHub Pages. Support both static site generation and client-side rendering modes. Include environment variables for GitHub App configuration.",
+        "created_at": 1748524887.568955
+      },
+      {
+        "id": 10,
+        "text": "FUTURE ENHANCEMENTS: 1) GraphQL v4 API for better performance 2) Real-time updates via webhooks 3) Mermaid diagrams for task dependencies 4) Bulk operations support 5) Task analytics and reporting 6) Integration with GitHub Issues",
+        "created_at": 1748524892.36869
+      },
+      {
+        "id": 11,
+        "text": "Starting work on GitHub Pages dashboard implementation",
+        "created_at": 1748525019.7625716
+      },
+      {
+        "id": 12,
+        "text": "Implemented static dashboard generation and added CLI command",
+        "created_at": 1748525129.4385207
+      },
+      {
+        "id": 13,
+        "text": "Basic HTML dashboard implemented; future tasks required for GitHub API integration",
+        "created_at": 1748525134.6631222
+      }
+    ],
+    "links": {},
+    "created_at": 1748524842.33008,
+    "updated_at": 1748525134.6631634,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-13",
+    "title": "Add GitHub API integration",
+    "description": "Fetch tasks from multiple repositories to build dashboard",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Implement GitHub API client to load task JSON files from remote repositories",
+        "created_at": 1748525152.1609848
+      },
+      {
+        "id": 2,
+        "text": "Starting GitHub API integration implementation",
+        "created_at": 1748529089.2015843
+      },
+      {
+        "id": 3,
+        "text": "Implemented GitHub API integration and tests",
+        "created_at": 1748529273.7945743
+      }
+    ],
+    "links": {},
+    "created_at": 1748525151.031295,
+    "updated_at": 1748529273.7946,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-14",
+    "title": "Create React dashboard frontend",
+    "description": "Use Next.js to render tasks in kanban and table views",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Build React components for task table and kanban board",
+        "created_at": 1748525155.4904478
+      },
+      {
+        "id": 2,
+        "text": "Starting development of React dashboard",
+        "created_at": 1748534801.3095376
+      },
+      {
+        "id": 3,
+        "text": "Added Next.js frontend skeleton with table and kanban views",
+        "created_at": 1748534898.9123201
+      },
+      {
+        "id": 4,
+        "text": "Updated gitignore and documentation",
+        "created_at": 1748534904.7484431
+      },
+      {
+        "id": 5,
+        "text": "Marked task complete",
+        "created_at": 1748534908.2287757
+      }
+    ],
+    "links": {},
+    "created_at": 1748525154.3372107,
+    "updated_at": 1748534908.2288082,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-15",
+    "title": "Setup GitHub Pages deployment",
+    "description": "Use GitHub Actions to publish dashboard",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Create workflow to deploy docs/ directory to GitHub Pages",
+        "created_at": 1748525157.5010235
+      },
+      {
+        "id": 2,
+        "text": "Starting work on GitHub Pages deployment setup",
+        "created_at": 1748536204.0741467
+      },
+      {
+        "id": 3,
+        "text": "Added GitHub Pages workflow and docs folder",
+        "created_at": 1748536259.5530906
+      },
+      {
+        "id": 4,
+        "text": "Completed GitHub Pages deployment workflow",
+        "created_at": 1748536297.6868536
+      }
+    ],
+    "links": {},
+    "created_at": 1748525156.492567,
+    "updated_at": 1748536297.686912,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-16",
+    "title": "Add started_at and closed_at timestamp fields to tasks",
+    "description": "Implement started_at and closed_at timestamp fields in the Task model to track when tasks are started and completed. Update the task start and done commands to set these timestamps.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start DEV-16 implementation",
+        "created_at": 1748537328.7766197
+      },
+      {
+        "id": 2,
+        "text": "Implemented timestamps with tests",
+        "created_at": 1748537415.599759
+      }
+    ],
+    "links": {},
+    "created_at": 1748534827.344876,
+    "updated_at": 1748537415.5997863,
+    "started_at": null,
+    "closed_at": 1748537413.5284839
+  },
+  {
+    "id": "DEV-17",
+    "title": "Add task linking functionality with related links",
+    "description": "Implement the ability to add links between tasks. Start with 'related' link type to connect related tasks. Add CLI commands to add, list, and remove task links.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start work on task linking functionality",
+        "created_at": 1748537895.3000839
+      },
+      {
+        "id": 2,
+        "text": "Implemented link functionality",
+        "created_at": 1748538104.3059175
+      },
+      {
+        "id": 3,
+        "text": "Completed implementation",
+        "created_at": 1748538141.080344
+      }
+    ],
+    "links": {},
+    "created_at": 1748534831.479786,
+    "updated_at": 1748538141.0803752,
+    "started_at": 1748537894.442035,
+    "closed_at": 1748538139.6452222
+  },
+  {
+    "id": "TM-1",
+    "title": "Add task/queue deletion commands",
+    "description": "Implement CLI commands to delete tasks and queues",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting work on deletion commands",
+        "created_at": 1748542123.898095
+      },
+      {
+        "id": 2,
+        "text": "Implemented delete commands and tests",
+        "created_at": 1748542227.3164392
+      },
+      {
+        "id": 3,
+        "text": "Completed implementation",
+        "created_at": 1748542269.5371919
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_TUI-1",
+        "TM_WEB-1"
+      ]
+    },
+    "created_at": 1748540578.1653335,
+    "updated_at": 1748542269.5372279,
+    "started_at": 1748542121.7009246,
+    "closed_at": 1748542267.3872318
+  },
+  {
+    "id": "TM-2",
+    "title": "Edit task comments command",
+    "description": "Implement command to edit comments on tasks",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start work on TM-2",
+        "created_at": 1748551312.2754073
+      },
+      {
+        "id": 2,
+        "text": "Add comment edit functionality and tests",
+        "created_at": 1748551454.5951037
+      },
+      {
+        "id": 3,
+        "text": "Finish implementation",
+        "created_at": 1748551499.8813584
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_TUI-2",
+        "TM_TUI-3",
+        "TM_WEB-2"
+      ]
+    },
+    "created_at": 1748540580.5285208,
+    "updated_at": 1748551499.8813899,
+    "started_at": 1748551310.49672,
+    "closed_at": 1748551496.6199665
+  },
+  {
+    "id": "TM_TUI-1",
+    "title": "Support deletion of tasks and queues",
+    "description": "Add TUI actions to remove tasks or queues",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Implemented queue and task deletion buttons",
+        "created_at": 1748551401.891317
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-1"
+      ]
+    },
+    "created_at": 1748540583.1323383,
+    "updated_at": 1748551404.5804698,
+    "started_at": 1748551400.5406654,
+    "closed_at": 1748551404.580447
+  },
+  {
+    "id": "TM_TUI-2",
+    "title": "Add comments interface",
+    "description": "Provide TUI for viewing and adding comments",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started implementing comment interface",
+        "created_at": 1748542131.356007
+      },
+      {
+        "id": 2,
+        "text": "Implemented basic comments view/add in TUI",
+        "created_at": 1748542167.3050761
+      },
+      {
+        "id": 3,
+        "text": "Completed implementation",
+        "created_at": 1748542199.6257226
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-2"
+      ]
+    },
+    "created_at": 1748540585.6959803,
+    "updated_at": 1748542199.6257646,
+    "started_at": 1748542129.3158634,
+    "closed_at": 1748542197.7992551
+  },
+  {
+    "id": "TM_TUI-3",
+    "title": "Edit and remove comments",
+    "description": "Allow editing and deleting comments from the TUI",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start work on TM_TUI-3",
+        "created_at": 1748555689.4304013
+      },
+      {
+        "id": 2,
+        "text": "Add edit and remove comment actions",
+        "created_at": 1748555768.2067528
+      },
+      {
+        "id": 3,
+        "text": "Run tests and style checks",
+        "created_at": 1748555770.1937706
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-2"
+      ]
+    },
+    "created_at": 1748540588.2582066,
+    "updated_at": 1748555771.9582553,
+    "started_at": 1748555687.635283,
+    "closed_at": 1748555771.9582314
+  },
+  {
+    "id": "TM_WEB-1",
+    "title": "Add delete actions in web",
+    "description": "Enable deleting tasks and queues via dashboard",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM-1"
+      ]
+    },
+    "created_at": 1748540591.6116464,
+    "updated_at": 1748540605.786244,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-2",
+    "title": "Edit and delete comments in web",
+    "description": "Allow editing and deleting comments from the dashboard",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM-2"
+      ]
+    },
+    "created_at": 1748540594.3079424,
+    "updated_at": 1748540609.974294,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-18",
+    "title": "Create tasks for deletion/comment features",
+    "description": "Add tasks in TM, TM_TUI, and TM_WEB queues",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Created tasks in TM, TM_TUI, and TM_WEB queues",
+        "created_at": 1748540636.4972794
+      },
+      {
+        "id": 2,
+        "text": "Closing task after creating tasks for deletion/comment features",
+        "created_at": 1748540904.46206
+      }
+    ],
+    "links": {},
+    "created_at": 1748540631.587383,
+    "updated_at": 1748540904.6041026,
+    "started_at": 1748540634.0282278,
+    "closed_at": 1748540904.6040514
+  },
+  {
+    "id": "TM_WEB-3",
+    "title": "Add TODO-only page to web dashboard",
+    "description": "Create a dedicated page in the web dashboard that displays only tasks with 'todo' status for better focus and task management",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting work on TODO-only page",
+        "created_at": 1748542070.6581237
+      },
+      {
+        "id": 2,
+        "text": "Implemented todo page",
+        "created_at": 1748542096.8133965
+      },
+      {
+        "id": 3,
+        "text": "tests pass",
+        "created_at": 1748542132.3809605
+      },
+      {
+        "id": 4,
+        "text": "Task completed",
+        "created_at": 1748542140.484019
+      }
+    ],
+    "links": {},
+    "created_at": 1748541967.916279,
+    "updated_at": 1748542140.4840515,
+    "started_at": 1748542068.4539707,
+    "closed_at": 1748542137.7808175
+  },
+  {
+    "id": "TM_WEB-4",
+    "title": "Separate task list and kanban board into different pages",
+    "description": "Split the current combined view into separate pages: one for task list view and another for kanban board view. This will improve navigation and allow users to choose their preferred view mode.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start work on splitting dashboard views into separate pages",
+        "created_at": 1748551607.837413
+      },
+      {
+        "id": 2,
+        "text": "Implemented separated task views with table and kanban pages and updated navigation",
+        "created_at": 1748552064.2820592
+      },
+      {
+        "id": 3,
+        "text": "All tests passed",
+        "created_at": 1748552064.4201367
+      }
+    ],
+    "links": {},
+    "created_at": 1748551382.8842611,
+    "updated_at": 1748552064.559595,
+    "started_at": 1748551606.7242832,
+    "closed_at": 1748552064.5595553
+  },
+  {
+    "id": "TM_WEB-5",
+    "title": "Implement table pagination",
+    "description": "Add pagination functionality to tables in the web interface to improve performance and user experience when dealing with large numbers of tasks. Include page size options and navigation controls.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started task TM_WEB-5",
+        "created_at": 1748551593.5423782
+      },
+      {
+        "id": 2,
+        "text": "Implemented table pagination",
+        "created_at": 1748551649.2808857
+      }
+    ],
+    "links": {},
+    "created_at": 1748551386.865212,
+    "updated_at": 1748551649.2809186,
+    "started_at": 1748551591.433242,
+    "closed_at": 1748551647.1434255
+  },
+  {
+    "id": "TM_WEB-6",
+    "title": "Add individual task view in dashboard",
+    "description": "Implement functionality to open and view individual tasks in a detailed view within the web dashboard. This should include task details, comments, links, and allow editing of task properties.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started work on task view",
+        "created_at": 1748552382.47666
+      },
+      {
+        "id": 2,
+        "text": "Implemented task view page with editing",
+        "created_at": 1748552433.8424869
+      },
+      {
+        "id": 3,
+        "text": "Closing task",
+        "created_at": 1748552755.293971
+      }
+    ],
+    "links": {},
+    "created_at": 1748552139.404376,
+    "updated_at": 1748552755.2940013,
+    "started_at": 1748552380.6230164,
+    "closed_at": 1748552749.6337075
+  },
+  {
+    "id": "TM_WEB-7",
+    "title": "Add filtering functionality to task table",
+    "description": "Implement filtering capabilities for the task table in the web dashboard. Users should be able to filter tasks by status, queue, title, and other relevant fields. Include search functionality and filter presets.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "\u041d\u0430\u0447\u0438\u043d\u0430\u044e \u0440\u0430\u0431\u043e\u0442\u0443 \u043d\u0430\u0434 \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u0446\u0438\u0435\u0439 \u0437\u0430\u0434\u0430\u0447 \u0432 \u0432\u0435\u0431-\u0442\u0430\u0431\u043b\u0438\u0446\u0435",
+        "created_at": 1748552375.841269
+      },
+      {
+        "id": 2,
+        "text": "\u0417\u0430\u043a\u0440\u044b\u0432\u0430\u044e \u0437\u0430\u0434\u0430\u0447\u0443",
+        "created_at": 1748552787.1864758
+      }
+    ],
+    "links": {},
+    "created_at": 1748552143.196875,
+    "updated_at": 1748552787.3316705,
+    "started_at": 1748552373.4454665,
+    "closed_at": 1748552787.3316379
+  },
+  {
+    "id": "DEV-19",
+    "title": "Code review and refactoring plan for TM core",
+    "description": "Review the core task manager (TM) codebase to identify areas for improvement. Analyze code quality, architecture, performance bottlenecks, and technical debt. Create specific refactoring tasks based on findings.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting code review and refactoring plan analysis",
+        "created_at": 1748553393.0903962
+      },
+      {
+        "id": 2,
+        "text": "Created TM tasks TM-3 to TM-6 and linked TM_TUI and TM_WEB tasks",
+        "created_at": 1748553492.9204001
+      },
+      {
+        "id": 3,
+        "text": "Review completed and tasks created",
+        "created_at": 1748553502.5580783
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-3",
+        "TM-4",
+        "TM-5",
+        "TM-6",
+        "TM_TUI-4",
+        "TM_WEB-8",
+        "TM_TUI-5",
+        "TM_WEB-9"
+      ]
+    },
+    "created_at": 1748553168.43776,
+    "updated_at": 1748553502.5581064,
+    "started_at": 1748553390.3272822,
+    "closed_at": 1748553501.3925564
+  },
+  {
+    "id": "DEV-20",
+    "title": "Code review and refactoring plan for TM_TUI",
+    "description": "Review the TM_TUI (terminal user interface) codebase to identify areas for improvement. Analyze UI/UX patterns, code organization, performance issues, and maintainability. Create specific refactoring tasks for TUI improvements.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "\u041d\u0430\u0447\u0438\u043d\u0430\u044e \u0438\u0441\u0441\u043b\u0435\u0434\u043e\u0432\u0430\u043d\u0438\u0435 \u0442\u0435\u043a\u0443\u0449\u0435\u0433\u043e \u043a\u043e\u0434\u0430 TUI.",
+        "created_at": 1748553409.6971073
+      },
+      {
+        "id": 2,
+        "text": "\u041f\u0440\u043e\u0430\u043d\u0430\u043b\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u043b \u0444\u0430\u0439\u043b task_manager/tui.py. \u041d\u0443\u0436\u043d\u0430 \u043c\u043e\u0434\u0443\u043b\u044c\u043d\u043e\u0441\u0442\u044c \u0438 \u0442\u0435\u0441\u0442\u044b.",
+        "created_at": 1748553488.1460636
+      },
+      {
+        "id": 3,
+        "text": "\u0421\u043e\u0437\u0434\u0430\u043b \u0437\u0430\u0434\u0430\u0447\u0443 TM_TUI-4 \u0434\u043b\u044f \u0440\u0435\u0444\u0430\u043a\u0442\u043e\u0440\u0438\u043d\u0433\u0430 \u0432 \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u0435 \u044d\u043a\u0440\u0430\u043d\u044b.",
+        "created_at": 1748553496.4680433
+      },
+      {
+        "id": 4,
+        "text": "\u0421\u043e\u0437\u0434\u0430\u043b \u0437\u0430\u0434\u0430\u0447\u0443 TM_TUI-5 \u0434\u043b\u044f \u043d\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u0438 \u0447\u0435\u0440\u0435\u0437 \u043a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u0443.",
+        "created_at": 1748553501.6690311
+      },
+      {
+        "id": 5,
+        "text": "\u0421\u043e\u0437\u0434\u0430\u043b \u0437\u0430\u0434\u0430\u0447\u0443 TM_TUI-6 \u0434\u043b\u044f \u0442\u0435\u0441\u0442\u043e\u0432 \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430.",
+        "created_at": 1748553506.7347324
+      },
+      {
+        "id": 6,
+        "text": "\u0421\u043e\u0437\u0434\u0430\u043b \u0437\u0430\u0434\u0430\u0447\u0443 TM_TUI-7 \u0434\u043b\u044f \u0443\u043f\u0440\u043e\u0449\u0435\u043d\u0438\u044f \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u0441\u043e\u0431\u044b\u0442\u0438\u0439.",
+        "created_at": 1748553512.5692906
+      },
+      {
+        "id": 7,
+        "text": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u0438\u043b \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442 TUI_REFACTOR_PLAN.md \u0441 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435\u043c \u043d\u0430\u0445\u043e\u0434\u043e\u043a \u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0445 \u0437\u0430\u0434\u0430\u0447.",
+        "created_at": 1748553560.0830262
+      }
+    ],
+    "links": {},
+    "created_at": 1748553172.1730292,
+    "updated_at": 1748553563.3693101,
+    "started_at": 1748553408.671543,
+    "closed_at": 1748553563.3692782
+  },
+  {
+    "id": "DEV-21",
+    "title": "Code review and refactoring plan for TM_WEB",
+    "description": "Review the TM_WEB (React dashboard) codebase to identify areas for improvement. Analyze React components, state management, performance optimization, code structure, and user experience. Create specific refactoring tasks for web dashboard improvements.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "\u041d\u0430\u0447\u0438\u043d\u0430\u044e \u043e\u0431\u0437\u043e\u0440 \u043a\u043e\u0434\u0430 TM_WEB",
+        "created_at": 1748553423.1950586
+      },
+      {
+        "id": 2,
+        "text": "\u0421\u043e\u0437\u0434\u0430\u043d\u044b \u0437\u0430\u0434\u0430\u0447\u0438 TM_WEB-8..12 \u0434\u043b\u044f \u0440\u0435\u0444\u0430\u043a\u0442\u043e\u0440\u0438\u043d\u0433\u0430 \u0438 \u0443\u043b\u0443\u0447\u0448\u0435\u043d\u0438\u044f",
+        "created_at": 1748553437.675604
+      },
+      {
+        "id": 3,
+        "text": "\u0414\u043e\u0431\u0430\u0432\u0438\u043b \u0441\u0432\u044f\u0437\u0438 \u0441 \u0437\u0430\u0434\u0430\u0447\u0430\u043c\u0438 TM_WEB-8..12",
+        "created_at": 1748553446.1346831
+      },
+      {
+        "id": 4,
+        "text": "\u041e\u0431\u0437\u043e\u0440 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d, \u0437\u0430\u0434\u0430\u0447\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u044b.",
+        "created_at": 1748553470.6049967
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_WEB-8",
+        "TM_WEB-9",
+        "TM_WEB-10",
+        "TM_WEB-11",
+        "TM_WEB-12"
+      ]
+    },
+    "created_at": 1748553176.382174,
+    "updated_at": 1748553470.60502,
+    "started_at": 1748553421.2995145,
+    "closed_at": 1748553468.8525217
+  },
+  {
+    "id": "TM_WEB-8",
+    "title": "Refactor data loading into reusable hook",
+    "description": "Create a custom React hook to load tasks from .tasks directory and share logic between pages",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting task work",
+        "created_at": 1748554246.0895278
+      },
+      {
+        "id": 2,
+        "text": "Implemented useTasks hook and API, updated pages to use it",
+        "created_at": 1748554398.3414428
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-21"
+      ]
+    },
+    "created_at": 1748553428.3552904,
+    "updated_at": 1748554400.8065505,
+    "started_at": 1748554245.005533,
+    "closed_at": 1748554400.8065233
+  },
+  {
+    "id": "TM_WEB-9",
+    "title": "Replace inline styles with CSS modules",
+    "description": "Improve maintainability by migrating component styling to CSS modules",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start migrating components to CSS modules.",
+        "created_at": 1748555643.723459
+      },
+      {
+        "id": 2,
+        "text": "Converted inline styles to CSS modules and ensured tests pass.",
+        "created_at": 1748555828.4712734
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-21"
+      ]
+    },
+    "created_at": 1748553430.2685616,
+    "updated_at": 1748556034.241406,
+    "started_at": 1748555638.5866306,
+    "closed_at": 1748556034.2413938
+  },
+  {
+    "id": "TM_WEB-10",
+    "title": "Implement global state management",
+    "description": "Use React context or state management library for tasks to reduce prop drilling",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started working on implementing global state management",
+        "created_at": 1748556475.025279
+      },
+      {
+        "id": 2,
+        "text": "Implemented TaskProvider context and updated components to use global tasks state",
+        "created_at": 1748556580.4329457
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-21"
+      ]
+    },
+    "created_at": 1748553432.1043518,
+    "updated_at": 1748556582.146319,
+    "started_at": 1748556472.9148653,
+    "closed_at": 1748556582.1462955
+  },
+  {
+    "id": "TM_WEB-11",
+    "title": "Improve task update error handling",
+    "description": "Show user-friendly errors and loading states when updating tasks via API",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started task to improve update error handling",
+        "created_at": 1748557463.107929
+      },
+      {
+        "id": 2,
+        "text": "Implemented user-friendly error and loading states",
+        "created_at": 1748557508.900846
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-21"
+      ]
+    },
+    "created_at": 1748553433.926326,
+    "updated_at": 1748557511.899294,
+    "started_at": 1748557460.6518633,
+    "closed_at": 1748557511.8992627
+  },
+  {
+    "id": "TM_WEB-12",
+    "title": "Add PropTypes or migrate to TypeScript",
+    "description": "Introduce static type checking to improve code reliability",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Analyzed React dashboard codebase. Found components: TaskTable, Navigation, Kanban, TaskContext. Deciding between PropTypes vs TypeScript migration. Given the modern Next.js setup and complexity of components, TypeScript migration would provide better long-term benefits.",
+        "created_at": 1748615586.507204
+      },
+      {
+        "id": 2,
+        "text": "Successfully migrated React dashboard from JavaScript to TypeScript. All components, hooks, context, and pages now have proper type definitions. TypeScript compilation passes without errors. Some build issues remain with static generation but core TypeScript migration is complete.",
+        "created_at": 1748617007.7191832
+      },
+      {
+        "id": 3,
+        "text": "TypeScript migration completed successfully! Development server is running without errors. All components (Navigation, TaskTable, Kanban, TaskContext) are working correctly with proper type safety. The dashboard is accessible at http://localhost:3000/codex-utils/",
+        "created_at": 1748617532.270941
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-21"
+      ]
+    },
+    "created_at": 1748553435.8020942,
+    "updated_at": 1748617532.270954,
+    "started_at": 1748615540.7463849,
+    "closed_at": 1748617019.495873
+  },
+  {
+    "id": "TM-3",
+    "title": "Refactor persistence layer",
+    "description": "Extract file operations and JSON handling into separate storage module",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting TM-3 refactor",
+        "created_at": 1748554210.582674
+      },
+      {
+        "id": 2,
+        "text": "Implemented storage module and updated TaskManager",
+        "created_at": 1748554329.545465
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_TUI-4",
+        "TM_WEB-8",
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553462.9956148,
+    "updated_at": 1748554331.3831124,
+    "started_at": 1748554208.7750838,
+    "closed_at": 1748554331.383079
+  },
+  {
+    "id": "TM_TUI-8",
+    "title": "Update TUI for new persistence layer",
+    "description": "Adapt TUI code to work with refactored storage module",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started TM_TUI-8",
+        "created_at": 1748887609.7844112
+      },
+      {
+        "id": 2,
+        "text": "Implemented error handling with TaskManagerError",
+        "created_at": 1748887613.1604357
+      },
+      {
+        "id": 3,
+        "text": "ruff and mypy pass; pytest fails without textual",
+        "created_at": 1748887618.9017565
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-3",
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553464.252788,
+    "updated_at": 1748887631.0350769,
+    "started_at": 1748887370.06228,
+    "closed_at": 1748887631.035044
+  },
+  {
+    "id": "TM_WEB-13",
+    "title": "Update Web dashboard for new persistence layer",
+    "description": "Adapt web dashboard to use refactored storage module",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting TM_WEB-13",
+        "created_at": 1748619582.3291047
+      },
+      {
+        "id": 2,
+        "text": "Implementation complete",
+        "created_at": 1748619648.9945726
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-3",
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553465.3876405,
+    "updated_at": 1748619648.9946115,
+    "started_at": 1748619580.1661315,
+    "closed_at": 1748619646.700163
+  },
+  {
+    "id": "TM-4",
+    "title": "Introduce custom exception handling",
+    "description": "Replace boolean returns with exceptions for clearer error reporting",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start implementing custom exceptions",
+        "created_at": 1748556591.090817
+      },
+      {
+        "id": 2,
+        "text": "Implemented custom exceptions and updated code",
+        "created_at": 1748556940.3999445
+      },
+      {
+        "id": 3,
+        "text": "Finished implementing exception handling",
+        "created_at": 1748557021.071495
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_TUI-5",
+        "TM_WEB-9",
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553470.605938,
+    "updated_at": 1748557021.0715184,
+    "started_at": 1748556587.3073359,
+    "closed_at": 1748557017.909407
+  },
+  {
+    "id": "TM_TUI-9",
+    "title": "Update TUI for exception handling",
+    "description": "Adapt TUI to handle exceptions from core",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started TM_TUI-9",
+        "created_at": 1748888451.3432043
+      },
+      {
+        "id": 2,
+        "text": "Running baseline tests",
+        "created_at": 1748888454.9080951
+      },
+      {
+        "id": 3,
+        "text": "Baseline tests pass",
+        "created_at": 1748888511.0836768
+      },
+      {
+        "id": 4,
+        "text": "Updated TUI to catch TaskManagerError and ValueError exceptions",
+        "created_at": 1748888614.942675
+      },
+      {
+        "id": 5,
+        "text": "Tests pass",
+        "created_at": 1748888617.0906863
+      },
+      {
+        "id": 6,
+        "text": "Verified ruff, mypy, and pytest all pass",
+        "created_at": 1748888931.3946745
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-4",
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553471.8673525,
+    "updated_at": 1748888942.1672626,
+    "started_at": 1748888449.4261644,
+    "closed_at": 1748888942.1672387
+  },
+  {
+    "id": "TM_WEB-14",
+    "title": "Update Web dashboard for exception handling",
+    "description": "Adapt web interface to display errors from core",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting TM_WEB-14",
+        "created_at": 1748620687.377212
+      },
+      {
+        "id": 2,
+        "text": "Display detailed API errors",
+        "created_at": 1748620802.4171083
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-4",
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553472.921496,
+    "updated_at": 1748620802.4171355,
+    "started_at": 1748620684.2745588,
+    "closed_at": 1748620799.116825
+  },
+  {
+    "id": "TM-5",
+    "title": "Implement caching for task and queue lists",
+    "description": "Cache list results to improve performance with large datasets",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting work on caching.",
+        "created_at": 1748615131.0922077
+      },
+      {
+        "id": 2,
+        "text": "Implemented caching and tests.",
+        "created_at": 1748615293.4572637
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553478.0440648,
+    "updated_at": 1748615294.6203852,
+    "started_at": 1748615128.7236488,
+    "closed_at": 1748615294.6203594
+  },
+  {
+    "id": "TM-6",
+    "title": "Expand unit tests for error handling",
+    "description": "Add tests covering new exceptions and edge cases",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start expanding error handling tests",
+        "created_at": 1748557613.7896876
+      },
+      {
+        "id": 2,
+        "text": "Add internal error handling tests",
+        "created_at": 1748557629.0316865
+      },
+      {
+        "id": 3,
+        "text": "All tests added and passing",
+        "created_at": 1748557666.4187524
+      }
+    ],
+    "links": {
+      "related": [
+        "DEV-19"
+      ]
+    },
+    "created_at": 1748553479.2418346,
+    "updated_at": 1748557666.4187768,
+    "started_at": 1748557611.943019,
+    "closed_at": 1748557663.6237874
+  },
+  {
+    "id": "TM_TUI-4",
+    "title": "Refactor TUI into screen classes",
+    "description": "Split TMApp into separate Textual screens and components for easier maintenance",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start refactoring TUI into screen classes",
+        "created_at": 1748615173.2745767
+      },
+      {
+        "id": 2,
+        "text": "Refactor complete and tests pass",
+        "created_at": 1748615272.618164
+      }
+    ],
+    "links": {},
+    "created_at": 1748553493.7485814,
+    "updated_at": 1748615275.7103128,
+    "started_at": 1748615170.8864288,
+    "closed_at": 1748615275.7102861
+  },
+  {
+    "id": "TM_TUI-5",
+    "title": "Add keyboard navigation",
+    "description": "Implement keybindings and focus management for faster navigation",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started work on keyboard navigation",
+        "created_at": 1748554268.3110247
+      },
+      {
+        "id": 2,
+        "text": "Implemented keybindings and focus management",
+        "created_at": 1748554351.0700183
+      },
+      {
+        "id": 3,
+        "text": "Finished task",
+        "created_at": 1748554353.1432557
+      }
+    ],
+    "links": {},
+    "created_at": 1748553499.1068456,
+    "updated_at": 1748554353.1432796,
+    "started_at": 1748554267.3341706,
+    "closed_at": 1748554350.0818524
+  },
+  {
+    "id": "TM_TUI-6",
+    "title": "Add tests for TUI",
+    "description": "Use textual's test utilities to cover basic workflows",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started implementing TUI tests",
+        "created_at": 1748620925.1069994
+      },
+      {
+        "id": 2,
+        "text": "Added basic navigation test with Textual run_test",
+        "created_at": 1748620928.3298776
+      },
+      {
+        "id": 3,
+        "text": "Verified ruff, mypy, pytest all pass",
+        "created_at": 1748620931.3414547
+      },
+      {
+        "id": 4,
+        "text": "Task completed",
+        "created_at": 1748620946.1025445
+      }
+    ],
+    "links": {},
+    "created_at": 1748553504.270316,
+    "updated_at": 1748620946.1025808,
+    "started_at": 1748620921.6596541,
+    "closed_at": 1748620943.2239778
+  },
+  {
+    "id": "TM_TUI-7",
+    "title": "Use message objects for events",
+    "description": "Replace large on_button_pressed with custom message classes",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Start implementing message objects and refactoring event handling",
+        "created_at": 1748890228.9331894
+      }
+    ],
+    "links": {},
+    "created_at": 1748553510.118547,
+    "updated_at": 1748890415.1845357,
+    "started_at": 1748890226.3830624,
+    "closed_at": 1748890415.1845129
+  },
+  {
+    "id": "TM_WEB-15",
+    "title": "Create comprehensive test plan for React components",
+    "description": "Develop a detailed testing strategy for TM_WEB React dashboard including unit tests, integration tests, and component testing. Define testing framework, tools, and coverage requirements.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-16"
+      ]
+    },
+    "created_at": 1748556897.361933,
+    "updated_at": 1748556913.12002,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-16",
+    "title": "Implement React testing framework setup",
+    "description": "Set up testing infrastructure for React components including Jest, React Testing Library, and test utilities. Configure test environment and establish testing patterns.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-15",
+        "TM_WEB-17"
+      ]
+    },
+    "created_at": 1748556900.84865,
+    "updated_at": 1748556916.6998022,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-17",
+    "title": "Write unit tests for React components",
+    "description": "Create comprehensive unit tests for all React components in the TM_WEB dashboard. Include tests for component rendering, props handling, state management, and user interactions.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-16",
+        "DEV-22"
+      ]
+    },
+    "created_at": 1748556905.189868,
+    "updated_at": 1748556919.8243032,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "DEV-22",
+    "title": "Add React testing to CI pipeline",
+    "description": "Integrate React testing into the continuous integration pipeline. Configure automated test execution, coverage reporting, and quality gates for React components in TM_WEB.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started working on React testing integration.",
+        "created_at": 1748613988.417573
+      },
+      {
+        "id": 2,
+        "text": "Added React testing dependencies, jest config, and sample test. Updated workflow to run React tests and added coverage directory to gitignore.",
+        "created_at": 1748614033.7171369
+      },
+      {
+        "id": 3,
+        "text": "Ruff, mypy, and pytest pass locally. React tests fail locally due to missing npm dependencies.",
+        "created_at": 1748614059.6808999
+      },
+      {
+        "id": 4,
+        "text": "Split React tests into a separate CI job that runs only when react-dashboard files change.",
+        "created_at": 1748614416.027393
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_WEB-17"
+      ]
+    },
+    "created_at": 1748556909.140626,
+    "updated_at": 1748614434.8309627,
+    "started_at": 1748613985.5501032,
+    "closed_at": 1748614434.830929
+  },
+  {
+    "id": "TM_WEB-18",
+    "title": "Remove KANBAN board functionality",
+    "description": "Remove the KANBAN board feature from the web dashboard interface. This includes removing related components, routes, and any associated UI elements.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting work on removing KANBAN board from web dashboard",
+        "created_at": 1748887304.2818418
+      },
+      {
+        "id": 2,
+        "text": "Removed Kanban board components, routes, styles, and references. Updated navigation, tests, and README.",
+        "created_at": 1748887478.337811
+      },
+      {
+        "id": 3,
+        "text": "Ran pytest, ruff, and mypy - all pass.",
+        "created_at": 1748887481.11259
+      },
+      {
+        "id": 4,
+        "text": "Added missing newlines at end of modified files",
+        "created_at": 1748887919.1096857
+      }
+    ],
+    "links": {},
+    "created_at": 1748620239.657114,
+    "updated_at": 1748887940.0523903,
+    "started_at": 1748887301.972297,
+    "closed_at": 1748887940.0523508
+  },
+  {
+    "id": "TM_WEB-19",
+    "title": "Improve task sorting in table",
+    "description": "Fix task sorting in the web dashboard table. Currently tasks are sorted lexicographically by ID, which causes incorrect ordering (e.g., TM_WEB-2 appears after TM_WEB-18). Implement proper numeric sorting for task IDs to ensure correct chronological order.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Started work on numeric sorting",
+        "created_at": 1748890631.1613927
+      },
+      {
+        "id": 2,
+        "text": "Analyzing previous code and preparing fixes based on feedback.",
+        "created_at": 1748890943.5142598
+      },
+      {
+        "id": 3,
+        "text": "Implemented improved sorting with queue and numeric order, added newline at EOF, and created test.",
+        "created_at": 1748890980.477922
+      }
+    ],
+    "links": {},
+    "created_at": 1748620378.743814,
+    "updated_at": 1748891410.9915493,
+    "started_at": 1748890627.4377182,
+    "closed_at": 1748891410.991525
+  },
+  {
+    "id": "TM_WEB-20",
+    "title": "Remove Todo page from web interface",
+    "description": "Remove the Todo page from the web dashboard as it's no longer needed. Clean up related components, routes, and navigation references.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "ANALYSIS: Found Todo page at react-dashboard/pages/todo.tsx that needs to be removed. The page shows tasks filtered by 'todo' status using TaskTable component.",
+        "created_at": 1748887135.130979
+      },
+      {
+        "id": 2,
+        "text": "NAVIGATION: Found navigation link in react-dashboard/components/Navigation.tsx line 17-18 that links to '/todo' page with '\u2705 TODO Tasks' text. This needs to be removed.",
+        "created_at": 1748887140.04945
+      },
+      {
+        "id": 3,
+        "text": "IMPORTANT: The 'todo' status is still used in other components (Kanban.tsx, TaskTable.tsx, task/[id].tsx) for filtering and status management. Only remove the dedicated Todo PAGE, not the todo status functionality.",
+        "created_at": 1748887145.377485
+      },
+      {
+        "id": 4,
+        "text": "CLEANUP NEEDED: After removing todo.tsx and navigation link, need to clean up: 1) Built files in out/todo/ directory 2) Routes manifest references 3) README.md mentions '/todo' route on line 24",
+        "created_at": 1748887150.249283
+      },
+      {
+        "id": 5,
+        "text": "STEP-BY-STEP PLAN: 1) Delete react-dashboard/pages/todo.tsx 2) Remove todo link from Navigation.tsx (lines 17-18) 3) Update README.md to remove todo route reference 4) Run 'npm run build' to regenerate static files 5) Test that navigation works without todo link",
+        "created_at": 1748887155.692241
+      },
+      {
+        "id": 6,
+        "text": "TESTING: After changes, verify: 1) Navigation menu has 3 links (Home, Task List, Kanban Board) 2) No broken links to /todo 3) Kanban and TaskTable still work with 'todo' status filtering 4) All pages load correctly 5) No console errors",
+        "created_at": 1748887160.890861
+      },
+      {
+        "id": 7,
+        "text": "Start removing Todo page",
+        "created_at": 1748888267.5985363
+      },
+      {
+        "id": 8,
+        "text": "Updated Navigation and README; removed todo.tsx; tests failing due to import error",
+        "created_at": 1748888301.423425
+      },
+      {
+        "id": 9,
+        "text": "Built dashboard and verified no /todo output. Running ruff, mypy, and pytest all pass.",
+        "created_at": 1748888599.3376646
+      }
+    ],
+    "links": {},
+    "created_at": 1748887077.729089,
+    "updated_at": 1748888604.0129247,
+    "started_at": 1748888264.759747,
+    "closed_at": 1748888604.0128996
+  },
+  {
+    "id": "TM_WEB-21",
+    "title": "Add GitHub OAuth authentication",
+    "description": "Implement GitHub OAuth Web flow for user authentication. Add login/logout functionality and store access token securely in session storage.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "PLAN: Implement GitHub OAuth using the OAuth implicit grant flow. Add login and logout buttons. Store the token in sessionStorage.",
+        "created_at": 1748888622.2969408
+      },
+      {
+        "id": 2,
+        "text": "Implemented AuthContext with device flow login, added login page and logout button.",
+        "created_at": 1748888703.0159347
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_WEB-22"
+      ]
+    },
+    "created_at": 1748887654.93889,
+    "updated_at": 1748888793.7534711,
+    "started_at": 1748888619.2239695,
+    "closed_at": 1748888793.7534394
+  },
+  {
+    "id": "TM_WEB-22",
+    "title": "Integrate Octokit client for GitHub API",
+    "description": "Add @octokit/rest dependency and create GitHub API client wrapper. Implement basic connection and error handling for GitHub API calls.",
+    "status": "done",
+    "comments": [
+      {
+        "id": 1,
+        "text": "Starting work on integrating Octokit client into react-dashboard.",
+        "created_at": 1748890441.8777514
+      },
+      {
+        "id": 2,
+        "text": "Ensure tests and wrappers handle missing Octokit gracefully and close task",
+        "created_at": 1748891366.516567
+      }
+    ],
+    "links": {
+      "related": [
+        "TM_WEB-21",
+        "TM_WEB-23",
+        "TM_WEB-24",
+        "TM_WEB-25",
+        "TM_WEB-26"
+      ]
+    },
+    "created_at": 1748887659.222373,
+    "updated_at": 1748891368.7393012,
+    "started_at": 1748890440.1537423,
+    "closed_at": 1748891368.7392745
+  },
+  {
+    "id": "TM_WEB-23",
+    "title": "Implement task synchronization with GitHub repository",
+    "description": "Create functionality to read tasks from GitHub repository files (.tasks/ directory) and sync with local task manager data. Handle file parsing and data mapping.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-22"
+      ]
+    },
+    "created_at": 1748887663.91928,
+    "updated_at": 1748887697.1609879,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-24",
+    "title": "Add task creation via GitHub API",
+    "description": "Implement functionality to create new tasks by writing to GitHub repository using createOrUpdateFileContents API. Handle file content generation and commit messages.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-22"
+      ]
+    },
+    "created_at": 1748887668.6957572,
+    "updated_at": 1748887701.01073,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-25",
+    "title": "Add task updates via GitHub API",
+    "description": "Implement task editing functionality through GitHub API. Handle task status changes, field updates, and comment additions by updating repository files.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-22"
+      ]
+    },
+    "created_at": 1748887672.629698,
+    "updated_at": 1748887701.179368,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-26",
+    "title": "Add queue management via GitHub API",
+    "description": "Implement queue creation, deletion, and modification through GitHub API. Handle queue file operations and maintain queue-task relationships in repository structure.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM_WEB-22"
+      ]
+    },
+    "created_at": 1748887676.921186,
+    "updated_at": 1748887701.357137,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-27",
+    "title": "Implement GitHub Actions workflow dispatch",
+    "description": "Add functionality to trigger GitHub Actions workflows from the web interface using workflow_dispatch API. Create UI for running automated tasks and CI/CD processes.",
+    "status": "todo",
+    "comments": [],
+    "links": {},
+    "created_at": 1748887681.0266392,
+    "updated_at": 1748887681.02664,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-28",
+    "title": "Add error handling and offline mode",
+    "description": "Implement comprehensive error handling for GitHub API failures, rate limiting, and network issues. Add offline mode with local storage fallback when GitHub API is unavailable.",
+    "status": "todo",
+    "comments": [],
+    "links": {},
+    "created_at": 1748887684.805411,
+    "updated_at": 1748887684.805411,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-29",
+    "title": "Add security and token management",
+    "description": "Implement secure token storage, token refresh mechanisms, and proper CORS handling. Add security measures against CSRF attacks and implement token expiration handling.",
+    "status": "todo",
+    "comments": [],
+    "links": {},
+    "created_at": 1748887689.774667,
+    "updated_at": 1748887689.774667,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM-7",
+    "title": "Add tm verify command for AI agent verification",
+    "description": "Create a new 'tm verify' command that helps AI agents check they haven't forgotten anything before ending their work session. Initial implementation should check for tasks left in 'in_progress' status and provide clear feedback.",
+    "status": "todo",
+    "comments": [
+      {
+        "id": 1,
+        "text": "REQUIREMENT: Create './tm verify' command that acts as a checklist tool for AI agents to ensure they haven't forgotten any critical steps before ending their work session.",
+        "created_at": 1748891087.027482
+      },
+      {
+        "id": 2,
+        "text": "INITIAL IMPLEMENTATION: Check for tasks in 'in_progress' status. Command should: 1) List any tasks with status='in_progress' 2) Show clear warning if any found 3) Return exit code 0 if all good, 1 if issues found 4) Provide actionable feedback",
+        "created_at": 1748891091.739019
+      },
+      {
+        "id": 3,
+        "text": "FUTURE ENHANCEMENTS: After initial implementation, extend to check: 1) Uncommitted git changes 2) Test failures (pytest, ruff, mypy, npm test) 3) Unsaved files 4) Missing task comments 5) Integration with AGENTS.md checklist",
+        "created_at": 1748891096.776084
+      },
+      {
+        "id": 4,
+        "text": "EXAMPLE OUTPUT: '\u2705 No tasks in progress' or '\u274c Found 2 tasks in progress: TM-5, TM_WEB-10. Run: ./tm task done --id <task-id> to close them.' Should be clear and actionable for AI agents.",
+        "created_at": 1748891102.33671
+      },
+      {
+        "id": 5,
+        "text": "IMPLEMENTATION LOCATION: Add to task-manager/cli.py as new subcommand. Follow existing pattern like 'task list --status in_progress' but with better formatting and exit codes for automation.",
+        "created_at": 1748891107.1996129
+      }
+    ],
+    "links": {},
+    "created_at": 1748891082.1824582,
+    "updated_at": 1748891107.199651,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM-8",
+    "title": "Design Epic entity data model",
+    "description": "Design the data structure for Epic entity. Define fields, relationships with tasks/epics, status constraints (only 'open' or 'done'), and hierarchical structure. Create Epic dataclass and database schema.",
+    "status": "todo",
+    "comments": [
+      {
+        "id": 1,
+        "text": "EPIC REQUIREMENTS: Epic is a collection of tasks and/or other epics that solve a global problem. Status can only be 'open' or 'done' (no intermediate states). Epic can only be marked 'done' when ALL child tasks and epics are 'done'.",
+        "created_at": 1748891445.133248
+      },
+      {
+        "id": 2,
+        "text": "EPIC FIELDS: id, title, description, status ('open'|'done'), created_at, updated_at, child_tasks (list of task IDs), child_epics (list of epic IDs). Consider parent_epic field for reverse lookup.",
+        "created_at": 1748891450.1098099
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-9"
+      ]
+    },
+    "created_at": 1748891399.924333,
+    "updated_at": 1748891450.1098251,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM-9",
+    "title": "Implement Epic persistence layer",
+    "description": "Add Epic storage functionality to persistence layer. Implement Epic file format, CRUD operations, and hierarchical relationships storage. Handle Epic-Task and Epic-Epic relationships.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM-8",
+        "TM-10",
+        "TM-11"
+      ]
+    },
+    "created_at": 1748891404.956207,
+    "updated_at": 1748891433.844374,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM-10",
+    "title": "Add Epic CLI commands",
+    "description": "Implement CLI commands for Epic management: epic add, epic list, epic show, epic update, epic done. Include commands for adding/removing tasks and sub-epics to epics. Handle status validation logic.",
+    "status": "todo",
+    "comments": [
+      {
+        "id": 1,
+        "text": "CLI COMMANDS: './tm epic add --title \"Epic title\" --description \"Description\"', './tm epic list', './tm epic show --id epic-1', './tm epic add-task --id epic-1 --task-id task-1', './tm epic add-epic --id epic-1 --child-id epic-2', './tm epic done --id epic-1' (with validation)",
+        "created_at": 1748891460.061244
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-9",
+        "TM_TUI-10",
+        "TM_WEB-30"
+      ]
+    },
+    "created_at": 1748891410.1966138,
+    "updated_at": 1748891460.061258,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM-11",
+    "title": "Implement Epic status validation logic",
+    "description": "Create logic to automatically manage Epic status based on child tasks/epics. Epic can only be marked 'done' if ALL child tasks and epics are 'done'. Implement validation and auto-status updates.",
+    "status": "todo",
+    "comments": [
+      {
+        "id": 1,
+        "text": "STATUS VALIDATION LOGIC: 1) Epic can only transition to 'done' if ALL child tasks have status='done' AND ALL child epics have status='done' 2) When child item status changes, check if parent epic can be auto-completed 3) Prevent manual status changes that violate rules",
+        "created_at": 1748891454.9806788
+      }
+    ],
+    "links": {
+      "related": [
+        "TM-9",
+        "TM-12"
+      ]
+    },
+    "created_at": 1748891414.815446,
+    "updated_at": 1748891454.980691,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_TUI-10",
+    "title": "Add Epic support to TUI interface",
+    "description": "Extend TUI to display and manage Epics. Add Epic views, hierarchical navigation, progress indicators, and Epic-specific operations. Show Epic completion status based on child items.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM-10"
+      ]
+    },
+    "created_at": 1748891419.2619898,
+    "updated_at": 1748891438.840945,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM_WEB-30",
+    "title": "Add Epic support to Web dashboard",
+    "description": "Implement Epic functionality in React dashboard. Add Epic views, hierarchical display, progress tracking, and Epic management interface. Show Epic tree structure and completion progress.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM-10"
+      ]
+    },
+    "created_at": 1748891423.243001,
+    "updated_at": 1748891439.020323,
+    "started_at": null,
+    "closed_at": null
+  },
+  {
+    "id": "TM-12",
+    "title": "Add Epic tests and documentation",
+    "description": "Create comprehensive tests for Epic functionality: unit tests for Epic model, CLI commands, status validation, and hierarchical operations. Add Epic documentation and usage examples.",
+    "status": "todo",
+    "comments": [],
+    "links": {
+      "related": [
+        "TM-11"
+      ]
+    },
+    "created_at": 1748891427.629737,
+    "updated_at": 1748891439.197525,
+    "started_at": null,
+    "closed_at": null
+  }
+]

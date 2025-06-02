@@ -2,13 +2,13 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 
 export interface AuthContextType {
   token: string | null
-  login: () => Promise<void>
+  login: () => void
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType>({
   token: null,
-  login: async () => {},
+  login: () => {},
   logout: () => {}
 })
 
@@ -24,49 +24,63 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (stored) {
       setToken(stored)
     }
+
+    // Check for OAuth callback with code parameter
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('code')
+      
+      if (code && !stored) {
+        // For static sites, we can't exchange the code for a token directly
+        // Instead, we'll show instructions to the user
+        alert('GitHub OAuth callback received. For static sites, you need to manually create a Personal Access Token.\n\nGo to GitHub Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token\n\nSelect "repo" scope and copy the token.')
+        
+        // Clear the code from URL
+        window.history.replaceState({}, document.title, window.location.pathname)
+      }
+    }
   }, [])
 
-  const login = async (): Promise<void> => {
+  const login = (): void => {
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
     if (!clientId) {
       alert('GitHub OAuth client ID not configured')
       return
     }
 
-    const res = await fetch('https://github.com/login/device/code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ client_id: clientId, scope: 'repo' })
-    })
-    const data = await res.json()
+    // For static sites, we'll provide two options:
+    // 1. OAuth flow (which will require manual token creation)
+    // 2. Direct Personal Access Token input
+    
+    const usePersonalToken = confirm(
+      'Choose authentication method:\n\n' +
+      'OK = Use Personal Access Token (recommended for static sites)\n' +
+      'Cancel = Use OAuth flow (requires manual token creation)\n\n' +
+      'Personal Access Token is easier and more secure for static sites.'
+    )
 
-    alert(`Open ${data.verification_uri} and enter code ${data.user_code}`)
-
-    const start = Date.now()
-    while (Date.now() - start < data.expires_in * 1000) {
-      await new Promise(r => setTimeout(r, data.interval * 1000))
-      const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          client_id: clientId,
-          device_code: data.device_code,
-          grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
-        })
-      })
-      const tokenData = await tokenRes.json()
-      if (tokenData.error === 'authorization_pending') {
-        continue
+    if (usePersonalToken) {
+      const token = prompt(
+        'Enter your GitHub Personal Access Token:\n\n' +
+        '1. Go to GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)\n' +
+        '2. Click "Generate new token (classic)"\n' +
+        '3. Select "repo" scope\n' +
+        '4. Copy and paste the token here:'
+      )
+      
+      if (token && token.trim()) {
+        sessionStorage.setItem('githubToken', token.trim())
+        setToken(token.trim())
+        alert('Successfully logged in!')
       }
-      if (tokenData.access_token) {
-        sessionStorage.setItem('githubToken', tokenData.access_token)
-        setToken(tokenData.access_token)
-        return
-      } else {
-        break
-      }
+    } else {
+      // Redirect to GitHub OAuth
+      const redirectUri = window.location.origin + window.location.pathname
+      const scope = 'repo'
+      const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`
+      
+      window.location.href = githubAuthUrl
     }
-    alert('Login failed')
   }
 
   const logout = (): void => {
