@@ -2,8 +2,24 @@
   "id": "TM_TUI-8",
   "title": "Update TUI for new persistence layer",
   "description": "Adapt TUI code to work with refactored storage module",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started TM_TUI-8",
+      "created_at": 1748887609.7844112
+    },
+    {
+      "id": 2,
+      "text": "Implemented error handling with TaskManagerError",
+      "created_at": 1748887613.1604357
+    },
+    {
+      "id": 3,
+      "text": "ruff and mypy pass; pytest fails without textual",
+      "created_at": 1748887618.9017565
+    }
+  ],
   "links": {
     "related": [
       "TM-3",
@@ -11,7 +27,7 @@
     ]
   },
   "created_at": 1748553464.252788,
-  "updated_at": 1748553488.5780978,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748887631.0350769,
+  "started_at": 1748887370.06228,
+  "closed_at": 1748887631.035044
 }
