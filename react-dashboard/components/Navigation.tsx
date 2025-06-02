@@ -1,8 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
 import styles from './Navigation.module.css'
+import { useAuth } from '../context/AuthContext'
 
 export default function Navigation() {
+  const { token, logout } = useAuth()
   return (
     <nav className={styles.nav}>
       <div className={styles.links}>
@@ -15,7 +17,16 @@ export default function Navigation() {
         <Link href="/todo" className={styles.link}>
           ✅ TODO Tasks
         </Link>
+        {token ? (
+          <button onClick={logout} className={styles.button}>
+            🔒 Logout
+          </button>
+        ) : (
+          <Link href="/login" className={styles.link}>
+            🔑 Login
+          </Link>
+        )}
       </div>
     </nav>
   )
-} 
+}

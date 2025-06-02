@@ -16,3 +16,9 @@ export interface TaskContextType {
 export interface TaskTableProps {
   tasks?: Task[];
 }
+
+export interface AuthContextType {
+  token: string | null;
+  login: () => Promise<void>;
+  logout: () => void;
+}
