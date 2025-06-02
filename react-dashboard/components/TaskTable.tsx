@@ -6,6 +6,13 @@ import { TaskTableProps, Task } from '../types'
 
 export default function TaskTable({ tasks: tasksProp }: TaskTableProps) {
   const tasks = tasksProp ?? useTasks()
+  const sortedTasks = useMemo(() => {
+    const parseId = (id: string): number => {
+      const num = parseInt(id.split('-')[1], 10)
+      return isNaN(num) ? Number.MAX_SAFE_INTEGER : num
+    }
+    return [...tasks].sort((a: Task, b: Task) => parseId(a.id) - parseId(b.id))
+  }, [tasks])
   const [pageSize, setPageSize] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
   const [statusFilter, setStatusFilter] = useState<string>('')
@@ -17,7 +24,7 @@ export default function TaskTable({ tasks: tasksProp }: TaskTableProps) {
     [tasks]
   )
 
-  const filteredTasks = tasks.filter((t: Task) => {
+  const filteredTasks = sortedTasks.filter((t: Task) => {
     if (statusFilter && t.status !== statusFilter) return false
     if (queueFilter && !(t.id || '').startsWith(queueFilter + '-')) return false
     if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false

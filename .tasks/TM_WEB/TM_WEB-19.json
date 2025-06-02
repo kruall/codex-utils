@@ -2,11 +2,17 @@
   "id": "TM_WEB-19",
   "title": "Improve task sorting in table",
   "description": "Fix task sorting in the web dashboard table. Currently tasks are sorted lexicographically by ID, which causes incorrect ordering (e.g., TM_WEB-2 appears after TM_WEB-18). Implement proper numeric sorting for task IDs to ensure correct chronological order.",
-  "status": "todo",
-  "comments": [],
+  "status": "in_progress",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started work on numeric sorting",
+      "created_at": 1748890631.1613927
+    }
+  ],
   "links": {},
   "created_at": 1748620378.743814,
-  "updated_at": 1748620378.743814,
-  "started_at": null,
+  "updated_at": 1748890631.1614187,
+  "started_at": 1748890627.4377182,
   "closed_at": null
 }
