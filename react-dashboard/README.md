@@ -21,7 +21,6 @@ The dashboard loads tasks at runtime using a shared React hook and API route.
 
 - `/` - home page
 - `/table` - task list view
-- `/todo` - page showing only tasks with a `todo` status
 - `/task/[id]` - view and edit an individual task
 
 To generate a static site for GitHub Pages run:

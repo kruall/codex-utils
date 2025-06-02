@@ -14,9 +14,6 @@ export default function Navigation() {
         <Link href="/table" className={styles.link}>
           📋 Task List
         </Link>
-        <Link href="/todo" className={styles.link}>
-          ✅ TODO Tasks
-        </Link>
         {token ? (
           <button onClick={logout} className={styles.button}>
             🔒 Logout

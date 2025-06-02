@@ -23,6 +23,23 @@ which python
 - Installing Python packages
 
 **⚠️ IMPORTANT**: The `./tm` script and `init_venv` script automatically handle virtual environment activation, but when running Python commands directly, always ensure `.venv` is activated first.
+## 🚨 TASK CLOSURE REQUIREMENTS 🚨
+
+**⚠️ CRITICAL REMINDER**: Agents frequently forget to close tasks even after completing all work. This is MANDATORY and must NEVER be skipped.
+
+**🔴 ABSOLUTE REQUIREMENT**: Every task that is started MUST be closed with `./tm task done --id <task-id>` when work is completed.
+
+**📋 TASK CLOSURE CHECKLIST** - Verify BEFORE ending your session:
+- [ ] All implementation work is complete
+- [ ] All Python tests pass (`pytest`, `ruff check .`, `mypy .`)
+- [ ] All React tests pass (`cd react-dashboard && npm test`)
+- [ ] All files are saved and committed
+- [ ] Task comments document the work performed
+- [ ] **MOST IMPORTANT**: `./tm task done --id <task-id>` has been executed
+
+**🚫 COMMON MISTAKE**: Completing all work but forgetting to run `./tm task done`. This leaves tasks in "in_progress" status indefinitely.
+
+**✅ CORRECT WORKFLOW**: Start → Work → Comment → Complete → **CLOSE TASK**
 
 ## Task Management
 
@@ -117,8 +134,9 @@ The task manager provides multiple interfaces for different use cases:
 2. **Create task**: `./tm task add --title "Task title" --description "Description" --queue my-queue`
 3. **Start task**: `./tm task start --id my-queue-1`
 4. **Add comments** during work: `./tm task comment add --id my-queue-1 --comment "Progress update"`
-5. **Complete task**: `./tm task done --id my-queue-1`
+5. **🚨 COMPLETE TASK**: `./tm task done --id my-queue-1` **← DO NOT FORGET THIS STEP!**
 
+**⚠️ REMINDER**: Step 5 is the most commonly forgotten step. Always verify the task is closed before ending your work session.
 
 #### PR Instructions
 
@@ -132,10 +150,31 @@ The task manager provides multiple interfaces for different use cases:
 * **🚨 CRITICAL REQUIREMENT**: **ALWAYS** add comments using `./tm task comment add --id <task-id> --comment "<comment>"` after each significant step
 * **🚨 CRITICAL REQUIREMENT**: **ALWAYS** call `./tm task done --id <task-id>` when work is completed
 
- 
 * Before opening a PR, ensure:
   • **MANDATORY**: Task was started with `./tm task start` command before work began
   • `pytest` passes,
   • `ruff check .` passes,
   • `mypy .` passes
+  • React tests pass (`cd react-dashboard && npm test`)
   • **MANDATORY**: Task was closed with `./tm task done` command when work is completed
+
+---
+
+## 🔥 FINAL REMINDER 🔥
+
+**BEFORE YOU FINISH YOUR WORK SESSION:**
+
+```bash
+# Check if you have any tasks still in progress
+./tm task list --status in_progress
+
+# If you see any tasks, close them:
+./tm task done --id <task-id>
+
+# Verify all tests pass before closing:
+pytest && ruff check . && mypy . && cd react-dashboard && npm test
+```
+
+**🚨 DO NOT LEAVE TASKS IN "in_progress" STATUS 🚨**
+
+Every started task MUST be closed. No exceptions.
