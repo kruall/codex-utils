@@ -1,0 +1,43 @@
+{
+  "id": "TM_WEB-20",
+  "title": "Remove Todo page from web interface",
+  "description": "Remove the Todo page from the web dashboard as it's no longer needed. Clean up related components, routes, and navigation references.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "ANALYSIS: Found Todo page at react-dashboard/pages/todo.tsx that needs to be removed. The page shows tasks filtered by 'todo' status using TaskTable component.",
+      "created_at": 1748887135.130979
+    },
+    {
+      "id": 2,
+      "text": "NAVIGATION: Found navigation link in react-dashboard/components/Navigation.tsx line 17-18 that links to '/todo' page with '\u2705 TODO Tasks' text. This needs to be removed.",
+      "created_at": 1748887140.04945
+    },
+    {
+      "id": 3,
+      "text": "IMPORTANT: The 'todo' status is still used in other components (Kanban.tsx, TaskTable.tsx, task/[id].tsx) for filtering and status management. Only remove the dedicated Todo PAGE, not the todo status functionality.",
+      "created_at": 1748887145.377485
+    },
+    {
+      "id": 4,
+      "text": "CLEANUP NEEDED: After removing todo.tsx and navigation link, need to clean up: 1) Built files in out/todo/ directory 2) Routes manifest references 3) README.md mentions '/todo' route on line 24",
+      "created_at": 1748887150.249283
+    },
+    {
+      "id": 5,
+      "text": "STEP-BY-STEP PLAN: 1) Delete react-dashboard/pages/todo.tsx 2) Remove todo link from Navigation.tsx (lines 17-18) 3) Update README.md to remove todo route reference 4) Run 'npm run build' to regenerate static files 5) Test that navigation works without todo link",
+      "created_at": 1748887155.692241
+    },
+    {
+      "id": 6,
+      "text": "TESTING: After changes, verify: 1) Navigation menu has 3 links (Home, Task List, Kanban Board) 2) No broken links to /todo 3) Kanban and TaskTable still work with 'todo' status filtering 4) All pages load correctly 5) No console errors",
+      "created_at": 1748887160.890861
+    }
+  ],
+  "links": {},
+  "created_at": 1748887077.729089,
+  "updated_at": 1748887160.8908741,
+  "started_at": null,
+  "closed_at": null
+}
