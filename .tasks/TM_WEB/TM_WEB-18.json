@@ -2,11 +2,32 @@
   "id": "TM_WEB-18",
   "title": "Remove KANBAN board functionality",
   "description": "Remove the KANBAN board feature from the web dashboard interface. This includes removing related components, routes, and any associated UI elements.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on removing KANBAN board from web dashboard",
+      "created_at": 1748887304.2818418
+    },
+    {
+      "id": 2,
+      "text": "Removed Kanban board components, routes, styles, and references. Updated navigation, tests, and README.",
+      "created_at": 1748887478.337811
+    },
+    {
+      "id": 3,
+      "text": "Ran pytest, ruff, and mypy - all pass.",
+      "created_at": 1748887481.11259
+    },
+    {
+      "id": 4,
+      "text": "Added missing newlines at end of modified files",
+      "created_at": 1748887919.1096857
+    }
+  ],
   "links": {},
   "created_at": 1748620239.657114,
-  "updated_at": 1748620239.657114,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748887940.0523903,
+  "started_at": 1748887301.972297,
+  "closed_at": 1748887940.0523508
 }
