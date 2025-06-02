@@ -16,8 +16,3 @@ export interface TaskContextType {
 export interface TaskTableProps {
   tasks?: Task[];
 }
-
-export interface KanbanColumnProps {
-  title: string;
-  tasks: Task[];
-} 

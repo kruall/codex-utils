@@ -12,9 +12,6 @@ export default function Navigation() {
         <Link href="/table" className={styles.link}>
           📋 Task List
         </Link>
-        <Link href="/kanban" className={styles.link}>
-          🗂 Kanban Board
-        </Link>
         <Link href="/todo" className={styles.link}>
           ✅ TODO Tasks
         </Link>
