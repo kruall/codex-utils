@@ -7,7 +7,8 @@ if TYPE_CHECKING:  # pragma: no cover - type hints only
     from textual.containers import Vertical  # type: ignore
     from textual.widgets import Header, Footer, Button, Static, Input, DataTable  # type: ignore
     from textual.screen import Screen  # type: ignore
-    from .core import TaskManager
+from .core import TaskManager
+from .exceptions import TaskManagerError
 
 try:
     from textual.app import App, ComposeResult  # type: ignore
@@ -50,6 +51,12 @@ else:
             bid = event.button.id
             if bid == "back":
                 self.app.pop_screen()
+
+        def show_error(self, message: str) -> None:
+            """Display an error message in the body."""
+            assert self.body is not None
+            logging.getLogger(__name__).error(message)
+            self.body.mount(Static(message, classes="error"))
 
     class MainScreen(BaseScreen):
         def on_mount(self) -> None:
@@ -104,7 +111,10 @@ else:
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
                 desc = self.query_one("#q_desc", Input).value
-                self.manager.queue_add(name, title, desc)
+                try:
+                    self.manager.queue_add(name, title, desc)
+                except TaskManagerError as e:
+                    self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "cancel":
                 self.refresh_screen()
@@ -125,7 +135,10 @@ else:
             elif bid == "confirm_delete":
                 delete_name: str | None = getattr(self, "_delete_target", None)
                 if delete_name:
-                    self.manager.queue_delete(delete_name)
+                    try:
+                        self.manager.queue_delete(delete_name)
+                    except TaskManagerError as e:
+                        self.show_error(str(e))
                 self.refresh_screen()
 
     class TasksScreen(BaseScreen):
@@ -154,7 +167,12 @@ else:
             elif bid == "view_comments":
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
-                    self.app.push_screen(CommentsScreen(self.manager, task_id))
+                    try:
+                        self.manager.task_show(task_id)  # validate existence
+                    except TaskManagerError as e:
+                        self.show_error(str(e))
+                    else:
+                        self.app.push_screen(CommentsScreen(self.manager, task_id))
             elif bid == "task_delete":
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
@@ -172,7 +190,10 @@ else:
             elif bid == "confirm_task_delete":
                 tid: str | None = getattr(self, "_delete_target", None)
                 if tid:
-                    self.manager.task_delete(tid)
+                    try:
+                        self.manager.task_delete(tid)
+                    except TaskManagerError as e:
+                        self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "cancel":
                 self.refresh_screen()
@@ -189,7 +210,11 @@ else:
             assert self.body is not None
             self.body.remove_children()
             self.body.mount(Static(f"Comments for {self.task_id}", classes="title"))
-            comments = self.manager.task_comment_list(self.task_id) or []
+            try:
+                comments = self.manager.task_comment_list(self.task_id) or []
+            except TaskManagerError as e:
+                self.show_error(str(e))
+                comments = []
             for c in comments:
                 created = time.strftime(
                     "%Y-%m-%d %H:%M:%S", time.localtime(c.get("created_at", 0))
@@ -213,7 +238,10 @@ else:
             elif bid == "add_comment":
                 comment = self.query_one("#new_comment", Input).value
                 if comment:
-                    self.manager.task_comment_add(self.task_id, comment)
+                    try:
+                        self.manager.task_comment_add(self.task_id, comment)
+                    except TaskManagerError as e:
+                        self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "edit_comment":
                 cid = self.query_one("#edit_comment_id", Input).value
@@ -221,14 +249,20 @@ else:
                 if cid and text:
                     cid_int = _parse_comment_id(cid)
                     if cid_int is not None:
-                        self.manager.task_comment_edit(self.task_id, cid_int, text)
+                        try:
+                            self.manager.task_comment_edit(self.task_id, cid_int, text)
+                        except TaskManagerError as e:
+                            self.show_error(str(e))
                 self.refresh_screen()
             elif bid == "remove_comment":
                 cid = self.query_one("#remove_comment_id", Input).value
                 if cid:
                     cid_int = _parse_comment_id(cid)
                     if cid_int is not None:
-                        self.manager.task_comment_remove(self.task_id, cid_int)
+                        try:
+                            self.manager.task_comment_remove(self.task_id, cid_int)
+                        except TaskManagerError as e:
+                            self.show_error(str(e))
                 self.refresh_screen()
 
     class TMApp(App):
