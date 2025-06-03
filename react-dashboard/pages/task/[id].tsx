@@ -3,6 +3,7 @@ import path from 'path'
 import { useState, ChangeEvent } from 'react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { useTaskContext } from '../../context/TaskContext'
+import { useAuth } from '../../context/AuthContext'
 import Navigation from '../../components/Navigation'
 import styles from '../Page.module.css'
 import { Task } from '../../types'
@@ -54,6 +55,7 @@ export default function TaskPage({ task }: TaskPageProps) {
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<boolean>(false)
   const { setTasks } = useTaskContext()
+  const { csrfToken, token } = useAuth()
 
   const save = async (): Promise<void> => {
     setSaving(true)
@@ -62,8 +64,15 @@ export default function TaskPage({ task }: TaskPageProps) {
     try {
       const res = await fetch('/api/update-task', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: task.id, updates: { title, status } })
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken || '',
+          ...(token ? { Authorization: `token ${token}` } : {})
+        },
+        body: JSON.stringify({
+          repo: (process.env.NEXT_PUBLIC_GITHUB_REPOS || '').split(',')[0],
+          task: { id: task.id, title, status }
+        })
       })
 
       const data = await res.json().catch(() => null)
