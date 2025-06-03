@@ -26,3 +26,19 @@ stored as a JSON file named `<epic-id>.json` using the fields defined above.
 
 This flat structure mirrors the task storage convention and will be used by the
 persistence layer implemented in later tasks.
+
+## CLI Usage
+The `tm` command offers helpers for managing epics from the command line:
+
+```bash
+# Create and list epics
+./tm epic add --title "Release" --description "Release tasks"
+./tm epic list
+
+# Relate tasks or sub epics
+./tm epic add-task --id epic-1 --task-id q-1
+./tm epic add-epic --id epic-1 --child-id epic-2
+
+# Close an epic when all children are done
+./tm epic done --id epic-1
+```
