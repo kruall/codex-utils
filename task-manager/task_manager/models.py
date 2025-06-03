@@ -42,3 +42,24 @@ class Task:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Task":
         return cls(**data)
+
+@dataclass
+class Epic:
+    """Data representation of an epic grouping tasks and sub-epics."""
+
+    id: str
+    title: str
+    description: str
+    status: str = "open"
+    child_tasks: List[str] = field(default_factory=list)
+    child_epics: List[str] = field(default_factory=list)
+    parent_epic: str | None = None
+    created_at: float = field(default_factory=time.time)
+    updated_at: float = field(default_factory=time.time)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Epic":
+        return cls(**data)

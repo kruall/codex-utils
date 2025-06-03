@@ -128,3 +128,8 @@ npm run dev
 ```
 Use `npm run build` to generate a static site in `out/` for GitHub Pages deployment.
 
+
+### Epic Model
+Initial support for Epics is being introduced. The entity represents a
+collection of tasks and/or sub-epics. See `docs/epic_model.md` for
+field definitions and storage details.

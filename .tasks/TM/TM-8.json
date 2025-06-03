@@ -2,7 +2,7 @@
   "id": "TM-8",
   "title": "Design Epic entity data model",
   "description": "Design the data structure for Epic entity. Define fields, relationships with tasks/epics, status constraints (only 'open' or 'done'), and hierarchical structure. Create Epic dataclass and database schema.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -13,6 +13,16 @@
       "id": 2,
       "text": "EPIC FIELDS: id, title, description, status ('open'|'done'), created_at, updated_at, child_tasks (list of task IDs), child_epics (list of epic IDs). Consider parent_epic field for reverse lookup.",
       "created_at": 1748891450.1098099
+    },
+    {
+      "id": 3,
+      "text": "Starting work on Epic data model",
+      "created_at": 1748932120.2933028
+    },
+    {
+      "id": 4,
+      "text": "Implemented Epic dataclass and schema doc",
+      "created_at": 1748932242.4233131
     }
   ],
   "links": {
@@ -21,7 +31,7 @@
     ]
   },
   "created_at": 1748891399.924333,
-  "updated_at": 1748891450.1098251,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748932242.4233475,
+  "started_at": 1748932117.0469205,
+  "closed_at": 1748932238.734123
 }
