@@ -31,9 +31,25 @@ function generateTasksJson() {
   try {
     const pythonPath = findPythonExecutable();
     console.log(`Using Python: ${pythonPath}`);
-    
+
+    const args = ['-m', 'task_manager.export_json', '--tasks-root', tasksRoot, '--output', outputPath];
+
+    const reposEnv = process.env.GITHUB_REPOS;
+    if (reposEnv) {
+      reposEnv.split(',').forEach(repo => {
+        if (repo.trim()) {
+          args.push('--repo', repo.trim());
+        }
+      });
+    }
+
+    const token = process.env.GITHUB_TOKEN;
+    if (token) {
+      args.push('--token', token);
+    }
+
     // Run as a module from the task-manager directory
-    execFileSync(pythonPath, ['-m', 'task_manager.export_json', '--tasks-root', tasksRoot, '--output', outputPath], { 
+    execFileSync(pythonPath, args, {
       stdio: 'inherit',
       cwd: taskManagerDir
     });
