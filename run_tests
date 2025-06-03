@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 # Colors for output
 RED='\033[0;31m'
@@ -99,20 +99,16 @@ run_test() {
     fi
 }
 
-# Run Python tests
-run_test "Python unit tests" "pytest"
+# Run all tests, continuing even if some fail
+run_test "Python unit tests" "pytest" || true
 
-# Run Python linting
-run_test "Python linting (ruff)" "ruff check ."
+run_test "Python linting (ruff)" "ruff check ." || true
 
-# Run Python type checking
-run_test "Python type checking (mypy)" "mypy ."
+run_test "Python type checking (mypy)" "mypy ." || true
 
-# Run React tests with console error checking
-run_test "React tests" "(cd react-dashboard && npm test)" "true"
+run_test "React tests" "(cd react-dashboard && npm test)" "true" || true
 
-# Run tm verify
-run_test "Task verification (tm verify)" "./tm verify"
+run_test "Task verification (tm verify)" "./tm verify" || true
 
 # Summary
 echo
