@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from .models import Queue, Task, TaskStatus
+from .models import Queue, Task, TaskStatus, Epic, EpicStatus
 from .utils import log_error
 from .storage import load_json, save_json
 from .exceptions import (
@@ -24,17 +24,23 @@ logger = logging.getLogger(__name__)
 
 
 class TaskManager:
-    def __init__(self, tasks_root: str = ".tasks"):
+    def __init__(self, tasks_root: str = ".tasks", epics_root: str = ".epics"):
         self.tasks_root = Path(tasks_root)
         self.tasks_root.mkdir(exist_ok=True)
+        self.epics_root = Path(epics_root)
+        self.epics_root.mkdir(exist_ok=True)
         self._queue_list_cache: List[Dict[str, str]] | None = None
         self._task_list_cache: dict[tuple[Optional[str], Optional[str]], List[Dict]] = {}
+        self._epic_list_cache: Optional[List[Dict]] = None
 
     def _invalidate_queue_cache(self) -> None:
         self._queue_list_cache = None
 
     def _invalidate_task_cache(self) -> None:
         self._task_list_cache.clear()
+
+    def _invalidate_epic_cache(self) -> None:
+        self._epic_list_cache = None
 
     def queue_list(self) -> List[Dict[str, str]]:
         """List all queues."""
@@ -119,6 +125,21 @@ class TaskManager:
         
         return max_num + 1
 
+    def _get_next_epic_number(self) -> int:
+        """Get the next available epic number."""
+        if not self.epics_root.exists():
+            return 1
+
+        max_num = 0
+        for epic_file in self.epics_root.glob("epic-*.json"):
+            try:
+                num_str = epic_file.stem.split("-", 1)[1]
+                num = int(num_str)
+                max_num = max(max_num, num)
+            except (IndexError, ValueError):
+                continue
+        return max_num + 1
+
     def task_add(self, title: str, description: str, queue: str) -> str:
         """Add a new task to a queue."""
         queue_dir = self.tasks_root / queue
@@ -155,6 +176,37 @@ class TaskManager:
         if task_file.exists():
             return task_file
         return None
+
+    def _find_epic_file(self, epic_id: str) -> Optional[Path]:
+        """Find the epic file for a given epic ID."""
+        if not epic_id.startswith("epic-"):
+            return None
+
+        epic_file = self.epics_root / f"{epic_id}.json"
+        if epic_file.exists():
+            return epic_file
+        return None
+
+    def _load_epic(self, epic_id: str) -> Epic:
+        epic_file = self._find_epic_file(epic_id)
+        if not epic_file:
+            raise TaskNotFoundError(f"Epic '{epic_id}' not found")
+
+        data = load_json(epic_file)
+        if data is None:
+            raise StorageError(f"Failed to read epic '{epic_id}'")
+        return Epic.from_dict(data)
+
+    def _save_epic(self, epic_data: Epic) -> None:
+        epic_id = epic_data.id
+        epic_file = self._find_epic_file(epic_id)
+        if not epic_file:
+            raise TaskNotFoundError(f"Epic '{epic_id}' not found")
+
+        epic_data.updated_at = time.time()
+        if not save_json(epic_file, epic_data.to_dict()):
+            raise StorageError(f"Failed to save epic '{epic_id}'")
+        self._invalidate_epic_cache()
 
     def _load_task(self, task_id: str) -> Task:
         """Load task data from file."""
@@ -418,4 +470,108 @@ class TaskManager:
             self._invalidate_task_cache()
         except (OSError, IOError) as e:
             raise StorageError(f"Error deleting task '{task_id}': {e}")
+
+    # ------------------------------------------------------------------
+    # Epic persistence methods
+    # ------------------------------------------------------------------
+
+    def epic_add(self, title: str, description: str) -> str:
+        """Create a new epic."""
+        try:
+            epic_num = self._get_next_epic_number()
+            epic_id = f"epic-{epic_num}"
+            epic_file = self.epics_root / f"{epic_id}.json"
+
+            epic_obj = Epic(id=epic_id, title=title, description=description)
+
+            if not save_json(epic_file, epic_obj.to_dict()):
+                raise StorageError(f"Failed to save epic '{epic_id}' to file")
+
+            logger.info(f"Epic '{epic_id}' created successfully")
+            self._invalidate_epic_cache()
+            return epic_id
+
+        except (OSError, IOError) as e:
+            raise StorageError(f"Error creating epic: {e}")
+
+    def epic_list(self) -> List[Dict]:
+        """List all epics."""
+        if self._epic_list_cache is not None:
+            return self._epic_list_cache
+
+        epics: List[Dict] = []
+        for epic_file in self.epics_root.glob("epic-*.json"):
+            try:
+                data = load_json(epic_file)
+                if data is None:
+                    continue
+                epics.append(Epic.from_dict(data).to_dict())
+            except (FileNotFoundError, PermissionError, json.JSONDecodeError) as e:
+                log_error(f"Error processing epic file '{epic_file}': {e}")
+                continue
+
+        epics.sort(key=lambda e: e.get("created_at", 0))
+        self._epic_list_cache = epics
+        return epics
+
+    def epic_show(self, epic_id: str) -> Dict:
+        """Show details of an epic."""
+        epic_data = self._load_epic(epic_id)
+        return epic_data.to_dict()
+
+    def epic_update(self, epic_id: str, field: str, value: str) -> None:
+        """Update an epic field."""
+        epic_data = self._load_epic(epic_id)
+
+        allowed_fields = ["title", "description", "status"]
+        if field not in allowed_fields:
+            raise InvalidFieldError(
+                f"Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}"
+            )
+
+        actual_value: Union[str, EpicStatus] = value
+        if field == "status":
+            try:
+                actual_value = EpicStatus(value)
+            except ValueError:
+                valid = [s.value for s in EpicStatus]
+                raise InvalidFieldError(
+                    f"Invalid status '{value}'. Valid statuses: {', '.join(valid)}"
+                )
+
+        setattr(epic_data, field, actual_value)
+        self._save_epic(epic_data)
+        logger.info(f"Epic '{epic_id}' updated successfully")
+
+    def epic_add_task(self, epic_id: str, task_id: str) -> None:
+        """Add a task to an epic."""
+        epic_data = self._load_epic(epic_id)
+        if task_id not in epic_data.child_tasks:
+            epic_data.child_tasks.append(task_id)
+        self._save_epic(epic_data)
+
+    def epic_add_epic(self, epic_id: str, child_epic_id: str) -> None:
+        """Add a child epic to an epic."""
+        parent_epic = self._load_epic(epic_id)
+        child_epic = self._load_epic(child_epic_id)
+
+        if child_epic_id not in parent_epic.child_epics:
+            parent_epic.child_epics.append(child_epic_id)
+        child_epic.parent_epic = epic_id
+
+        self._save_epic(parent_epic)
+        self._save_epic(child_epic)
+
+    def epic_delete(self, epic_id: str) -> None:
+        """Delete an epic."""
+        epic_file = self._find_epic_file(epic_id)
+        if not epic_file or not epic_file.exists():
+            raise TaskNotFoundError(f"Epic '{epic_id}' not found")
+
+        try:
+            epic_file.unlink()
+            logger.info(f"Epic '{epic_id}' deleted successfully")
+            self._invalidate_epic_cache()
+        except (OSError, IOError) as e:
+            raise StorageError(f"Error deleting epic '{epic_id}': {e}")
 
