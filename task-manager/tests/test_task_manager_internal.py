@@ -19,6 +19,7 @@ from task_manager import (
     InvalidFieldError,
     CommentNotFoundError,
     LinkNotFoundError,
+    LinkAlreadyExistsError,
     StorageError,
 )
 
@@ -340,6 +341,13 @@ class TestTaskManagerInternal(unittest.TestCase):
         queue_name, task_ids = self._create_multiple_tasks("q", 2)
         with self.assertRaises(LinkNotFoundError):
             self.tm.task_link_remove(task_ids[0], task_ids[1])
+
+    def test_task_link_duplicate_internal(self):
+        """Adding a duplicate link raises LinkAlreadyExistsError."""
+        queue_name, task_ids = self._create_multiple_tasks("qdup", 2)
+        self.tm.task_link_add(task_ids[0], task_ids[1])
+        with self.assertRaises(LinkAlreadyExistsError):
+            self.tm.task_link_add(task_ids[0], task_ids[1])
 
     def test_task_delete_nonexistent_internal(self):
         """Deleting a missing task raises TaskNotFoundError."""

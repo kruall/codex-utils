@@ -26,5 +26,9 @@ class LinkNotFoundError(TaskManagerError):
     """Raised when a link between tasks does not exist."""
 
 
+class LinkAlreadyExistsError(TaskManagerError):
+    """Raised when attempting to create a duplicate link between tasks."""
+
+
 class StorageError(TaskManagerError):
     """Raised when an underlying storage operation fails."""

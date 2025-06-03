@@ -451,6 +451,7 @@ def handle_dashboard(args: argparse.Namespace, tm: TaskManager) -> int:
 
 def verify_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
     """Check for common issues before finishing work."""
+    tm.repair_links()
     tasks = tm.task_list(status="in_progress")
     invalid_epics = tm.invalid_closed_epics()
 

@@ -657,6 +657,26 @@ class TestTaskManagement(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertIn("No links found", result.stdout)
 
+    def test_task_link_duplicate(self):
+        """Adding the same link twice should fail."""
+        self.run_task_manager([
+            "task", "add", "--title", "Task 1", "--description", "Desc", "--queue", "test-queue"
+        ])
+        self.run_task_manager([
+            "task", "add", "--title", "Task 2", "--description", "Desc", "--queue", "test-queue"
+        ])
+
+        result1 = self.run_task_manager([
+            "task", "link", "add", "--id", "test-queue-1", "--target-id", "test-queue-2"
+        ])
+        self.assertEqual(result1.returncode, 0)
+
+        result2 = self.run_task_manager([
+            "task", "link", "add", "--id", "test-queue-1", "--target-id", "test-queue-2"
+        ])
+        self.assertEqual(result2.returncode, 1)
+        self.assertIn("already exists", result2.stderr)
+
     def test_task_link_nonexistent(self):
         """Test link operations with non-existent tasks."""
         self.run_task_manager([
