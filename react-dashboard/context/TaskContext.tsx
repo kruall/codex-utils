@@ -19,7 +19,16 @@ export function TaskProvider({ children }: TaskProviderProps) {
       if (reposEnv) {
         const repos = reposEnv.split(',').map(r => r.trim()).filter(Boolean)
         const data = await fetchTasksFromRepos(repos, token || undefined)
-        setTasks(data)
+        
+        // Extract tasks from all repositories and flatten them
+        const allTasks: Task[] = []
+        data.forEach(result => {
+          if (result.tasks && !result.error) {
+            allTasks.push(...result.tasks)
+          }
+        })
+        
+        setTasks(allTasks)
         return
       }
       try {

@@ -36,15 +36,29 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
   const rootTasks = await Promise.all(
     rootItems.map(async (item) => {
       if (item.type === 'file' && item.name.endsWith('.json')) {
+        if (!item.download_url) {
+          console.warn(`No download_url for file ${item.name}`);
+          return null;
+        }
         return fetchFile(item.download_url);
       } else if (item.type === 'dir') {
+        if (!item.url) {
+          console.warn(`No url for directory ${item.name}`);
+          return null;
+        }
         const subItems = await fetchDir(item.url);
         const subTasks = await Promise.all(
           subItems
             .filter((sub) => sub.type === 'file' && sub.name.endsWith('.json'))
-            .map((sub) => fetchFile(sub.download_url))
+            .map((sub) => {
+              if (!sub.download_url) {
+                console.warn(`No download_url for file ${sub.name}`);
+                return null;
+              }
+              return fetchFile(sub.download_url);
+            })
         );
-        return subTasks;
+        return subTasks.filter(task => task !== null);
       }
       return null;
     })
