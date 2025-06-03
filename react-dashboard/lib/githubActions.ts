@@ -5,7 +5,7 @@ export async function dispatchWorkflow(
   inputs?: Record<string, any>,
   token?: string
 ): Promise<boolean> {
-  const [owner, repoName] = repo.split('/');
+  const [owner, repoName] = repo.split('/', 2);
   if (!owner || !repoName) {
     throw new Error('Invalid repo format; expected owner/repo');
   }
