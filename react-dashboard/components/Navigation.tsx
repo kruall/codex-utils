@@ -14,6 +14,9 @@ export default function Navigation() {
         <Link href="/table" className={styles.link}>
           📋 Task List
         </Link>
+        <Link href="/workflows" className={styles.link}>
+          🚀 Workflows
+        </Link>
         {token ? (
           <button onClick={logout} className={styles.button}>
             🔒 Logout

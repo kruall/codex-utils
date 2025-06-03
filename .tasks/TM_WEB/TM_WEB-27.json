@@ -2,11 +2,22 @@
   "id": "TM_WEB-27",
   "title": "Implement GitHub Actions workflow dispatch",
   "description": "Add functionality to trigger GitHub Actions workflows from the web interface using workflow_dispatch API. Create UI for running automated tasks and CI/CD processes.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on GitHub Actions workflow dispatch UI.",
+      "created_at": 1748977699.1521122
+    },
+    {
+      "id": 2,
+      "text": "Implemented dispatchWorkflow API, new page for running workflows, navigation link, and tests.",
+      "created_at": 1748977889.184706
+    }
+  ],
   "links": {},
   "created_at": 1748887681.0266392,
-  "updated_at": 1748887681.02664,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748977891.1476083,
+  "started_at": 1748977697.4658003,
+  "closed_at": 1748977891.1475737
 }
