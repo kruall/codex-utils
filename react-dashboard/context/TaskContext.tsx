@@ -18,12 +18,12 @@ export function TaskProvider({ children }: TaskProviderProps) {
       const reposEnv = process.env.NEXT_PUBLIC_GITHUB_REPOS
       if (reposEnv) {
         const repos = reposEnv.split(',').map(r => r.trim()).filter(Boolean)
-        const data = await fetchTasksFromRepos(repos, token || undefined)
+        const repoResults = await fetchTasksFromRepos(repos, token || undefined)
         
-        // Extract tasks from all repositories and flatten them
+        // Extract and flatten tasks from all repositories
         const allTasks: Task[] = []
-        data.forEach(result => {
-          if (result.tasks && !result.error) {
+        repoResults.forEach(result => {
+          if (result.tasks && Array.isArray(result.tasks) && !result.error) {
             allTasks.push(...result.tasks)
           }
         })

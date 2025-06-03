@@ -20,7 +20,7 @@ describe('fetchTasksFromRepo', () => {
     const secondDir = [
       { name: 'TM_WEB-1.json', path: '.tasks/TM_WEB/TM_WEB-1.json', type: 'file', download_url: 'file-url' }
     ];
-    const fileData = { id: 'TM_WEB-1', title: 'Test', status: 'todo' };
+    const fileData = { id: 'TM_WEB-1', title: 'Test', status: 'todo' as const };
 
     global.fetch = jest.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => firstDir })
@@ -35,7 +35,7 @@ describe('fetchTasksFromRepo', () => {
 
 describe('createTaskInRepo', () => {
   test('calls safeGitHubCall with correct parameters', async () => {
-    const task = { id: 'TM_WEB-99', title: 'demo', status: 'todo' }
+    const task = { id: 'TM_WEB-99', title: 'demo', status: 'todo' as const }
 
     const result = await createTaskInRepo('owner/repo', task, 'tkn')
     expect(result).toBe(true)
@@ -46,13 +46,13 @@ describe('createTaskInRepo', () => {
 
   test('returns false when safeGitHubCall fails', async () => {
     ;(safeGitHubCall as unknown as jest.Mock).mockResolvedValueOnce(null)
-    const task = { id: 'TM_WEB-1', title: 'demo', status: 'todo' }
+    const task = { id: 'TM_WEB-1', title: 'demo', status: 'todo' as const }
     const result = await createTaskInRepo('owner/repo', task, 'tkn')
     expect(result).toBe(false)
   })
 
   test('throws error for invalid repo string', async () => {
-    const task = { id: 'TM_WEB-2', title: 'demo', status: 'todo' }
+    const task = { id: 'TM_WEB-2', title: 'demo', status: 'todo' as const }
     await expect(createTaskInRepo('invalidrepo', task)).rejects.toThrow()
   })
 })

@@ -8,6 +8,11 @@ export interface GitHubContentItem {
   url?: string;
 }
 
+// Helper function to generate task file path
+export function generateTaskPath(taskId: string): string {
+  return `.tasks/${taskId.split('-')[0]}/${taskId}.json`
+}
+
 export async function fetchTasksFromRepo(repo: string, token?: string): Promise<any[]> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github.v3.raw'
@@ -98,7 +103,7 @@ export async function createTaskInRepo(repo: string, task: NewTask, token?: stri
     throw new Error('Invalid repo format; expected owner/repo')
   }
 
-  const path = `.tasks/${task.id.split('-')[0]}/${task.id}.json`
+  const path = generateTaskPath(task.id)
   const content = Buffer.from(JSON.stringify(task, null, 2) + '\n').toString('base64')
   const message = `Add task ${task.id}`
 
