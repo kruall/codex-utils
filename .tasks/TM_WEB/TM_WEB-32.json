@@ -1,0 +1,16 @@
+{
+  "id": "TM_WEB-32",
+  "title": "Update Web dashboard to show task-epic relationships",
+  "description": "Extend React dashboard to display epic relationships for tasks. Show which epics a task belongs to in task cards and details, add filtering by epic, and provide navigation between tasks and epics.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-14"
+    ]
+  },
+  "created_at": 1748978255.437958,
+  "updated_at": 1748978264.0442188,
+  "started_at": null,
+  "closed_at": null
+}
