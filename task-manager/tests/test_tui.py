@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from task_manager.core import TaskManager
-from task_manager.tui import TMApp, MainScreen, QueuesScreen, TasksScreen
+from task_manager.tui import TMApp, MainScreen, QueuesScreen, TasksScreen, EpicsScreen
 
 
 class TestTuiNavigation(unittest.IsolatedAsyncioTestCase):
@@ -25,6 +25,11 @@ class TestTuiNavigation(unittest.IsolatedAsyncioTestCase):
             await pilot.press("2")
             await pilot.pause()
             self.assertIsInstance(pilot.app.screen, TasksScreen)
+
+            # Open epics screen
+            await pilot.press("3")
+            await pilot.pause()
+            self.assertIsInstance(pilot.app.screen, EpicsScreen)
 
             # Quit the application
             await pilot.press("q")
