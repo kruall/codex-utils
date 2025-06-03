@@ -198,24 +198,26 @@ else:
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
                 desc = self.query_one("#q_desc", Input).value
-                self.post_message(CreateQueue(name, title, desc))
-            elif bid == "cancel":
-                self.post_message(Cancel())
+                if name and title:
+                    self.post_message(CreateQueue(name, title, desc))
             elif bid == "queue_delete":
-                name = self.query_one("#del_queue_name", Input).value
-                if name:
-                    self.post_message(QueueDelete(name))
+                queue_name = self.query_one("#del_queue_name", Input).value
+                if queue_name:
+                    self.post_message(QueueDelete(queue_name))
             elif bid == "confirm_delete":
                 self.post_message(ConfirmDelete())
+            elif bid == "cancel":
+                self.post_message(Cancel())
 
         def on_queue_add(self, message: QueueAdd) -> None:  # pragma: no cover - UI callbacks
             assert self.body is not None
             self.body.remove_children()
+            self.body.mount(Static("Add New Queue", classes="title"))
             self.body.mount(Input(placeholder="Queue name", id="q_name"))
             self.body.mount(Input(placeholder="Queue title", id="q_title"))
-            self.body.mount(Input(placeholder="Description", id="q_desc"))
+            self.body.mount(Input(placeholder="Queue description", id="q_desc"))
             self.body.mount(Button("Create", id="create_queue"))
-            self.body.mount(Button("Back", id="cancel"))
+            self.body.mount(Button("Cancel", id="cancel"))
 
         def on_create_queue(self, message: CreateQueue) -> None:  # pragma: no cover - UI callbacks
             self._handle_manager_operation(
@@ -231,8 +233,8 @@ else:
             self.body.remove_children()
             self.body.mount(
                 Static(
-                    f"Are you sure you want to delete the queue '{message.name}'?",
-                    classes="confirmation",
+                    f"Are you sure you want to delete queue '{message.name}'?",
+                    id="confirm_delete",
                 )
             )
             self.body.mount(Button("Yes", id="confirm_delete"))
@@ -246,7 +248,7 @@ else:
             self._delete_target = None
             self.refresh_screen()
 
-class TasksScreen(BaseScreen):
+    class TasksScreen(BaseScreen):
         def __init__(self, manager: "TaskManager") -> None:
             super().__init__(manager)
             self._delete_target: str | None = None
@@ -286,7 +288,7 @@ class TasksScreen(BaseScreen):
 
         def on_view_comments(self, message: ViewComments) -> None:  # pragma: no cover - UI callbacks
             if self._handle_manager_operation(self.manager.task_show, message.task_id) is not None:
-                self.app.push_screen(CommentsScreen(self.manager, message.task_id))  # type: ignore[name-defined]
+                self.app.push_screen(CommentsScreen(self.manager, message.task_id))
 
         def on_task_delete(self, message: TaskDelete) -> None:  # pragma: no cover - UI callbacks
             assert self.body is not None
@@ -308,136 +310,135 @@ class TasksScreen(BaseScreen):
             self._delete_target = None
             self.refresh_screen()
 
-class EpicsScreen(BaseScreen):
-    def __init__(self, manager: "TaskManager") -> None:
-        super().__init__(manager)
+    class EpicsScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__(manager)
 
-    def on_mount(self) -> None:
-        self.refresh_screen()
+        def on_mount(self) -> None:
+            self.refresh_screen()
 
-    def _progress(self, epic: dict) -> str:
-        done = 0
-        total = len(epic.get("child_tasks", [])) + len(epic.get("child_epics", []))
-        for tid in epic.get("child_tasks", []):
-            data = self.manager.task_show(tid)
-            if data.get("status") == "done":
-                done += 1
-        for eid in epic.get("child_epics", []):
-            data = self.manager.epic_show(eid)
-            if data.get("status") == "closed":
-                done += 1
-        if total == 0:
-            return "0/0"
-        return f"{done}/{total}"
+        def _progress(self, epic: dict) -> str:
+            done = 0
+            total = len(epic.get("child_tasks", [])) + len(epic.get("child_epics", []))
+            for tid in epic.get("child_tasks", []):
+                data = self._handle_manager_operation(self.manager.task_show, tid)
+                if data and data.get("status") == "done":
+                    done += 1
+            for eid in epic.get("child_epics", []):
+                data = self._handle_manager_operation(self.manager.epic_show, eid)
+                if data and data.get("status") == "closed":
+                    done += 1
+            if total == 0:
+                return "0/0"
+            return f"{done}/{total}"
 
-    def refresh_screen(self) -> None:
-        assert self.body is not None
-        self.body.remove_children()
-        table: DataTable = DataTable()
-        table.add_columns("ID", "Title", "Status", "Progress")
-        for e in self.manager.epic_list():
-            table.add_row(e["id"], e["title"], e["status"], self._progress(e))
-        self.body.mount(table)
-        self.set_focus(table)
-        self.body.mount(Button("Back", id="back"))
+        def refresh_screen(self) -> None:
+            assert self.body is not None
+            self.body.remove_children()
+            table: DataTable = DataTable()
+            table.add_columns("ID", "Title", "Status", "Progress")
+            for e in self.manager.epic_list():
+                table.add_row(e["id"], e["title"], e["status"], self._progress(e))
+            self.body.mount(table)
+            self.set_focus(table)
+            self.body.mount(Button("Back", id="back"))
 
-class CommentsScreen(BaseScreen):
-    def __init__(self, manager: "TaskManager", task_id: str) -> None:
-        super().__init__(manager)
-        self.task_id = task_id
+    class CommentsScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager", task_id: str) -> None:
+            super().__init__(manager)
+            self.task_id = task_id
 
-    def on_mount(self) -> None:
-        self.refresh_screen()
+        def on_mount(self) -> None:
+            self.refresh_screen()
 
-    def refresh_screen(self) -> None:
-        assert self.body is not None
-        self.body.remove_children()
-        self.body.mount(Static(f"Comments for {self.task_id}", classes="title"))
-        comments = self._handle_manager_operation(self.manager.task_comment_list, self.task_id) or []
-        for c in comments:
-            created = time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.localtime(c.get("created_at", 0))
+        def refresh_screen(self) -> None:
+            assert self.body is not None
+            self.body.remove_children()
+            self.body.mount(Static(f"Comments for {self.task_id}", classes="title"))
+            comments = self._handle_manager_operation(self.manager.task_comment_list, self.task_id) or []
+            for c in comments:
+                created = time.strftime(
+                    "%Y-%m-%d %H:%M:%S", time.localtime(c.get("created_at", 0))
+                )
+                self.body.mount(
+                    Static(f"[{c.get('id')}] {created}: {c.get('text')}")
+                )
+            self.body.mount(Input(placeholder="New comment", id="new_comment"))
+            self.body.mount(Button("Add Comment", id="add_comment"))
+            self.body.mount(Input(placeholder="Comment ID", id="edit_comment_id"))
+            self.body.mount(Input(placeholder="Updated text", id="edit_comment_text"))
+            self.body.mount(Button("Edit Comment", id="edit_comment"))
+            self.body.mount(Input(placeholder="Comment ID", id="remove_comment_id"))
+            self.body.mount(Button("Remove Comment", id="remove_comment"))
+            self.body.mount(Button("Back", id="back"))
+
+        def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)
+            bid = event.button.id
+            if bid == "add_comment":
+                comment = self.query_one("#new_comment", Input).value
+                if comment:
+                    self.post_message(AddComment(comment))
+            elif bid == "edit_comment":
+                cid = self.query_one("#edit_comment_id", Input).value
+                text = self.query_one("#edit_comment_text", Input).value
+                if cid and text:
+                    cid_int = _parse_comment_id(cid)
+                    if cid_int is not None:
+                        self.post_message(EditComment(cid_int, text))
+            elif bid == "remove_comment":
+                cid = self.query_one("#remove_comment_id", Input).value
+                if cid:
+                    cid_int = _parse_comment_id(cid)
+                    if cid_int is not None:
+                        self.post_message(RemoveComment(cid_int))
+
+        def on_add_comment(self, message: AddComment) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.task_comment_add, self.task_id, message.text
             )
-            self.body.mount(
-                Static(f"[{c.get('id')}] {created}: {c.get('text')}")
+            self.refresh_screen()
+
+        def on_edit_comment(self, message: EditComment) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.task_comment_edit, self.task_id, message.cid, message.text
             )
-        self.body.mount(Input(placeholder="New comment", id="new_comment"))
-        self.body.mount(Button("Add Comment", id="add_comment"))
-        self.body.mount(Input(placeholder="Comment ID", id="edit_comment_id"))
-        self.body.mount(Input(placeholder="Updated text", id="edit_comment_text"))
-        self.body.mount(Button("Edit Comment", id="edit_comment"))
-        self.body.mount(Input(placeholder="Comment ID", id="remove_comment_id"))
-        self.body.mount(Button("Remove Comment", id="remove_comment"))
-        self.body.mount(Button("Back", id="back"))
+            self.refresh_screen()
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
-        super().on_button_pressed(event)
-        bid = event.button.id
-        if bid == "add_comment":
-            comment = self.query_one("#new_comment", Input).value
-            if comment:
-                self.post_message(AddComment(comment))
-        elif bid == "edit_comment":
-            cid = self.query_one("#edit_comment_id", Input).value
-            text = self.query_one("#edit_comment_text", Input).value
-            if cid and text:
-                cid_int = _parse_comment_id(cid)
-                if cid_int is not None:
-                    self.post_message(EditComment(cid_int, text))
-        elif bid == "remove_comment":
-            cid = self.query_one("#remove_comment_id", Input).value
-            if cid:
-                cid_int = _parse_comment_id(cid)
-                if cid_int is not None:
-                    self.post_message(RemoveComment(cid_int))
+        def on_remove_comment(self, message: RemoveComment) -> None:  # pragma: no cover - UI callbacks
+            self._handle_manager_operation(
+                self.manager.task_comment_remove, self.task_id, message.cid
+            )
+            self.refresh_screen()
 
-    def on_add_comment(self, message: AddComment) -> None:  # pragma: no cover - UI callbacks
-        self._handle_manager_operation(
-            self.manager.task_comment_add, self.task_id, message.text
-        )
-        self.refresh_screen()
+    class TMApp(App):
+        TITLE = "Task Manager"
+        BINDINGS = [
+            ("q", "quit", "Quit"),
+            ("1", "queues", "Queues"),
+            ("2", "tasks", "Tasks"),
+            ("3", "epics", "Epics"),
+            ("escape", "main", "Back"),
+        ]
 
-    def on_edit_comment(self, message: EditComment) -> None:  # pragma: no cover - UI callbacks
-        self._handle_manager_operation(
-            self.manager.task_comment_edit, self.task_id, message.cid, message.text
-        )
-        self.refresh_screen()
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__()
+            self.manager = manager
 
-    def on_remove_comment(self, message: RemoveComment) -> None:  # pragma: no cover - UI callbacks
-        self._handle_manager_operation(
-            self.manager.task_comment_remove, self.task_id, message.cid
-        )
-        self.refresh_screen()
+        def action_main(self) -> None:
+            self.push_screen(MainScreen(self.manager))
 
-class TMApp(App):
-    TITLE = "Task Manager"
-    BINDINGS = [
-        ("q", "quit", "Quit"),
-        ("1", "queues", "Queues"),
-        ("2", "tasks", "Tasks"),
-        ("3", "epics", "Epics"),
-        ("escape", "main", "Back"),
-    ]
+        def action_queues(self) -> None:
+            self.push_screen(QueuesScreen(self.manager))
 
-    def __init__(self, manager: "TaskManager") -> None:
-        super().__init__()
-        self.manager = manager
+        def action_tasks(self) -> None:
+            self.push_screen(TasksScreen(self.manager))
 
-    def action_main(self) -> None:
-        self.push_screen(MainScreen(self.manager))
+        def action_epics(self) -> None:
+            self.push_screen(EpicsScreen(self.manager))
 
-    def action_queues(self) -> None:
-        self.push_screen(QueuesScreen(self.manager))
+        def on_mount(self) -> None:
+            self.action_main()
 
-    def action_tasks(self) -> None:
-        self.push_screen(TasksScreen(self.manager))
-
-    def action_epics(self) -> None:
-        self.push_screen(EpicsScreen(self.manager))
-
-    def on_mount(self) -> None:
-        self.action_main()
-
-
-def launch_tui(tm: "TaskManager") -> None:  # type: ignore[no-redef]
-    TMApp(tm).run()  # type: ignore[name-defined]
+    def launch_tui(tm: "TaskManager") -> None:
+        TMApp(tm).run()
