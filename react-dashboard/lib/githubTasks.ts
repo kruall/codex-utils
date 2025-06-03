@@ -132,3 +132,43 @@ export async function createTaskInRepo(repo: string, task: NewTask, token?: stri
   const result = await safeGitHubCall(call, token)
   return result !== null
 }
+
+export async function updateTaskInRepo(repo: string, task: NewTask, token?: string): Promise<boolean> {
+  const [owner, repoName] = repo.split('/')
+  if (!owner || !repoName) {
+    throw new Error('Invalid repo format; expected owner/repo')
+  }
+
+  const path = generateTaskPath(task.id)
+  const content = Buffer.from(JSON.stringify(task, null, 2) + '\n').toString('base64')
+  const message = `Update task ${task.id}`
+
+  const call = async (client: any) => {
+    let sha: string | undefined
+    try {
+      const { data } = await client.repos.getContent({ owner, repo: repoName, path })
+      if (typeof data === 'object' && 'sha' in data) {
+        sha = (data as { sha: string }).sha
+      }
+    } catch (_) {
+      // File does not exist, cannot update
+      return null
+    }
+
+    if (!sha) {
+      return null
+    }
+
+    return client.repos.createOrUpdateFileContents({
+      owner,
+      repo: repoName,
+      path,
+      message,
+      content,
+      sha,
+    })
+  }
+
+  const result = await safeGitHubCall(call, token)
+  return result !== null
+}
