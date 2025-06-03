@@ -14,6 +14,7 @@ from .exceptions import (
     InvalidFieldError,
     CommentNotFoundError,
     LinkNotFoundError,
+    LinkAlreadyExistsError,
     StorageError,
 )
 
@@ -38,6 +39,7 @@ __all__ = [
     "InvalidFieldError",
     "CommentNotFoundError",
     "LinkNotFoundError",
+    "LinkAlreadyExistsError",
     "StorageError",
 ]
 

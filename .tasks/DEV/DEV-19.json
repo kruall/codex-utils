@@ -29,11 +29,15 @@
       "TM_TUI-4",
       "TM_WEB-8",
       "TM_TUI-5",
-      "TM_WEB-9"
+      "TM_WEB-9",
+      "TM_TUI-8",
+      "TM_WEB-13",
+      "TM_TUI-9",
+      "TM_WEB-14"
     ]
   },
   "created_at": 1748553168.43776,
-  "updated_at": 1748553502.5581064,
+  "updated_at": 1748978959.6474793,
   "started_at": 1748553390.3272822,
   "closed_at": 1748553501.3925564
 }

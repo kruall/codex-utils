@@ -2,17 +2,22 @@
   "id": "TM-13",
   "title": "Implement bidirectional relationship checks",
   "description": "Add validation to ensure that when task A links to task B, task B automatically creates a reciprocal link to task A. This prevents inconsistent relationship states where one task references another but the relationship is not mutual.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "Implementation requirements: 1) When adding a link from task A to task B using 'tm task link add', automatically create reciprocal link from B to A. 2) When removing a link, remove both directions. 3) Add validation to prevent duplicate bidirectional links. 4) Update existing unidirectional links to be bidirectional. 5) Ensure TUI and Web interfaces reflect bidirectional nature of relationships.",
       "created_at": 1748978076.498351
+    },
+    {
+      "id": 2,
+      "text": "Starting work on bidirectional link validation",
+      "created_at": 1748978729.2369652
     }
   ],
   "links": {},
   "created_at": 1748978066.430201,
-  "updated_at": 1748978076.498362,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748978890.7878273,
+  "started_at": 1748978726.1518023,
+  "closed_at": 1748978890.787805
 }

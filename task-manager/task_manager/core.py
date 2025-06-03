@@ -17,6 +17,7 @@ from .exceptions import (
     InvalidFieldError,
     CommentNotFoundError,
     LinkNotFoundError,
+    LinkAlreadyExistsError,
     StorageError,
 )
 
@@ -266,6 +267,28 @@ class TaskManager:
                 invalid.append(epic.id)
         return invalid
 
+    def repair_links(self) -> None:
+        """Ensure all task links are bidirectional."""
+        for task in self.task_list():
+            task_obj = self._load_task(task["id"])
+            changed = False
+            for link_type, targets in list(task_obj.links.items()):
+                unique_targets = list(dict.fromkeys(targets))
+                if unique_targets != targets:
+                    task_obj.links[link_type] = unique_targets
+                    changed = True
+                for target_id in unique_targets:
+                    try:
+                        target_obj = self._load_task(target_id)
+                    except TaskNotFoundError:
+                        continue
+                    reciprocal = target_obj.links.setdefault(link_type, [])
+                    if task_obj.id not in reciprocal:
+                        reciprocal.append(task_obj.id)
+                        self._save_task(target_obj)
+            if changed:
+                self._save_task(task_obj)
+
     def _load_task(self, task_id: str) -> Task:
         """Load task data from file."""
         task_file = self._find_task_file(task_id)
@@ -454,10 +477,16 @@ class TaskManager:
         target_data = self._load_task(target_id)
 
         links = task_data.links.setdefault(link_type, [])
+        target_links = target_data.links.setdefault(link_type, [])
+
+        if target_id in links and task_id in target_links:
+            raise LinkAlreadyExistsError(
+                f"Link between {task_id} and {target_id} already exists"
+            )
+
         if target_id not in links:
             links.append(target_id)
 
-        target_links = target_data.links.setdefault(link_type, [])
         if task_id not in target_links:
             target_links.append(task_id)
 

@@ -24,11 +24,13 @@
     "related": [
       "TM_TUI-5",
       "TM_WEB-9",
-      "DEV-19"
+      "DEV-19",
+      "TM_TUI-9",
+      "TM_WEB-14"
     ]
   },
   "created_at": 1748553470.605938,
-  "updated_at": 1748557021.0715184,
+  "updated_at": 1748978959.647261,
   "started_at": 1748556587.3073359,
   "closed_at": 1748557017.909407
 }
