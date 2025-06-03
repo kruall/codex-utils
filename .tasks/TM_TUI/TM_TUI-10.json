@@ -2,15 +2,26 @@
   "id": "TM_TUI-10",
   "title": "Add Epic support to TUI interface",
   "description": "Extend TUI to display and manage Epics. Add Epic views, hierarchical navigation, progress indicators, and Epic-specific operations. Show Epic completion status based on child items.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start work on Epic support in TUI",
+      "created_at": 1748977758.7559872
+    },
+    {
+      "id": 2,
+      "text": "Implemented epics screen and updated tests",
+      "created_at": 1748978445.979801
+    }
+  ],
   "links": {
     "related": [
       "TM-10"
     ]
   },
   "created_at": 1748891419.2619898,
-  "updated_at": 1748891438.840945,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748978445.979833,
+  "started_at": 1748977755.3560665,
+  "closed_at": 1748978440.4016743
 }

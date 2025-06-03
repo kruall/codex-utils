@@ -19,8 +19,10 @@ except Exception:  # pragma: no cover - optional dependency
     logging.getLogger(__name__).error(
         "Textual is required for the UI. Install with 'pip install textual'"
     )
-    def launch_tui(tm: "TaskManager") -> None:
+    def _launch_tui_noop(tm: "TaskManager") -> None:
         return
+
+    launch_tui = _launch_tui_noop
 else:
     from textual.message import Message
 
@@ -41,6 +43,9 @@ else:
 
     class Queues(Message):
         """Navigate to the queues screen."""
+
+    class Epics(Message):
+        """Navigate to the epics screen."""
 
     class Tasks(Message):
         """Navigate to the tasks screen."""
@@ -139,6 +144,7 @@ else:
             self.body.mount(Static("Task Manager", classes="title"))
             self.body.mount(Button("Queues", id="queues"))
             self.body.mount(Button("Tasks", id="tasks"))
+            self.body.mount(Button("Epics", id="epics"))
             self.body.mount(Button("Quit", id="quit"))
             self.set_focus(self.query_one("#queues"))
 
@@ -149,12 +155,17 @@ else:
                 self.post_message(Queues())
             elif bid == "tasks":
                 self.post_message(Tasks())
+            elif bid == "epics":
+                self.post_message(Epics())
 
         def on_queues(self, message: Queues) -> None:  # pragma: no cover - UI callbacks
             self.app.push_screen(QueuesScreen(self.manager))
 
         def on_tasks(self, message: Tasks) -> None:  # pragma: no cover - UI callbacks
             self.app.push_screen(TasksScreen(self.manager))
+
+        def on_epics(self, message: Epics) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(EpicsScreen(self.manager))
 
     class QueuesScreen(BaseScreen):
         def __init__(self, manager: "TaskManager") -> None:
@@ -187,24 +198,26 @@ else:
                 name = self.query_one("#q_name", Input).value
                 title = self.query_one("#q_title", Input).value
                 desc = self.query_one("#q_desc", Input).value
-                self.post_message(CreateQueue(name, title, desc))
-            elif bid == "cancel":
-                self.post_message(Cancel())
+                if name and title:
+                    self.post_message(CreateQueue(name, title, desc))
             elif bid == "queue_delete":
-                name = self.query_one("#del_queue_name", Input).value
-                if name:
-                    self.post_message(QueueDelete(name))
+                queue_name = self.query_one("#del_queue_name", Input).value
+                if queue_name:
+                    self.post_message(QueueDelete(queue_name))
             elif bid == "confirm_delete":
                 self.post_message(ConfirmDelete())
+            elif bid == "cancel":
+                self.post_message(Cancel())
 
         def on_queue_add(self, message: QueueAdd) -> None:  # pragma: no cover - UI callbacks
             assert self.body is not None
             self.body.remove_children()
+            self.body.mount(Static("Add New Queue", classes="title"))
             self.body.mount(Input(placeholder="Queue name", id="q_name"))
             self.body.mount(Input(placeholder="Queue title", id="q_title"))
-            self.body.mount(Input(placeholder="Description", id="q_desc"))
+            self.body.mount(Input(placeholder="Queue description", id="q_desc"))
             self.body.mount(Button("Create", id="create_queue"))
-            self.body.mount(Button("Back", id="cancel"))
+            self.body.mount(Button("Cancel", id="cancel"))
 
         def on_create_queue(self, message: CreateQueue) -> None:  # pragma: no cover - UI callbacks
             self._handle_manager_operation(
@@ -220,8 +233,8 @@ else:
             self.body.remove_children()
             self.body.mount(
                 Static(
-                    f"Are you sure you want to delete the queue '{message.name}'?",
-                    classes="confirmation",
+                    f"Are you sure you want to delete queue '{message.name}'?",
+                    id="confirm_delete",
                 )
             )
             self.body.mount(Button("Yes", id="confirm_delete"))
@@ -297,6 +310,39 @@ else:
             self._delete_target = None
             self.refresh_screen()
 
+    class EpicsScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager") -> None:
+            super().__init__(manager)
+
+        def on_mount(self) -> None:
+            self.refresh_screen()
+
+        def _progress(self, epic: dict) -> str:
+            done = 0
+            total = len(epic.get("child_tasks", [])) + len(epic.get("child_epics", []))
+            for tid in epic.get("child_tasks", []):
+                data = self._handle_manager_operation(self.manager.task_show, tid)
+                if data and data.get("status") == "done":
+                    done += 1
+            for eid in epic.get("child_epics", []):
+                data = self._handle_manager_operation(self.manager.epic_show, eid)
+                if data and data.get("status") == "closed":
+                    done += 1
+            if total == 0:
+                return "0/0"
+            return f"{done}/{total}"
+
+        def refresh_screen(self) -> None:
+            assert self.body is not None
+            self.body.remove_children()
+            table: DataTable = DataTable()
+            table.add_columns("ID", "Title", "Status", "Progress")
+            for e in self.manager.epic_list():
+                table.add_row(e["id"], e["title"], e["status"], self._progress(e))
+            self.body.mount(table)
+            self.set_focus(table)
+            self.body.mount(Button("Back", id="back"))
+
     class CommentsScreen(BaseScreen):
         def __init__(self, manager: "TaskManager", task_id: str) -> None:
             super().__init__(manager)
@@ -371,6 +417,7 @@ else:
             ("q", "quit", "Quit"),
             ("1", "queues", "Queues"),
             ("2", "tasks", "Tasks"),
+            ("3", "epics", "Epics"),
             ("escape", "main", "Back"),
         ]
 
@@ -386,6 +433,9 @@ else:
 
         def action_tasks(self) -> None:
             self.push_screen(TasksScreen(self.manager))
+
+        def action_epics(self) -> None:
+            self.push_screen(EpicsScreen(self.manager))
 
         def on_mount(self) -> None:
             self.action_main()
