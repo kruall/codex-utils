@@ -1,0 +1,38 @@
+{
+  "id": "TM-14",
+  "title": "Add epic relationships to Task schema",
+  "description": "Extend Task model to include 'epics' field containing list of epic IDs that the task belongs to. Implement bidirectional validation to ensure when a task is added to an epic, the task's epics list is updated, and vice versa. Update CLI commands, persistence layer, and validation logic.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "SCHEMA CHANGES: 1) Add 'epics' field to Task dataclass as List[str] = field(default_factory=list) 2) Update Task.to_dict() and Task.from_dict() methods to handle the new field 3) Ensure backward compatibility with existing task files",
+      "created_at": 1748978225.577615
+    },
+    {
+      "id": 2,
+      "text": "BIDIRECTIONAL VALIDATION: 1) When epic_add_task() is called, automatically add epic_id to task's epics list 2) When epic_remove_task() is called, remove epic_id from task's epics list 3) Add validation to prevent inconsistent states 4) Update existing tasks that are already in epics to have correct epics field",
+      "created_at": 1748978231.377229
+    },
+    {
+      "id": 3,
+      "text": "CLI UPDATES: 1) Update 'tm task show' to display epics that contain the task 2) Add optional 'tm task list --epic <epic-id>' to list tasks in specific epic 3) Consider adding 'tm task add-to-epic' and 'tm task remove-from-epic' commands for direct task-epic management",
+      "created_at": 1748978238.788734
+    },
+    {
+      "id": 4,
+      "text": "TESTING: 1) Add unit tests for Task model with epics field 2) Test bidirectional validation in epic_add_task/epic_remove_task 3) Test CLI commands showing epic relationships 4) Test backward compatibility with existing task files 5) Update TUI and Web interfaces to show task-epic relationships",
+      "created_at": 1748978244.3738282
+    }
+  ],
+  "links": {
+    "related": [
+      "TM_TUI-11",
+      "TM_WEB-32"
+    ]
+  },
+  "created_at": 1748978219.394832,
+  "updated_at": 1748978264.0439491,
+  "started_at": null,
+  "closed_at": null
+}
