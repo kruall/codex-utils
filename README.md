@@ -92,6 +92,19 @@ Launch the interactive Textual interface:
 ./tm task link remove --id feature-queue-1 --target-id feature-queue-2
 ```
 
+### Epic Management
+```bash
+# Create an epic
+./tm epic add --title "Release" --description "Release preparations"
+
+# Attach work items
+./tm epic add-task --id epic-1 --task-id feature-queue-1
+./tm epic add-epic --id epic-1 --child-id epic-2
+
+# Close when all children are done
+./tm epic done --id epic-1
+```
+
 ### Typical Workflow
 1. **Create a queue**: `./tm queue add --name "my-queue" --title "My Queue" --description "Description"`.
 2. **Add a task**: `./tm task add --title "Task title" --description "Description" --queue my-queue`.

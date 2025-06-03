@@ -76,6 +76,19 @@ class TestEpicCLI(unittest.TestCase):
         show = self.run_tm(["epic", "show", "--id", "epic-1"])
         self.assertIn("closed", show.stdout)
 
+    def test_epic_remove_relations(self):
+        self.run_tm(["queue", "add", "--name", "q", "--title", "Q", "--description", "d"])
+        self.run_tm(["task", "add", "--title", "T", "--description", "d", "--queue", "q"])
+        self.run_tm(["epic", "add", "--title", "Parent", "--description", "d"])
+        self.run_tm(["epic", "add", "--title", "Child", "--description", "d"])
+        self.run_tm(["epic", "add-task", "--id", "epic-1", "--task-id", "q-1"])
+        self.run_tm(["epic", "add-epic", "--id", "epic-1", "--child-id", "epic-2"])
+        self.run_tm(["epic", "remove-task", "--id", "epic-1", "--task-id", "q-1"])
+        self.run_tm(["epic", "remove-epic", "--id", "epic-1", "--child-id", "epic-2"])
+        show = self.run_tm(["epic", "show", "--id", "epic-1"])
+        self.assertNotIn("q-1", show.stdout)
+        self.assertNotIn("epic-2", show.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

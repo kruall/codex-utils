@@ -2,15 +2,31 @@
   "id": "TM-12",
   "title": "Add Epic tests and documentation",
   "description": "Create comprehensive tests for Epic functionality: unit tests for Epic model, CLI commands, status validation, and hierarchical operations. Add Epic documentation and usage examples.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on epic tests and docs",
+      "created_at": 1748976407.6989946
+    },
+    {
+      "id": 2,
+      "text": "Implemented new epic tests and documentation updates",
+      "created_at": 1748976585.472086
+    },
+    {
+      "id": 3,
+      "text": "All tests pass; closing task",
+      "created_at": 1748976673.3398225
+    }
+  ],
   "links": {
     "related": [
       "TM-11"
     ]
   },
   "created_at": 1748891427.629737,
-  "updated_at": 1748891439.197525,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748976673.3398461,
+  "started_at": 1748976405.726318,
+  "closed_at": 1748976670.6123326
 }
