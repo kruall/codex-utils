@@ -208,6 +208,64 @@ class TaskManager:
             raise StorageError(f"Failed to save epic '{epic_id}'")
         self._invalidate_epic_cache()
 
+    def _get_all_epics(self) -> List[Epic]:
+        """Return all epics as objects."""
+        epics: list[Epic] = []
+        for epic_file in self.epics_root.glob("epic-*.json"):
+            data = load_json(epic_file)
+            if data is None:
+                continue
+            try:
+                epics.append(Epic.from_dict(data))
+            except Exception as e:  # pragma: no cover - shouldn't happen
+                log_error(f"Error loading epic '{epic_file}': {e}")
+        return epics
+
+    def _get_parent_epics(self, item_id: str) -> List[Epic]:
+        """Return epics that reference the given task or epic."""
+        parents = []
+        for epic in self._get_all_epics():
+            if item_id in epic.child_tasks or item_id in epic.child_epics:
+                parents.append(epic)
+        return parents
+
+    def _can_close_epic(self, epic: Epic) -> bool:
+        """Return True if all children of epic are complete."""
+        for task_id in epic.child_tasks:
+            try:
+                task = self._load_task(task_id)
+            except TaskNotFoundError:
+                return False
+            if task.status != TaskStatus.DONE:
+                return False
+
+        for child_id in epic.child_epics:
+            try:
+                child = self._load_epic(child_id)
+            except TaskNotFoundError:
+                return False
+            if child.status != EpicStatus.CLOSED:
+                return False
+
+        return True
+
+    def _auto_close_parent_epics(self, item_id: str) -> None:
+        """Automatically close parent epics if they are now complete."""
+        for parent in self._get_parent_epics(item_id):
+            if self._can_close_epic(parent) and parent.status != EpicStatus.CLOSED:
+                parent.status = EpicStatus.CLOSED
+                self._save_epic(parent)
+                if parent.parent_epic:
+                    self._auto_close_parent_epics(parent.id)
+
+    def invalid_closed_epics(self) -> List[str]:
+        """Return IDs of epics marked closed with incomplete children."""
+        invalid = []
+        for epic in self._get_all_epics():
+            if epic.status == EpicStatus.CLOSED and not self._can_close_epic(epic):
+                invalid.append(epic.id)
+        return invalid
+
     def _load_task(self, task_id: str) -> Task:
         """Load task data from file."""
         task_file = self._find_task_file(task_id)
@@ -302,6 +360,9 @@ class TaskManager:
         self._save_task(task_data)
         logger.info(f"Task '{task_id}' updated successfully")
 
+        if field == 'status' and actual_value == TaskStatus.DONE:
+            self._auto_close_parent_epics(task_id)
+
     def task_start(self, task_id: str) -> None:
         """Start a task (set status to 'in_progress' and record time)."""
         task_data = self._load_task(task_id)
@@ -323,6 +384,7 @@ class TaskManager:
 
         self._save_task(task_data)
         logger.info(f"Task '{task_id}' updated successfully")
+        self._auto_close_parent_epics(task_id)
 
     def task_comment_add(self, task_id: str, comment: str) -> int:
         """Add a comment to a task."""
@@ -538,10 +600,18 @@ class TaskManager:
                 raise InvalidFieldError(
                     f"Invalid status '{value}'. Valid statuses: {', '.join(valid)}"
                 )
+            if actual_value == EpicStatus.CLOSED and not self._can_close_epic(epic_data):
+                raise InvalidFieldError(
+                    f"Cannot close epic '{epic_id}' because child tasks or epics are incomplete"
+                )
 
         setattr(epic_data, field, actual_value)
         self._save_epic(epic_data)
         logger.info(f"Epic '{epic_id}' updated successfully")
+
+        if field == "status" and actual_value == EpicStatus.CLOSED:
+            if epic_data.parent_epic:
+                self._auto_close_parent_epics(epic_id)
 
     def epic_add_task(self, epic_id: str, task_id: str) -> None:
         """Add a task to an epic."""
@@ -608,21 +678,15 @@ class TaskManager:
         """Mark an epic as closed if all children are complete."""
         epic_data = self._load_epic(epic_id)
 
-        for task_id in epic_data.child_tasks:
-            task = self._load_task(task_id)
-            if task.status != TaskStatus.DONE:
-                raise InvalidFieldError(
-                    f"Task '{task_id}' is not done; cannot close epic '{epic_id}'"
-                )
-
-        for child_id in epic_data.child_epics:
-            child = self._load_epic(child_id)
-            if child.status != EpicStatus.CLOSED:
-                raise InvalidFieldError(
-                    f"Epic '{child_id}' is not closed; cannot close epic '{epic_id}'"
-                )
+        if not self._can_close_epic(epic_data):
+            raise InvalidFieldError(
+                f"Cannot close epic '{epic_id}' because child tasks or epics are incomplete"
+            )
 
         epic_data.status = EpicStatus.CLOSED
         self._save_epic(epic_data)
         logger.info(f"Epic '{epic_id}' updated successfully")
+
+        if epic_data.parent_epic:
+            self._auto_close_parent_epics(epic_id)
 

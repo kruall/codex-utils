@@ -1,0 +1,11 @@
+{
+  "id": "epic-1",
+  "title": "E1",
+  "description": "Desc",
+  "status": "open",
+  "child_tasks": [],
+  "child_epics": [],
+  "parent_epic": null,
+  "created_at": 1748936065.1647189,
+  "updated_at": 1748936375.020517
+}

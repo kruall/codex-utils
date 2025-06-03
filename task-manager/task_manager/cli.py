@@ -450,17 +450,28 @@ def handle_dashboard(args: argparse.Namespace, tm: TaskManager) -> int:
 
 
 def verify_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
-    """Check for tasks left in progress."""
+    """Check for common issues before finishing work."""
     tasks = tm.task_list(status="in_progress")
-    if not tasks:
-        print("\u2705 No tasks in progress")
+    invalid_epics = tm.invalid_closed_epics()
+
+    if not tasks and not invalid_epics:
+        print("\u2705 No tasks in progress and all epics valid")
         return 0
 
-    task_ids = ", ".join(t["id"] for t in tasks)
-    count = len(tasks)
-    plural = "task" if count == 1 else "tasks"
-    print(f"\u274C Found {count} {plural} in progress: {task_ids}")
-    print("Run: ./tm task done --id <task-id> to close them.")
+    if tasks:
+        task_ids = ", ".join(t["id"] for t in tasks)
+        count = len(tasks)
+        plural = "task" if count == 1 else "tasks"
+        print(f"\u274C Found {count} {plural} in progress: {task_ids}")
+        print("Run: ./tm task done --id <task-id> to close them.")
+
+    if invalid_epics:
+        epic_ids = ", ".join(invalid_epics)
+        count = len(invalid_epics)
+        plural = "epic" if count == 1 else "epics"
+        print(f"\u274C Found {count} {plural} with invalid status: {epic_ids}")
+        print("Ensure all child tasks and epics are done, then run: ./tm epic done --id <epic-id>")
+
     return 1
 
 
