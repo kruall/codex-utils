@@ -1,4 +1,6 @@
+import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -22,8 +24,6 @@ class TestVerifyCommand(unittest.TestCase):
         ])
 
     def tearDown(self):
-        import shutil
-
         shutil.rmtree(self.temp_dir)
 
     def run_task_manager(self, args):
