@@ -5,6 +5,8 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from .github_api import fetch_github_tasks
+
 from .models import Queue, Task
 from .utils import log_error
 from .storage import load_json, save_json
@@ -405,4 +407,47 @@ class TaskManager:
             self._invalidate_task_cache()
         except (OSError, IOError) as e:
             raise StorageError(f"Error deleting task '{task_id}': {e}")
+
+    def sync_from_github(self, repos: List[str], token: str | None = None) -> List[str]:
+        """Import tasks from GitHub repositories.
+
+        Parameters
+        ----------
+        repos:
+            Repositories in ``owner/repo`` format.
+        token:
+            Optional GitHub token for authenticated requests.
+
+        Returns
+        -------
+        list[str]
+            IDs of tasks that were imported.
+        """
+
+        remote_tasks = fetch_github_tasks(repos, token)
+        imported: List[str] = []
+
+        for data in remote_tasks:
+            try:
+                task = Task.from_dict(data)
+            except TypeError:
+                continue
+
+            queue_name = task.id.rsplit("-", 1)[0]
+            queue_dir = self.tasks_root / queue_name
+            queue_dir.mkdir(parents=True, exist_ok=True)
+
+            meta_file = queue_dir / "meta.json"
+            if not meta_file.exists():
+                save_json(meta_file, {"title": queue_name, "description": ""})
+                self._invalidate_queue_cache()
+
+            task_file = queue_dir / f"{task.id}.json"
+            save_json(task_file, task.to_dict())
+            imported.append(task.id)
+
+        if imported:
+            self._invalidate_task_cache()
+
+        return imported
 

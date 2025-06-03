@@ -321,11 +321,23 @@ def handle_dashboard(args: argparse.Namespace, tm: TaskManager) -> int:
     return 0
 
 
+def handle_sync(args: argparse.Namespace, tm: TaskManager) -> int:
+    repos = args.repo or []
+    if not repos:
+        print("At least one --repo is required")
+        return 1
+
+    imported = tm.sync_from_github(repos, args.token)
+    print(f"Imported {len(imported)} tasks")
+    return 0
+
+
 COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "queue": handle_queue,
     "task": handle_task,
     "ui": handle_ui,
     "dashboard": handle_dashboard,
+    "sync": handle_sync,
 }
 
 def main():
@@ -363,6 +375,21 @@ def main():
         help="GitHub repository in owner/repo format (can be used multiple times)",
     )
     dashboard_parser.add_argument(
+        "--token",
+        help="GitHub token for authenticated requests",
+    )
+
+    # Sync command
+    sync_parser = subparsers.add_parser(
+        "sync", help="Sync tasks from GitHub repositories"
+    )
+    sync_parser.add_argument(
+        "--repo",
+        action="append",
+        required=True,
+        help="GitHub repository in owner/repo format (can be used multiple times)",
+    )
+    sync_parser.add_argument(
         "--token",
         help="GitHub token for authenticated requests",
     )
