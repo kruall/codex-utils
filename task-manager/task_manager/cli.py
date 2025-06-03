@@ -321,11 +321,27 @@ def handle_dashboard(args: argparse.Namespace, tm: TaskManager) -> int:
     return 0
 
 
+def verify_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    """Check for tasks left in progress."""
+    tasks = tm.task_list(status="in_progress")
+    if not tasks:
+        print("\u2705 No tasks in progress")
+        return 0
+
+    task_ids = ", ".join(t["id"] for t in tasks)
+    count = len(tasks)
+    plural = "task" if count == 1 else "tasks"
+    print(f"\u274C Found {count} {plural} in progress: {task_ids}")
+    print("Run: ./tm task done --id <task-id> to close them.")
+    return 1
+
+
 COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "queue": handle_queue,
     "task": handle_task,
     "ui": handle_ui,
     "dashboard": handle_dashboard,
+    "verify": verify_cmd,
 }
 
 def main():
@@ -366,6 +382,9 @@ def main():
         "--token",
         help="GitHub token for authenticated requests",
     )
+
+    # Verify command
+    subparsers.add_parser("verify", help="Verify no tasks are left in progress")
     
     # Queue commands
     queue_parser = subparsers.add_parser("queue", help="Queue management")
