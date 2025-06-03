@@ -1,9 +1,16 @@
+import { safeGitHubCall } from './githubClient'
+
 export interface GitHubContentItem {
   name: string;
   path: string;
   type: 'file' | 'dir';
   download_url?: string;
   url?: string;
+}
+
+// Helper function to generate task file path
+export function generateTaskPath(taskId: string): string {
+  return `.tasks/${taskId.split('-')[0]}/${taskId}.json`
 }
 
 export async function fetchTasksFromRepo(repo: string, token?: string): Promise<any[]> {
@@ -81,4 +88,47 @@ export async function fetchTasksFromRepos(repos: string[], token?: string): Prom
     }
   }
   return results;
+}
+
+export interface NewTask {
+  id: string
+  title: string
+  status: 'todo' | 'in_progress' | 'done'
+  description?: string
+}
+
+export async function createTaskInRepo(repo: string, task: NewTask, token?: string): Promise<boolean> {
+  const [owner, repoName] = repo.split('/')
+  if (!owner || !repoName) {
+    throw new Error('Invalid repo format; expected owner/repo')
+  }
+
+  const path = generateTaskPath(task.id)
+  const content = Buffer.from(JSON.stringify(task, null, 2) + '\n').toString('base64')
+  const message = `Add task ${task.id}`
+
+  const call = async (client: any) => {
+    let sha: string | undefined
+    try {
+      // Check if file already exists to include its sha for updates
+      const { data } = await client.repos.getContent({ owner, repo: repoName, path })
+      if (typeof data === 'object' && 'sha' in data) {
+        sha = (data as { sha: string }).sha
+      }
+    } catch (_) {
+      // Ignore errors - file likely does not exist
+    }
+
+    return client.repos.createOrUpdateFileContents({
+      owner,
+      repo: repoName,
+      path,
+      message,
+      content,
+      sha,
+    })
+  }
+
+  const result = await safeGitHubCall(call, token)
+  return result !== null
 }
