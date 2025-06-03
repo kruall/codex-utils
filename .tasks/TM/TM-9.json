@@ -2,8 +2,19 @@
   "id": "TM-9",
   "title": "Implement Epic persistence layer",
   "description": "Add Epic storage functionality to persistence layer. Implement Epic file format, CRUD operations, and hierarchical relationships storage. Handle Epic-Task and Epic-Epic relationships.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting task TM-9 implementation",
+      "created_at": 1748934130.8001451
+    },
+    {
+      "id": 2,
+      "text": "Implemented epic persistence layer and tests",
+      "created_at": 1748934506.782857
+    }
+  ],
   "links": {
     "related": [
       "TM-8",
@@ -12,7 +23,7 @@
     ]
   },
   "created_at": 1748891404.956207,
-  "updated_at": 1748891433.844374,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748934508.9653413,
+  "started_at": 1748934128.8282657,
+  "closed_at": 1748934504.5822384
 }
