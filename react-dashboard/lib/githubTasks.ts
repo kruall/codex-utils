@@ -172,3 +172,134 @@ export async function updateTaskInRepo(repo: string, task: NewTask, token?: stri
   const result = await safeGitHubCall(call, token)
   return result !== null
 }
+
+export interface NewQueue {
+  name: string
+  title: string
+  description: string
+}
+
+export function generateQueueMetaPath(name: string): string {
+  return `.tasks/${name}/meta.json`
+}
+
+export async function createQueueInRepo(repo: string, queue: NewQueue, token?: string): Promise<boolean> {
+  const [owner, repoName] = repo.split('/')
+  if (!owner || !repoName) {
+    throw new Error('Invalid repo format; expected owner/repo')
+  }
+
+  const path = generateQueueMetaPath(queue.name)
+  const meta = { title: queue.title, description: queue.description }
+  const content = Buffer.from(JSON.stringify(meta, null, 2) + '\n').toString('base64')
+  const message = `Add queue ${queue.name}`
+
+  const call = async (client: any) => {
+    let sha: string | undefined
+    try {
+      const { data } = await client.repos.getContent({ owner, repo: repoName, path })
+      if (typeof data === 'object' && 'sha' in data) {
+        sha = (data as { sha: string }).sha
+      }
+    } catch (_) {
+      // Ignore errors - file likely does not exist
+    }
+
+    return client.repos.createOrUpdateFileContents({
+      owner,
+      repo: repoName,
+      path,
+      message,
+      content,
+      sha,
+    })
+  }
+
+  const result = await safeGitHubCall(call, token)
+  return result !== null
+}
+
+export async function updateQueueInRepo(repo: string, queue: NewQueue, token?: string): Promise<boolean> {
+  const [owner, repoName] = repo.split('/')
+  if (!owner || !repoName) {
+    throw new Error('Invalid repo format; expected owner/repo')
+  }
+
+  const path = generateQueueMetaPath(queue.name)
+  const meta = { title: queue.title, description: queue.description }
+  const content = Buffer.from(JSON.stringify(meta, null, 2) + '\n').toString('base64')
+  const message = `Update queue ${queue.name}`
+
+  const call = async (client: any) => {
+    let sha: string | undefined
+    try {
+      const { data } = await client.repos.getContent({ owner, repo: repoName, path })
+      if (typeof data === 'object' && 'sha' in data) {
+        sha = (data as { sha: string }).sha
+      }
+    } catch (_) {
+      return null
+    }
+
+    if (!sha) {
+      return null
+    }
+
+    return client.repos.createOrUpdateFileContents({
+      owner,
+      repo: repoName,
+      path,
+      message,
+      content,
+      sha,
+    })
+  }
+
+  const result = await safeGitHubCall(call, token)
+  return result !== null
+}
+
+export async function deleteQueueInRepo(repo: string, name: string, token?: string): Promise<boolean> {
+  const [owner, repoName] = repo.split('/')
+  if (!owner || !repoName) {
+    throw new Error('Invalid repo format; expected owner/repo')
+  }
+
+  const call = async (client: any) => {
+    try {
+      const { data } = await client.repos.getContent({ owner, repo: repoName, path: `.tasks/${name}` })
+      const items = Array.isArray(data) ? data : [data]
+      for (const item of items) {
+        if (item.type === 'file') {
+          await client.repos.deleteFile({
+            owner,
+            repo: repoName,
+            path: item.path,
+            message: `Delete ${item.path}`,
+            sha: item.sha,
+          })
+        } else if (item.type === 'dir') {
+          const sub = await client.repos.getContent({ owner, repo: repoName, path: item.path })
+          const subItems = Array.isArray(sub.data) ? sub.data : [sub.data]
+          for (const s of subItems) {
+            if (s.type === 'file') {
+              await client.repos.deleteFile({
+                owner,
+                repo: repoName,
+                path: s.path,
+                message: `Delete ${s.path}`,
+                sha: s.sha,
+              })
+            }
+          }
+        }
+      }
+      return true
+    } catch (_) {
+      return null
+    }
+  }
+
+  const result = await safeGitHubCall(call, token)
+  return result !== null
+}
