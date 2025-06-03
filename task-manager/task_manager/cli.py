@@ -256,6 +256,134 @@ LINK_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
 }
 
 
+def epic_list_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    epics = tm.epic_list()
+    if not epics:
+        print("No epics found")
+    else:
+        print(f"{'ID':<10} {'Title':<30} {'Status':<10} {'Created'}")
+        print("-" * 70)
+        for epic in epics:
+            created = format_timestamp(epic.get('created_at', 0))
+            print(
+                f"{epic['id']:<10} {epic['title']:<30} {epic['status']:<10} {created}"
+            )
+    return 0
+
+
+def epic_add_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_add(args.title, args.description)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        data = tm.epic_show(args.id)
+        print(f"ID: {data['id']}")
+        print(f"Title: {data['title']}")
+        print(f"Description: {data['description']}")
+        print(f"Status: {data['status']}")
+        print(f"Created: {format_timestamp(data.get('created_at', 0))}")
+        print(f"Updated: {format_timestamp(data.get('updated_at', 0))}")
+        if data.get('parent_epic'):
+            print(f"Parent: {data['parent_epic']}")
+        if data.get('child_tasks'):
+            print("Tasks:")
+            for t in data['child_tasks']:
+                print(f"  - {t}")
+        if data.get('child_epics'):
+            print("Epics:")
+            for e in data['child_epics']:
+                print(f"  - {e}")
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_update_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_update(args.id, args.field, args.value)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_done_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_done(args.id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_add_task_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_add_task(args.id, args.task_id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_add_epic_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_add_epic(args.id, args.child_id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_remove_task_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_remove_task(args.id, args.task_id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+def epic_remove_epic_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
+    try:
+        tm.epic_remove_epic(args.id, args.child_id)
+        return 0
+    except TaskManagerError as e:
+        log_error(f"Error: {e}")
+        return 1
+
+
+EPIC_ACTIONS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
+    "list": epic_list_cmd,
+    "add": epic_add_cmd,
+    "show": epic_show_cmd,
+    "update": epic_update_cmd,
+    "done": epic_done_cmd,
+    "add-task": epic_add_task_cmd,
+    "add-epic": epic_add_epic_cmd,
+    "remove-task": epic_remove_task_cmd,
+    "remove-epic": epic_remove_epic_cmd,
+}
+
+
+def handle_epic(args: argparse.Namespace, tm: TaskManager) -> int:
+    action = args.epic_action
+    if not action:
+        print(args.parser_epic.format_help())
+        return 1
+    func = EPIC_ACTIONS.get(action)
+    if not func:
+        print(args.parser_epic.format_help())
+        return 1
+    return func(args, tm)
+
+
 def handle_comment(args: argparse.Namespace, tm: TaskManager) -> int:
     action = args.comment_action
     if not action:
@@ -339,6 +467,7 @@ def verify_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
 COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace, TaskManager], int]] = {
     "queue": handle_queue,
     "task": handle_task,
+    "epic": handle_epic,
     "ui": handle_ui,
     "dashboard": handle_dashboard,
     "verify": verify_cmd,
@@ -483,6 +612,52 @@ def main():
     # task link list
     task_link_list_parser = task_link_subparsers.add_parser("list", help="List task links")
     task_link_list_parser.add_argument("--id", required=True, help="Task ID")
+
+    # Epic commands
+    epic_parser = subparsers.add_parser("epic", help="Epic management")
+    epic_subparsers = epic_parser.add_subparsers(dest="epic_action", help="Epic actions")
+
+    # epic list
+    epic_subparsers.add_parser("list", help="List epics")
+
+    # epic add
+    epic_add_parser = epic_subparsers.add_parser("add", help="Add a new epic")
+    epic_add_parser.add_argument("--title", required=True, help="Epic title")
+    epic_add_parser.add_argument("--description", required=True, help="Epic description")
+
+    # epic show
+    epic_show_parser = epic_subparsers.add_parser("show", help="Show epic details")
+    epic_show_parser.add_argument("--id", required=True, help="Epic ID")
+
+    # epic update
+    epic_update_parser = epic_subparsers.add_parser("update", help="Update an epic")
+    epic_update_parser.add_argument("--id", required=True, help="Epic ID")
+    epic_update_parser.add_argument("--field", required=True, help="Field to update")
+    epic_update_parser.add_argument("--value", required=True, help="New value")
+
+    # epic done
+    epic_done_parser = epic_subparsers.add_parser("done", help="Mark epic as done")
+    epic_done_parser.add_argument("--id", required=True, help="Epic ID")
+
+    # epic add-task
+    epic_add_task_parser = epic_subparsers.add_parser("add-task", help="Add task to epic")
+    epic_add_task_parser.add_argument("--id", required=True, help="Epic ID")
+    epic_add_task_parser.add_argument("--task-id", required=True, help="Task ID")
+
+    # epic add-epic
+    epic_add_epic_parser = epic_subparsers.add_parser("add-epic", help="Add child epic")
+    epic_add_epic_parser.add_argument("--id", required=True, help="Epic ID")
+    epic_add_epic_parser.add_argument("--child-id", required=True, help="Child epic ID")
+
+    # epic remove-task
+    epic_remove_task_parser = epic_subparsers.add_parser("remove-task", help="Remove task from epic")
+    epic_remove_task_parser.add_argument("--id", required=True, help="Epic ID")
+    epic_remove_task_parser.add_argument("--task-id", required=True, help="Task ID")
+
+    # epic remove-epic
+    epic_remove_epic_parser = epic_subparsers.add_parser("remove-epic", help="Remove child epic")
+    epic_remove_epic_parser.add_argument("--id", required=True, help="Epic ID")
+    epic_remove_epic_parser.add_argument("--child-id", required=True, help="Child epic ID")
     
     args = parser.parse_args()
 
@@ -499,6 +674,7 @@ def main():
     args.parser_task = task_parser
     args.parser_comment = task_comment_parser
     args.parser_link = task_link_parser
+    args.parser_epic = epic_parser
 
     tm = TaskManager(args.tasks_root)
 
