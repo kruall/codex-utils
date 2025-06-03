@@ -2,7 +2,7 @@
   "id": "TM-7",
   "title": "Add tm verify command for AI agent verification",
   "description": "Create a new 'tm verify' command that helps AI agents check they haven't forgotten anything before ending their work session. Initial implementation should check for tasks left in 'in_progress' status and provide clear feedback.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -28,11 +28,26 @@
       "id": 5,
       "text": "IMPLEMENTATION LOCATION: Add to task-manager/cli.py as new subcommand. Follow existing pattern like 'task list --status in_progress' but with better formatting and exit codes for automation.",
       "created_at": 1748891107.1996129
+    },
+    {
+      "id": 6,
+      "text": "Started work on TM-7",
+      "created_at": 1748930646.138365
+    },
+    {
+      "id": 7,
+      "text": "Implemented verify command and tests",
+      "created_at": 1748930757.948159
+    },
+    {
+      "id": 8,
+      "text": "Completed implementation and tests",
+      "created_at": 1748930843.734832
     }
   ],
   "links": {},
   "created_at": 1748891082.1824582,
-  "updated_at": 1748891107.199651,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748930843.7348595,
+  "started_at": 1748930643.8372722,
+  "closed_at": 1748930840.8203628
 }
