@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import json
 import logging
 import os
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
-from .models import Queue, Task
+from .models import Queue, Task, TaskStatus
 from .utils import log_error
 from .storage import load_json, save_json
 from .exceptions import (
@@ -203,7 +205,7 @@ class TaskManager:
                     task_obj = Task.from_dict(data)
 
                     # Filter by status if specified
-                    if status and task_obj.status != status:
+                    if status and task_obj.status.value != status:
                         continue
 
                     tasks.append(task_obj.to_dict())
@@ -232,7 +234,18 @@ class TaskManager:
                 f"Field '{field}' is not allowed. Allowed fields: {', '.join(allowed_fields)}"
             )
         
-        setattr(task_data, field, value)
+        # Handle status field specially to convert string to enum
+        actual_value: Union[str, TaskStatus] = value
+        if field == 'status':
+            try:
+                actual_value = TaskStatus(value)
+            except ValueError:
+                valid_statuses = [status.value for status in TaskStatus]
+                raise InvalidFieldError(
+                    f"Invalid status '{value}'. Valid statuses: {', '.join(valid_statuses)}"
+                )
+        
+        setattr(task_data, field, actual_value)
 
         self._save_task(task_data)
         logger.info(f"Task '{task_id}' updated successfully")
@@ -241,7 +254,7 @@ class TaskManager:
         """Start a task (set status to 'in_progress' and record time)."""
         task_data = self._load_task(task_id)
 
-        task_data.status = 'in_progress'
+        task_data.status = TaskStatus.IN_PROGRESS
         if task_data.started_at is None:
             task_data.started_at = time.time()
 
@@ -252,7 +265,7 @@ class TaskManager:
         """Mark a task as done (set status to 'done' and record time)."""
         task_data = self._load_task(task_id)
 
-        task_data.status = 'done'
+        task_data.status = TaskStatus.DONE
         if task_data.closed_at is None:
             task_data.closed_at = time.time()
 

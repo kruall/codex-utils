@@ -2,7 +2,21 @@ from __future__ import annotations
 
 from dataclasses import dataclass, asdict, field
 from typing import List, Dict, Any
+from enum import Enum
 import time
+
+
+class TaskStatus(Enum):
+    """Status values for tasks."""
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+
+
+class EpicStatus(Enum):
+    """Status values for epics."""
+    OPEN = "open"
+    CLOSED = "closed"
 
 
 @dataclass
@@ -28,7 +42,7 @@ class Task:
     id: str
     title: str
     description: str
-    status: str = "todo"
+    status: TaskStatus = TaskStatus.TODO
     comments: List[Dict[str, Any]] = field(default_factory=list)
     links: Dict[str, List[str]] = field(default_factory=dict)
     created_at: float = field(default_factory=time.time)
@@ -37,10 +51,14 @@ class Task:
     closed_at: float | None = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        data['status'] = self.status.value
+        return data
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Task":
+        if 'status' in data and isinstance(data['status'], str):
+            data['status'] = TaskStatus(data['status'])
         return cls(**data)
 
 @dataclass
@@ -50,7 +68,7 @@ class Epic:
     id: str
     title: str
     description: str
-    status: str = "open"
+    status: EpicStatus = EpicStatus.OPEN
     child_tasks: List[str] = field(default_factory=list)
     child_epics: List[str] = field(default_factory=list)
     parent_epic: str | None = None
@@ -58,8 +76,12 @@ class Epic:
     updated_at: float = field(default_factory=time.time)
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        data['status'] = self.status.value
+        return data
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Epic":
+        if 'status' in data and isinstance(data['status'], str):
+            data['status'] = EpicStatus(data['status'])
         return cls(**data)
