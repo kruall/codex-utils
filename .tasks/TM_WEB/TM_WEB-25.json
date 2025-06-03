@@ -2,15 +2,26 @@
   "id": "TM_WEB-25",
   "title": "Add task updates via GitHub API",
   "description": "Implement task editing functionality through GitHub API. Handle task status changes, field updates, and comment additions by updating repository files.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on implementing GitHub API updates in React web dashboard",
+      "created_at": 1748936524.4575396
+    },
+    {
+      "id": 2,
+      "text": "Implemented updateTaskInRepo and tests",
+      "created_at": 1748936744.6043723
+    }
+  ],
   "links": {
     "related": [
       "TM_WEB-22"
     ]
   },
   "created_at": 1748887672.629698,
-  "updated_at": 1748887701.179368,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748936747.5595448,
+  "started_at": 1748936522.6276298,
+  "closed_at": 1748936747.5594864
 }
