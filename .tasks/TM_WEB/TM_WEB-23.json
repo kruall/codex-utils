@@ -2,15 +2,26 @@
   "id": "TM_WEB-23",
   "title": "Implement task synchronization with GitHub repository",
   "description": "Create functionality to read tasks from GitHub repository files (.tasks/ directory) and sync with local task manager data. Handle file parsing and data mapping.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Implemented Python export_json with GitHub repo support and updated Node generate-tasks script to use env vars. Added tests.",
+      "created_at": 1748932139.407999
+    },
+    {
+      "id": 2,
+      "text": "All tests pass and task closed.",
+      "created_at": 1748932241.0724947
+    }
+  ],
   "links": {
     "related": [
       "TM_WEB-22"
     ]
   },
   "created_at": 1748887663.91928,
-  "updated_at": 1748887697.1609879,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748932241.0725198,
+  "started_at": 1748931962.1907794,
+  "closed_at": 1748932193.2314692
 }

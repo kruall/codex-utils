@@ -1,0 +1,18 @@
+{
+  "id": "TM_WEB-31",
+  "title": "Load tasks directly from GitHub in client",
+  "description": "Modify React dashboard to fetch tasks from GitHub repository on the client side",
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started work on client-side GitHub task fetching",
+      "created_at": 1748932597.396421
+    }
+  ],
+  "links": {},
+  "created_at": 1748932591.6739678,
+  "updated_at": 1748932800.439929,
+  "started_at": 1748932593.8344638,
+  "closed_at": 1748932800.439897
+}
