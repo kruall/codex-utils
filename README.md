@@ -2,6 +2,23 @@
 
 A collection of tools for managing development tasks.
 
+## Testing
+
+Run all tests with the unified test runner:
+
+```bash
+./run_tests
+```
+
+This script automatically:
+- Activates the virtual environment
+- Runs Python unit tests (`pytest`)
+- Runs Python linting (`ruff check .`)
+- Runs Python type checking (`mypy .`)
+- Runs React tests (`cd react-dashboard && npm test`)
+- Runs task verification (`./tm verify`)
+- Provides colored output and comprehensive summary
+
 ## Task Manager CLI
 
 The `tm` script provides a lightweight interface for tracking work. All data is stored in the `.tasks/` directory.

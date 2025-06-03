@@ -23,6 +23,27 @@ which python
 - Installing Python packages
 
 **⚠️ IMPORTANT**: The `./tm` script and `init_venv` script automatically handle virtual environment activation, but when running Python commands directly, always ensure `.venv` is activated first.
+
+## Testing Requirements
+
+**🧪 UNIFIED TEST RUNNER**: Use the `./run_tests` script to run all tests and verifications:
+
+```bash
+# Run all tests (Python, React, linting, type checking, and tm verify)
+./run_tests
+```
+
+The `run_tests` script automatically:
+- Activates the virtual environment
+- Runs Python unit tests (`pytest`)
+- Runs Python linting (`ruff check .`)
+- Runs Python type checking (`mypy .`)
+- Runs React tests (`cd react-dashboard && npm test`)
+- Runs task verification (`./tm verify`)
+- Provides colored output and comprehensive summary
+
+**⚠️ IMPORTANT**: Always use `./run_tests` instead of running individual test commands to ensure consistency and completeness.
+
 ## 🚨 TASK CLOSURE REQUIREMENTS 🚨
 
 **⚠️ CRITICAL REMINDER**: Agents frequently forget to close tasks even after completing all work. This is MANDATORY and must NEVER be skipped.
@@ -31,8 +52,7 @@ which python
 
 **📋 TASK CLOSURE CHECKLIST** - Verify BEFORE ending your session:
 - [ ] All implementation work is complete
-- [ ] All Python tests pass (`pytest`, `ruff check .`, `mypy .`)
-- [ ] All React tests pass (`cd react-dashboard && npm test`)
+- [ ] All tests pass (`./run_tests`)
 - [ ] All files are saved and committed
 - [ ] Task comments document the work performed
 - [ ] **MOST IMPORTANT**: `./tm task done --id <task-id>` has been executed
@@ -152,10 +172,7 @@ The task manager provides multiple interfaces for different use cases:
 
 * Before opening a PR, ensure:
   • **MANDATORY**: Task was started with `./tm task start` command before work began
-  • `pytest` passes,
-  • `ruff check .` passes,
-  • `mypy .` passes
-  • React tests pass (`cd react-dashboard && npm test`)
+  • All tests pass (`./run_tests`)
   • **MANDATORY**: Task was closed with `./tm task done` command when work is completed
 
 ---
@@ -165,14 +182,14 @@ The task manager provides multiple interfaces for different use cases:
 **BEFORE YOU FINISH YOUR WORK SESSION:**
 
 ```bash
+# Run all tests to ensure everything works
+./run_tests
+
 # Check if you have any tasks still in progress
 ./tm task list --status in_progress
 
 # If you see any tasks, close them:
 ./tm task done --id <task-id>
-
-# Verify all tests pass before closing:
-pytest && ruff check . && mypy . && cd react-dashboard && npm test
 ```
 
 **🚨 DO NOT LEAVE TASKS IN "in_progress" STATUS 🚨**
