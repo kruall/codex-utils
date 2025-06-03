@@ -28,7 +28,7 @@ class TestVerifyCommand(unittest.TestCase):
 
     def run_task_manager(self, args):
         cmd = [
-            "python",
+            sys.executable,
             str(self.task_manager_path),
             "--tasks-root",
             str(self.tasks_root),
