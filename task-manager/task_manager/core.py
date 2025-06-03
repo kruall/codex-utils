@@ -575,3 +575,54 @@ class TaskManager:
         except (OSError, IOError) as e:
             raise StorageError(f"Error deleting epic '{epic_id}': {e}")
 
+    def epic_remove_task(self, epic_id: str, task_id: str) -> None:
+        """Remove a task from an epic."""
+        epic_data = self._load_epic(epic_id)
+        try:
+            epic_data.child_tasks.remove(task_id)
+        except ValueError:
+            raise TaskNotFoundError(
+                f"Task '{task_id}' not found in epic '{epic_id}'"
+            )
+        self._save_epic(epic_data)
+
+    def epic_remove_epic(self, epic_id: str, child_epic_id: str) -> None:
+        """Remove a child epic from an epic."""
+        parent_epic = self._load_epic(epic_id)
+        child_epic = self._load_epic(child_epic_id)
+
+        try:
+            parent_epic.child_epics.remove(child_epic_id)
+        except ValueError:
+            raise TaskNotFoundError(
+                f"Epic '{child_epic_id}' not found in epic '{epic_id}'"
+            )
+
+        if child_epic.parent_epic == epic_id:
+            child_epic.parent_epic = None
+
+        self._save_epic(parent_epic)
+        self._save_epic(child_epic)
+
+    def epic_done(self, epic_id: str) -> None:
+        """Mark an epic as closed if all children are complete."""
+        epic_data = self._load_epic(epic_id)
+
+        for task_id in epic_data.child_tasks:
+            task = self._load_task(task_id)
+            if task.status != TaskStatus.DONE:
+                raise InvalidFieldError(
+                    f"Task '{task_id}' is not done; cannot close epic '{epic_id}'"
+                )
+
+        for child_id in epic_data.child_epics:
+            child = self._load_epic(child_id)
+            if child.status != EpicStatus.CLOSED:
+                raise InvalidFieldError(
+                    f"Epic '{child_id}' is not closed; cannot close epic '{epic_id}'"
+                )
+
+        epic_data.status = EpicStatus.CLOSED
+        self._save_epic(epic_data)
+        logger.info(f"Epic '{epic_id}' updated successfully")
+

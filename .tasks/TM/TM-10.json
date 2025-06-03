@@ -2,12 +2,17 @@
   "id": "TM-10",
   "title": "Add Epic CLI commands",
   "description": "Implement CLI commands for Epic management: epic add, epic list, epic show, epic update, epic done. Include commands for adding/removing tasks and sub-epics to epics. Handle status validation logic.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "CLI COMMANDS: './tm epic add --title \"Epic title\" --description \"Description\"', './tm epic list', './tm epic show --id epic-1', './tm epic add-task --id epic-1 --task-id task-1', './tm epic add-epic --id epic-1 --child-id epic-2', './tm epic done --id epic-1' (with validation)",
       "created_at": 1748891460.061244
+    },
+    {
+      "id": 2,
+      "text": "Implemented CLI support for epic management with add/list/show/update/done and relation commands.",
+      "created_at": 1748935313.7197833
     }
   ],
   "links": {
@@ -18,7 +23,7 @@
     ]
   },
   "created_at": 1748891410.1966138,
-  "updated_at": 1748891460.061258,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748935313.7198207,
+  "started_at": 1748934937.352084,
+  "closed_at": 1748935310.3553898
 }
