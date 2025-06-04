@@ -1,6 +1,5 @@
 import tempfile
 import unittest
-from pathlib import Path
 from task_manager.core import TaskManager
 from task_manager.tui import (
     TMApp,
@@ -16,7 +15,8 @@ from task_manager.tui import (
 class TestTuiNavigation(unittest.IsolatedAsyncioTestCase):
     async def test_basic_navigation(self) -> None:
         tasks_dir = tempfile.mkdtemp()
-        manager = TaskManager(tasks_dir, epics_root=str(Path(tasks_dir)/"epics"))
+        epics_dir = tempfile.mkdtemp()
+        manager = TaskManager(tasks_dir, epics_root=epics_dir)
         async with TMApp(manager).run_test() as pilot:
             # Should start on main screen
             self.assertIsInstance(pilot.app.screen, MainScreen)
@@ -47,7 +47,8 @@ class TestTuiNavigation(unittest.IsolatedAsyncioTestCase):
 class TestTaskEpicNavigation(unittest.IsolatedAsyncioTestCase):
     async def test_task_epic_navigation(self) -> None:
         tasks_dir = tempfile.mkdtemp()
-        manager = TaskManager(tasks_dir)
+        epics_dir = tempfile.mkdtemp()
+        manager = TaskManager(tasks_dir, epics_root=epics_dir)
         manager.queue_add("q", "Q", "d")
         tid = manager.task_add("T", "d", "q")
         eid = manager.epic_add("E", "d")
