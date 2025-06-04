@@ -449,6 +449,18 @@ else:
             super().__init__(manager)
             self.task_id = task_id
 
+        def _build_epic_chain(self, epic_id: str) -> str:
+            chain = []
+            current_id = epic_id
+            while current_id:
+                data = self.manager.epic_show(current_id)
+                chain.append(f"{data['title']}({current_id})")
+                parent = data.get("parent_epic")
+                if not parent:
+                    break
+                current_id = parent
+            return " > ".join(reversed(chain))
+
         def on_mount(self) -> None:
             self.refresh_screen()
 
@@ -465,7 +477,25 @@ else:
             if epics:
                 self.body.mount(Static("Epics:", classes="title"))
                 for e in epics:
-                    self.body.mount(Button(e["id"], id=f"open_epic_{e['id']}"))
+                    eid = e["id"]
+                    edata = self.manager.epic_show(eid)
+                    hierarchy = self._build_epic_chain(eid)
+                    label = f"{eid}: {edata['title']} ({edata['status']})"
+                    self.body.mount(Button(label, id=f"open_epic_{eid}"))
+                    self.body.mount(Static(hierarchy))
+                    self.body.mount(Static(edata.get("description", "")))
+                    if edata.get("child_tasks"):
+                        self.body.mount(Static("Tasks:", classes="title"))
+                        for tid in edata["child_tasks"]:
+                            tdata = self.manager.task_show(tid)
+                            tlabel = f"{tid}: {tdata['title']} ({tdata['status']})"
+                            self.body.mount(Button(tlabel, id=f"open_task_{tid}"))
+                    if edata.get("child_epics"):
+                        self.body.mount(Static("Child Epics:", classes="title"))
+                        for ceid in edata["child_epics"]:
+                            cdata = self.manager.epic_show(ceid)
+                            clabel = f"{ceid}: {cdata['title']} ({cdata['status']})"
+                            self.body.mount(Button(clabel, id=f"open_epic_{ceid}"))
             self.body.mount(Button("View Comments", id="view_comments"))
             self.body.mount(Button("Back", id="back"))
 
