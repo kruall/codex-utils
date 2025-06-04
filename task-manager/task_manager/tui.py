@@ -527,6 +527,15 @@ else:
         def on_view_epic(self, message: ViewEpic) -> None:  # pragma: no cover - UI callbacks
             self.app.push_screen(EpicDetailScreen(self.manager, message.epic_id))
 
+        def on_view_task(self, message: ViewTask) -> None:  # pragma: no cover - UI callbacks
+            if (
+                self._handle_manager_operation(
+                    self.manager.task_show, message.task_id
+                )
+                is not None
+            ):
+                self.app.push_screen(TaskDetailScreen(self.manager, message.task_id))
+
     class EpicDetailScreen(BaseScreen):
         def __init__(self, manager: "TaskManager", epic_id: str) -> None:
             super().__init__(manager)

@@ -18,6 +18,11 @@
       "id": 3,
       "text": "Fixed cycle detection and button handling",
       "created_at": 1749020930.3652408
+    },
+    {
+      "id": 4,
+      "text": "Fix missing ViewTask handler in TaskDetailScreen",
+      "created_at": 1749022175.0516357
     }
   ],
   "links": {
@@ -29,7 +34,7 @@
     "epic-1"
   ],
   "created_at": 1749018733.3395462,
-  "updated_at": 1749020930.365283,
+  "updated_at": 1749022264.987912,
   "started_at": 1749019136.1328392,
   "closed_at": 1749019358.4131665
 }
