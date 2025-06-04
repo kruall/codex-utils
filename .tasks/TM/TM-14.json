@@ -33,6 +33,16 @@
       "id": 6,
       "text": "Implemented epic relationship features",
       "created_at": 1748979888.6507125
+    },
+    {
+      "id": 7,
+      "text": "Fix epic_remove_task to allow removing nonexistent tasks",
+      "created_at": 1749015532.1455917
+    },
+    {
+      "id": 8,
+      "text": "Handled removal of missing tasks in epic_remove_task",
+      "created_at": 1749015646.9901743
     }
   ],
   "links": {
@@ -43,7 +53,7 @@
   },
   "epics": [],
   "created_at": 1748978219.394832,
-  "updated_at": 1748979888.6507359,
+  "updated_at": 1749015646.9902012,
   "started_at": 1748979509.6554575,
   "closed_at": 1748979886.3398175
 }

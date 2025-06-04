@@ -691,7 +691,10 @@ class TaskManager:
     def epic_remove_task(self, epic_id: str, task_id: str) -> None:
         """Remove a task from an epic."""
         epic_data = self._load_epic(epic_id)
-        task_data = self._load_task(task_id)
+        try:
+            task_data = self._load_task(task_id)
+        except TaskNotFoundError:
+            task_data = None
         try:
             epic_data.child_tasks.remove(task_id)
         except ValueError:
@@ -699,11 +702,12 @@ class TaskManager:
                 f"Task '{task_id}' not found in epic '{epic_id}'"
             )
 
-        if epic_id in task_data.epics:
+        if task_data and epic_id in task_data.epics:
             task_data.epics.remove(epic_id)
 
         self._save_epic(epic_data)
-        self._save_task(task_data)
+        if task_data:
+            self._save_task(task_data)
 
     def epic_remove_epic(self, epic_id: str, child_epic_id: str) -> None:
         """Remove a child epic from an epic."""
