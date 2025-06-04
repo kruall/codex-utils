@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { repo, task } = req.body
   const authHeader = req.headers['authorization']
-  const token = authHeader?.toString().replace('token ', '')
+  const token = authHeader?.toString()?.replace('token ', '')
 
   if (!repo || !task) {
     return res.status(400).json({ error: 'Invalid request' })

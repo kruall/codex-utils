@@ -27,10 +27,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [csrfToken, setCsrfToken] = useState<string | null>(null)
 
   useEffect(() => {
-    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('githubToken') : null
+    const storedRaw = typeof window !== 'undefined' ? sessionStorage.getItem('githubToken') : null
     const expiry = typeof window !== 'undefined' ? Number(sessionStorage.getItem('githubTokenExpiry')) : 0
     const csrf = typeof window !== 'undefined' ? sessionStorage.getItem('csrfToken') : null
-    if (stored && expiry > Date.now()) {
+    const stored = storedRaw && expiry > Date.now() ? storedRaw : null
+    if (stored) {
       setToken(stored)
       if (csrf) {
         setCsrfToken(csrf)
