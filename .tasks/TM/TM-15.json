@@ -2,8 +2,14 @@
   "id": "TM-15",
   "title": "Enhance task show command with epic information",
   "description": "Modify task show command to display epic information after task description. Show parent epic details and list all other tasks and epics within the same epic, including their descriptions and statuses. Improve information hierarchy and readability.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Implemented epic details in task show and added tests",
+      "created_at": 1749019627.1027722
+    }
+  ],
   "links": {
     "related": [
       "TM_TUI-12",
@@ -16,7 +22,7 @@
     "epic-1"
   ],
   "created_at": 1749018721.128208,
-  "updated_at": 1749019577.489363,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749019635.8583028,
+  "started_at": 1749019099.057508,
+  "closed_at": 1749019635.8582637
 }
