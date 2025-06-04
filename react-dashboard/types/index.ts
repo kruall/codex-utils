@@ -19,6 +19,8 @@ export interface TaskTableProps {
 
 export interface AuthContextType {
   token: string | null;
+  csrfToken: string | null;
   login: () => Promise<void>;
   logout: () => void;
+  refreshToken: () => void;
 }

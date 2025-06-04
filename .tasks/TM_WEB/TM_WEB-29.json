@@ -2,11 +2,32 @@
   "id": "TM_WEB-29",
   "title": "Add security and token management",
   "description": "Implement secure token storage, token refresh mechanisms, and proper CORS handling. Add security measures against CSRF attacks and implement token expiration handling.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting security and token management implementation. Plan: add token expiry, refresh mechanism, CORS headers for API, and CSRF protection.",
+      "created_at": 1748978566.037798
+    },
+    {
+      "id": 2,
+      "text": "Implemented token expiry, CSRF protection with double submit cookie, CORS headers, refreshToken, and API route with tests.",
+      "created_at": 1748978760.7429926
+    },
+    {
+      "id": 3,
+      "text": "Verified implementation; all tests pass.",
+      "created_at": 1748979751.0184882
+    },
+    {
+      "id": 4,
+      "text": "Fix bug in header handling and expired token callback",
+      "created_at": 1749015459.0956457
+    }
+  ],
   "links": {},
   "created_at": 1748887689.774667,
-  "updated_at": 1748887689.774667,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749015566.1179163,
+  "started_at": 1748978563.1413007,
+  "closed_at": 1748979753.8747368
 }
