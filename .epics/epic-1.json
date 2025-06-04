@@ -1,0 +1,16 @@
+{
+  "id": "epic-1",
+  "title": "Improve task information display",
+  "description": "Enhance task show command to display comprehensive epic information including parent epic details and all related tasks and epics within the same epic with their descriptions and statuses",
+  "status": "open",
+  "child_tasks": [
+    "TM-15",
+    "TM_TUI-12",
+    "TM_WEB-33",
+    "TM-16"
+  ],
+  "child_epics": [],
+  "parent_epic": null,
+  "created_at": 1749018715.335389,
+  "updated_at": 1749018774.611371
+}

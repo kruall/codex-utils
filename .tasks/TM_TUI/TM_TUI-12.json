@@ -1,0 +1,19 @@
+{
+  "id": "TM_TUI-12",
+  "title": "Update TUI task view with enhanced epic information",
+  "description": "Adapt TUI interface to display enhanced epic information in task views. Show epic hierarchy and related tasks/epics with descriptions and statuses. Ensure consistent display with CLI improvements.",
+  "status": "todo",
+  "comments": [],
+  "links": {
+    "related": [
+      "TM-15"
+    ]
+  },
+  "epics": [
+    "epic-1"
+  ],
+  "created_at": 1749018733.3395462,
+  "updated_at": 1749018759.905626,
+  "started_at": null,
+  "closed_at": null
+}
