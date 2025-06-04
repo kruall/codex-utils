@@ -2,16 +2,28 @@
   "id": "TM_WEB-16",
   "title": "Implement React testing framework setup",
   "description": "Set up testing infrastructure for React components including Jest, React Testing Library, and test utilities. Configure test environment and establish testing patterns.",
-  "status": "todo",
-  "comments": [],
+  "status": "in_progress",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Investigating existing React test setup",
+      "created_at": 1749019468.6396668
+    },
+    {
+      "id": 2,
+      "text": "All tests pass using existing jest setup",
+      "created_at": 1749019656.742587
+    }
+  ],
   "links": {
     "related": [
       "TM_WEB-15",
       "TM_WEB-17"
     ]
   },
+  "epics": [],
   "created_at": 1748556900.84865,
-  "updated_at": 1748556916.6998022,
-  "started_at": null,
+  "updated_at": 1749019656.7426248,
+  "started_at": 1749019464.8388855,
   "closed_at": null
 }
