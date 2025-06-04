@@ -2,8 +2,29 @@
   "id": "TM_TUI-12",
   "title": "Update TUI task view with enhanced epic information",
   "description": "Adapt TUI interface to display enhanced epic information in task views. Show epic hierarchy and related tasks/epics with descriptions and statuses. Ensure consistent display with CLI improvements.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting task TM_TUI-12",
+      "created_at": 1749019138.18291
+    },
+    {
+      "id": 2,
+      "text": "Implemented enhanced epic info in TUI",
+      "created_at": 1749019361.509265
+    },
+    {
+      "id": 3,
+      "text": "Fixed cycle detection and button handling",
+      "created_at": 1749020930.3652408
+    },
+    {
+      "id": 4,
+      "text": "Fix missing ViewTask handler in TaskDetailScreen",
+      "created_at": 1749022175.0516357
+    }
+  ],
   "links": {
     "related": [
       "TM-15"
@@ -13,7 +34,7 @@
     "epic-1"
   ],
   "created_at": 1749018733.3395462,
-  "updated_at": 1749018759.905626,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749022264.987912,
+  "started_at": 1749019136.1328392,
+  "closed_at": 1749019358.4131665
 }
