@@ -7,10 +7,11 @@
     "TM-15",
     "TM_TUI-12",
     "TM_WEB-33",
-    "TM-16"
+    "TM-16",
+    "TM-17"
   ],
   "child_epics": [],
   "parent_epic": null,
   "created_at": 1749018715.335389,
-  "updated_at": 1749018774.611371
+  "updated_at": 1749019571.323524
 }

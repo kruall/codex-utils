@@ -1,0 +1,30 @@
+{
+  "id": "TM-17",
+  "title": "Add PR validation for epic closure",
+  "description": "Extend PR validation to detect epic closures. Check that when an epic is closed in a PR: 1) All child tasks and epics are completed, 2) The epic was either not present or was open before the PR, 3) The epic is now closed. Similar to existing task closure validation but for epics.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "EPIC PR VALIDATION REQUIREMENTS: 1) Extend .github/scripts/check_pr_task.py to detect epic closures in PR titles using pattern [epic-X], 2) Check epic status before PR (should be 'open' or not exist), 3) Verify epic status after PR (should be 'closed'), 4) Validate all child tasks and epics are 'done'/'closed' when epic is closed, 5) Similar validation logic to existing task closure checks",
+      "created_at": 1749019590.7317371
+    },
+    {
+      "id": 2,
+      "text": "IMPLEMENTATION DETAILS: 1) Modify check_pr_task.py to handle both [task-id] and [epic-id] patterns, 2) Add get_epic_status_from_commit() function similar to get_task_status_from_commit(), 3) Add epic file discovery logic in .epics/ directory, 4) Validate epic closure rules using existing tm.invalid_closed_epics() logic, 5) Update GitHub workflow to handle epic validation",
+      "created_at": 1749019596.7556422
+    }
+  ],
+  "links": {
+    "related": [
+      "TM-15"
+    ]
+  },
+  "epics": [
+    "epic-1"
+  ],
+  "created_at": 1749019566.8826618,
+  "updated_at": 1749019596.7556548,
+  "started_at": null,
+  "closed_at": null
+}

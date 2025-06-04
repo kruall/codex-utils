@@ -8,14 +8,15 @@
     "related": [
       "TM_TUI-12",
       "TM_WEB-33",
-      "TM-16"
+      "TM-16",
+      "TM-17"
     ]
   },
   "epics": [
     "epic-1"
   ],
   "created_at": 1749018721.128208,
-  "updated_at": 1749018779.930281,
+  "updated_at": 1749019577.489363,
   "started_at": null,
   "closed_at": null
 }
