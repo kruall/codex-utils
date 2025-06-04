@@ -14,7 +14,8 @@
     "related": [
       "TM_TUI-12",
       "TM_WEB-33",
-      "TM-16"
+      "TM-16",
+      "TM-17"
     ]
   },
   "epics": [
