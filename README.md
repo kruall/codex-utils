@@ -49,6 +49,7 @@ Launch the interactive Textual interface:
 # Filter tasks
 ./tm task list --status todo
 ./tm task list --queue feature-queue
+./tm task list --epic epic-1
 
 # Create a task
 ./tm task add --title "Implement user auth" --description "Add authentication system" --queue feature-queue
@@ -100,6 +101,10 @@ Launch the interactive Textual interface:
 # Attach work items
 ./tm epic add-task --id epic-1 --task-id feature-queue-1
 ./tm epic add-epic --id epic-1 --child-id epic-2
+
+# Manage task membership
+./tm task add-to-epic --id feature-queue-1 --epic-id epic-1
+./tm task remove-from-epic --id feature-queue-1 --epic-id epic-1
 
 # Close when all children are done
 ./tm epic done --id epic-1

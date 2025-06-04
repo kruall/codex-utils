@@ -31,7 +31,7 @@ class TaskManager:
         self.epics_root = Path(epics_root)
         self.epics_root.mkdir(exist_ok=True)
         self._queue_list_cache: List[Dict[str, str]] | None = None
-        self._task_list_cache: dict[tuple[Optional[str], Optional[str]], List[Dict]] = {}
+        self._task_list_cache: dict[tuple[Optional[str], Optional[str], Optional[str]], List[Dict]] = {}
         self._epic_list_cache: Optional[List[Dict]] = None
 
     def _invalidate_queue_cache(self) -> None:
@@ -312,9 +312,14 @@ class TaskManager:
             raise StorageError(f"Failed to save task '{task_id}'")
         self._invalidate_task_cache()
 
-    def task_list(self, status: Optional[str] = None, queue: Optional[str] = None) -> List[Dict]:
+    def task_list(
+        self,
+        status: Optional[str] = None,
+        queue: Optional[str] = None,
+        epic: Optional[str] = None,
+    ) -> List[Dict]:
         """List tasks with optional filtering."""
-        cache_key = (status, queue)
+        cache_key = (status, queue, epic)
         if cache_key in self._task_list_cache:
             return self._task_list_cache[cache_key]
 
@@ -339,6 +344,9 @@ class TaskManager:
 
                     # Filter by status if specified
                     if status and task_obj.status.value != status:
+                        continue
+                    # Filter by epic if specified
+                    if epic and epic not in task_obj.epics:
                         continue
 
                     tasks.append(task_obj.to_dict())
@@ -645,9 +653,15 @@ class TaskManager:
     def epic_add_task(self, epic_id: str, task_id: str) -> None:
         """Add a task to an epic."""
         epic_data = self._load_epic(epic_id)
+        task_data = self._load_task(task_id)
+
         if task_id not in epic_data.child_tasks:
             epic_data.child_tasks.append(task_id)
+        if epic_id not in task_data.epics:
+            task_data.epics.append(epic_id)
+
         self._save_epic(epic_data)
+        self._save_task(task_data)
 
     def epic_add_epic(self, epic_id: str, child_epic_id: str) -> None:
         """Add a child epic to an epic."""
@@ -677,13 +691,19 @@ class TaskManager:
     def epic_remove_task(self, epic_id: str, task_id: str) -> None:
         """Remove a task from an epic."""
         epic_data = self._load_epic(epic_id)
+        task_data = self._load_task(task_id)
         try:
             epic_data.child_tasks.remove(task_id)
         except ValueError:
             raise TaskNotFoundError(
                 f"Task '{task_id}' not found in epic '{epic_id}'"
             )
+
+        if epic_id in task_data.epics:
+            task_data.epics.remove(epic_id)
+
         self._save_epic(epic_data)
+        self._save_task(task_data)
 
     def epic_remove_epic(self, epic_id: str, child_epic_id: str) -> None:
         """Remove a child epic from an epic."""

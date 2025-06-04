@@ -372,7 +372,7 @@ class TestTaskManagerInternal(unittest.TestCase):
         self.tm.queue_add("qc", "Q", "d")
         self.tm.task_add("t1", "d1", "qc")
         tasks_first = self.tm.task_list()
-        cache_key = (None, None)
+        cache_key = (None, None, None)
         self.assertIs(tasks_first, self.tm._task_list_cache[cache_key])
         tasks_second = self.tm.task_list()
         self.assertIs(tasks_first, tasks_second)

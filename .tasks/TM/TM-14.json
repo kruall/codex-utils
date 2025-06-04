@@ -2,7 +2,7 @@
   "id": "TM-14",
   "title": "Add epic relationships to Task schema",
   "description": "Extend Task model to include 'epics' field containing list of epic IDs that the task belongs to. Implement bidirectional validation to ensure when a task is added to an epic, the task's epics list is updated, and vice versa. Update CLI commands, persistence layer, and validation logic.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -23,6 +23,16 @@
       "id": 4,
       "text": "TESTING: 1) Add unit tests for Task model with epics field 2) Test bidirectional validation in epic_add_task/epic_remove_task 3) Test CLI commands showing epic relationships 4) Test backward compatibility with existing task files 5) Update TUI and Web interfaces to show task-epic relationships",
       "created_at": 1748978244.3738282
+    },
+    {
+      "id": 5,
+      "text": "Starting implementation",
+      "created_at": 1748979512.0471573
+    },
+    {
+      "id": 6,
+      "text": "Implemented epic relationship features",
+      "created_at": 1748979888.6507125
     }
   ],
   "links": {
@@ -31,8 +41,9 @@
       "TM_WEB-32"
     ]
   },
+  "epics": [],
   "created_at": 1748978219.394832,
-  "updated_at": 1748978264.0439491,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1748979888.6507359,
+  "started_at": 1748979509.6554575,
+  "closed_at": 1748979886.3398175
 }

@@ -38,6 +38,15 @@ class TestEpicPersistence(unittest.TestCase):
         self.assertIn(self.task_id, p["child_tasks"])
         self.assertIn(child, p["child_epics"])
         self.assertEqual(c["parent_epic"], parent)
+        task = self.tm.task_show(self.task_id)
+        self.assertIn(parent, task["epics"])
+
+    def test_epic_remove_task_updates_task(self):
+        epic_id = self.tm.epic_add("Epic", "Desc")
+        self.tm.epic_add_task(epic_id, self.task_id)
+        self.tm.epic_remove_task(epic_id, self.task_id)
+        task = self.tm.task_show(self.task_id)
+        self.assertNotIn(epic_id, task["epics"])
 
     def test_epic_update(self):
         epic_id = self.tm.epic_add("Title", "Desc")
