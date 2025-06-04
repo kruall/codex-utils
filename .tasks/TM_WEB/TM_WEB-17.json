@@ -2,16 +2,23 @@
   "id": "TM_WEB-17",
   "title": "Write unit tests for React components",
   "description": "Create comprehensive unit tests for all React components in the TM_WEB dashboard. Include tests for component rendering, props handling, state management, and user interactions.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting task TM_WEB-17: create unit tests for React components.",
+      "created_at": 1749016586.182276
+    }
+  ],
   "links": {
     "related": [
       "TM_WEB-16",
       "DEV-22"
     ]
   },
+  "epics": [],
   "created_at": 1748556905.189868,
-  "updated_at": 1748556919.8243032,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749017740.1051788,
+  "started_at": 1749016583.56936,
+  "closed_at": 1749017740.1051497
 }
