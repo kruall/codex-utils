@@ -2,15 +2,27 @@
   "id": "TM_WEB-15",
   "title": "Create comprehensive test plan for React components",
   "description": "Develop a detailed testing strategy for TM_WEB React dashboard including unit tests, integration tests, and component testing. Define testing framework, tools, and coverage requirements.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting TM_WEB-15: create test plan",
+      "created_at": 1749018147.3505008
+    },
+    {
+      "id": 2,
+      "text": "Created react test plan and updated README",
+      "created_at": 1749018293.5153525
+    }
+  ],
   "links": {
     "related": [
       "TM_WEB-16"
     ]
   },
+  "epics": [],
   "created_at": 1748556897.361933,
-  "updated_at": 1748556913.12002,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749018293.5153856,
+  "started_at": 1749018145.0128136,
+  "closed_at": 1749018290.9035583
 }

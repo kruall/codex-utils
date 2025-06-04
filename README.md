@@ -18,6 +18,7 @@ This script automatically:
 - Runs React tests (`cd react-dashboard && npm test`)
 - Runs task verification (`./tm verify`)
 - Provides colored output and comprehensive summary
+- For React component guidelines see `docs/react_test_plan.md`
 
 ## Task Manager CLI
 
