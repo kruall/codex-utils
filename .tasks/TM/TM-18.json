@@ -1,0 +1,21 @@
+{
+  "id": "TM-18",
+  "title": "Refactor core epic management code",
+  "description": "Refactor epic-related code in task-manager core module. Improve epic persistence layer, validation logic, and relationship management. Extract epic operations into dedicated service classes and improve error handling.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "CORE REFACTORING AREAS: 1) Extract epic operations from TaskManager into EpicManager service class, 2) Improve epic validation logic separation, 3) Refactor epic-task relationship management, 4) Enhance epic status transition logic, 5) Improve epic persistence layer abstraction, 6) Add better error handling for epic operations",
+      "created_at": 1749020722.3864791
+    }
+  ],
+  "links": {},
+  "epics": [
+    "epic-2"
+  ],
+  "created_at": 1749020666.455006,
+  "updated_at": 1749020722.3864908,
+  "started_at": null,
+  "closed_at": null
+}

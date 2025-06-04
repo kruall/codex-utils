@@ -1,0 +1,21 @@
+{
+  "id": "TM_TUI-13",
+  "title": "Refactor TUI epic interface code",
+  "description": "Refactor epic-related code in TUI interface. Improve epic display components, navigation logic, and user interaction patterns. Extract epic UI components into reusable modules and enhance epic visualization.",
+  "status": "todo",
+  "comments": [
+    {
+      "id": 1,
+      "text": "TUI REFACTORING AREAS: 1) Extract epic display components into reusable widgets, 2) Improve epic navigation and hierarchy visualization, 3) Refactor epic status indicators and progress bars, 4) Enhance epic interaction patterns (create, edit, close), 5) Improve epic-task relationship display, 6) Add epic filtering and search capabilities",
+      "created_at": 1749020728.164961
+    }
+  ],
+  "links": {},
+  "epics": [
+    "epic-2"
+  ],
+  "created_at": 1749020678.642085,
+  "updated_at": 1749020728.164973,
+  "started_at": null,
+  "closed_at": null
+}

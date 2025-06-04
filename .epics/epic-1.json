@@ -10,8 +10,10 @@
     "TM-16",
     "TM-17"
   ],
-  "child_epics": [],
+  "child_epics": [
+    "epic-2"
+  ],
   "parent_epic": null,
   "created_at": 1749018715.335389,
-  "updated_at": 1749019571.323524
+  "updated_at": 1749020659.2710452
 }
