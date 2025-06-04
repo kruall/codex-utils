@@ -259,6 +259,11 @@ class TaskManager:
                 if parent.parent_epic:
                     self._auto_close_parent_epics(parent.id)
 
+    def task_parent_epics(self, task_id: str) -> List[Dict]:
+        """Return epics containing the given task."""
+        epics = [e.to_dict() for e in self._get_parent_epics(task_id)]
+        return epics
+
     def invalid_closed_epics(self) -> List[str]:
         """Return IDs of epics marked closed with incomplete children."""
         invalid = []
