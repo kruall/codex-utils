@@ -450,15 +450,19 @@ else:
             self.task_id = task_id
 
         def _build_epic_chain(self, epic_id: str) -> str:
-            chain = []
+            """Return full hierarchy string for ``epic_id`` with cycle detection."""
+            chain: list[str] = []
             current_id = epic_id
-            while current_id:
-                data = self.manager.epic_show(current_id)
-                chain.append(f"{data['title']}({current_id})")
-                parent = data.get("parent_epic")
-                if not parent:
+            visited: set[str] = set()
+            while current_id and current_id not in visited:
+                visited.add(current_id)
+                data = self._handle_manager_operation(self.manager.epic_show, current_id)
+                if not data:
                     break
-                current_id = parent
+                chain.append(f"{data['title']}({current_id})")
+                current_id = data.get("parent_epic")
+            if current_id and current_id in visited:
+                chain.append("...")
             return " > ".join(reversed(chain))
 
         def on_mount(self) -> None:
@@ -473,12 +477,16 @@ else:
             self.body.mount(Static(f"Task {data['id']}", classes="title"))
             self.body.mount(Static(f"Title: {data['title']}"))
             self.body.mount(Static(f"Status: {data['status']}"))
-            epics = self.manager.task_parent_epics(self.task_id)
+            epics = self._handle_manager_operation(
+                self.manager.task_parent_epics, self.task_id
+            ) or []
             if epics:
                 self.body.mount(Static("Epics:", classes="title"))
                 for e in epics:
                     eid = e["id"]
-                    edata = self.manager.epic_show(eid)
+                    edata = self._handle_manager_operation(self.manager.epic_show, eid)
+                    if not edata:
+                        continue
                     hierarchy = self._build_epic_chain(eid)
                     label = f"{eid}: {edata['title']} ({edata['status']})"
                     self.body.mount(Button(label, id=f"open_epic_{eid}"))
@@ -487,13 +495,17 @@ else:
                     if edata.get("child_tasks"):
                         self.body.mount(Static("Tasks:", classes="title"))
                         for tid in edata["child_tasks"]:
-                            tdata = self.manager.task_show(tid)
+                            tdata = self._handle_manager_operation(self.manager.task_show, tid)
+                            if not tdata:
+                                continue
                             tlabel = f"{tid}: {tdata['title']} ({tdata['status']})"
                             self.body.mount(Button(tlabel, id=f"open_task_{tid}"))
                     if edata.get("child_epics"):
                         self.body.mount(Static("Child Epics:", classes="title"))
                         for ceid in edata["child_epics"]:
-                            cdata = self.manager.epic_show(ceid)
+                            cdata = self._handle_manager_operation(self.manager.epic_show, ceid)
+                            if not cdata:
+                                continue
                             clabel = f"{ceid}: {cdata['title']} ({cdata['status']})"
                             self.body.mount(Button(clabel, id=f"open_epic_{ceid}"))
             self.body.mount(Button("View Comments", id="view_comments"))
@@ -504,6 +516,8 @@ else:
             bid = event.button.id or ""
             if bid == "view_comments":
                 self.post_message(ViewComments(self.task_id))
+            elif bid.startswith("open_task_"):
+                self.post_message(ViewTask(bid.split("_", 2)[2]))
             elif bid.startswith("open_epic_"):
                 self.post_message(ViewEpic(bid.split("_", 2)[2]))
 

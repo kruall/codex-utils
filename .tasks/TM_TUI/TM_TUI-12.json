@@ -13,6 +13,11 @@
       "id": 2,
       "text": "Implemented enhanced epic info in TUI",
       "created_at": 1749019361.509265
+    },
+    {
+      "id": 3,
+      "text": "Fixed cycle detection and button handling",
+      "created_at": 1749020930.3652408
     }
   ],
   "links": {
@@ -24,7 +29,7 @@
     "epic-1"
   ],
   "created_at": 1749018733.3395462,
-  "updated_at": 1749019361.5092921,
+  "updated_at": 1749020930.365283,
   "started_at": 1749019136.1328392,
   "closed_at": 1749019358.4131665
 }
