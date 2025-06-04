@@ -2,7 +2,7 @@
   "id": "TM_TUI-11",
   "title": "Update TUI to show task-epic relationships",
   "description": "Extend TUI interface to display epic relationships for tasks. Show which epics a task belongs to in task details view and add navigation between tasks and epics.",
-  "status": "todo",
+  "status": "done",
   "comments": [],
   "links": {
     "related": [
@@ -10,7 +10,7 @@
     ]
   },
   "created_at": 1748978250.409672,
-  "updated_at": 1748978259.8645608,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749015834.4270027,
+  "started_at": 1748979641.1420112,
+  "closed_at": 1748980326.2164218
 }

@@ -81,6 +81,16 @@ else:
             super().__init__()
             self.task_id = task_id
 
+    class ViewTask(Message):
+        def __init__(self, task_id: str) -> None:
+            super().__init__()
+            self.task_id = task_id
+
+    class ViewEpic(Message):
+        def __init__(self, epic_id: str) -> None:
+            super().__init__()
+            self.epic_id = epic_id
+
     class ConfirmTaskDelete(Message):
         """Confirm task deletion."""
 
@@ -266,6 +276,7 @@ else:
             self.body.mount(table)
             self.set_focus(table)
             self.body.mount(Input(placeholder="Task ID", id="task_id"))
+            self.body.mount(Button("View Task", id="view_task"))
             self.body.mount(Button("View Comments", id="view_comments"))
             self.body.mount(Button("Delete Task", id="task_delete"))
             self.body.mount(Button("Back", id="back"))
@@ -277,6 +288,10 @@ else:
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
                     self.post_message(ViewComments(task_id))
+            elif bid == "view_task":
+                task_id = self.query_one("#task_id", Input).value
+                if task_id:
+                    self.post_message(ViewTask(task_id))
             elif bid == "task_delete":
                 task_id = self.query_one("#task_id", Input).value
                 if task_id:
@@ -289,6 +304,10 @@ else:
         def on_view_comments(self, message: ViewComments) -> None:  # pragma: no cover - UI callbacks
             if self._handle_manager_operation(self.manager.task_show, message.task_id) is not None:
                 self.app.push_screen(CommentsScreen(self.manager, message.task_id))
+
+        def on_view_task(self, message: ViewTask) -> None:  # pragma: no cover - UI callbacks
+            if self._handle_manager_operation(self.manager.task_show, message.task_id) is not None:
+                self.app.push_screen(TaskDetailScreen(self.manager, message.task_id))
 
         def on_task_delete(self, message: TaskDelete) -> None:  # pragma: no cover - UI callbacks
             assert self.body is not None
@@ -341,7 +360,21 @@ else:
                 table.add_row(e["id"], e["title"], e["status"], self._progress(e))
             self.body.mount(table)
             self.set_focus(table)
+            self.body.mount(Input(placeholder="Epic ID", id="epic_id"))
+            self.body.mount(Button("View Epic", id="view_epic"))
             self.body.mount(Button("Back", id="back"))
+
+        def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)
+            bid = event.button.id
+            if bid == "view_epic":
+                epic_id = self.query_one("#epic_id", Input).value
+                if epic_id:
+                    self.post_message(ViewEpic(epic_id))
+
+        def on_view_epic(self, message: ViewEpic) -> None:  # pragma: no cover - UI callbacks
+            if self._handle_manager_operation(self.manager.epic_show, message.epic_id) is not None:
+                self.app.push_screen(EpicDetailScreen(self.manager, message.epic_id))
 
     class CommentsScreen(BaseScreen):
         def __init__(self, manager: "TaskManager", task_id: str) -> None:
@@ -410,6 +443,88 @@ else:
                 self.manager.task_comment_remove, self.task_id, message.cid
             )
             self.refresh_screen()
+
+    class TaskDetailScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager", task_id: str) -> None:
+            super().__init__(manager)
+            self.task_id = task_id
+
+        def on_mount(self) -> None:
+            self.refresh_screen()
+
+        def refresh_screen(self) -> None:
+            assert self.body is not None
+            self.body.remove_children()
+            data = self._handle_manager_operation(self.manager.task_show, self.task_id)
+            if not data:
+                return
+            self.body.mount(Static(f"Task {data['id']}", classes="title"))
+            self.body.mount(Static(f"Title: {data['title']}"))
+            self.body.mount(Static(f"Status: {data['status']}"))
+            epics = self.manager.task_parent_epics(self.task_id)
+            if epics:
+                self.body.mount(Static("Epics:", classes="title"))
+                for e in epics:
+                    self.body.mount(Button(e["id"], id=f"open_epic_{e['id']}"))
+            self.body.mount(Button("View Comments", id="view_comments"))
+            self.body.mount(Button("Back", id="back"))
+
+        def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)
+            bid = event.button.id or ""
+            if bid == "view_comments":
+                self.post_message(ViewComments(self.task_id))
+            elif bid.startswith("open_epic_"):
+                self.post_message(ViewEpic(bid.split("_", 2)[2]))
+
+        def on_view_comments(self, message: ViewComments) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(CommentsScreen(self.manager, self.task_id))
+
+        def on_view_epic(self, message: ViewEpic) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(EpicDetailScreen(self.manager, message.epic_id))
+
+    class EpicDetailScreen(BaseScreen):
+        def __init__(self, manager: "TaskManager", epic_id: str) -> None:
+            super().__init__(manager)
+            self.epic_id = epic_id
+
+        def on_mount(self) -> None:
+            self.refresh_screen()
+
+        def refresh_screen(self) -> None:
+            assert self.body is not None
+            self.body.remove_children()
+            data = self._handle_manager_operation(self.manager.epic_show, self.epic_id)
+            if not data:
+                return
+            self.body.mount(Static(f"Epic {data['id']}", classes="title"))
+            self.body.mount(Static(f"Title: {data['title']}"))
+            self.body.mount(Static(f"Status: {data['status']}"))
+            if data.get("parent_epic"):
+                self.body.mount(Button(f"Parent: {data['parent_epic']}", id=f"open_epic_{data['parent_epic']}"))
+            if data.get("child_tasks"):
+                self.body.mount(Static("Tasks:", classes="title"))
+                for tid in data["child_tasks"]:
+                    self.body.mount(Button(tid, id=f"open_task_{tid}"))
+            if data.get("child_epics"):
+                self.body.mount(Static("Child Epics:", classes="title"))
+                for eid in data["child_epics"]:
+                    self.body.mount(Button(eid, id=f"open_epic_{eid}"))
+            self.body.mount(Button("Back", id="back"))
+
+        def on_button_pressed(self, event: Button.Pressed) -> None:  # pragma: no cover - UI callbacks
+            super().on_button_pressed(event)
+            bid = event.button.id or ""
+            if bid.startswith("open_task_"):
+                self.post_message(ViewTask(bid.split("_", 2)[2]))
+            elif bid.startswith("open_epic_"):
+                self.post_message(ViewEpic(bid.split("_", 2)[2]))
+
+        def on_view_task(self, message: ViewTask) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(TaskDetailScreen(self.manager, message.task_id))
+
+        def on_view_epic(self, message: ViewEpic) -> None:  # pragma: no cover - UI callbacks
+            self.app.push_screen(EpicDetailScreen(self.manager, message.epic_id))
 
     class TMApp(App):
         TITLE = "Task Manager"
