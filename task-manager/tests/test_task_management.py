@@ -59,6 +59,7 @@ class TestTaskManagement(unittest.TestCase):
         self.assertEqual(task_data['description'], "A test task for testing")
         self.assertEqual(task_data['status'], "todo")
         self.assertEqual(task_data['comments'], [])
+        self.assertEqual(task_data['epics'], [])
         self.assertIn('created_at', task_data)
         self.assertIn('updated_at', task_data)
         self.assertIsNone(task_data.get('started_at'))

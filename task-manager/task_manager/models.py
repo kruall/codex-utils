@@ -45,6 +45,7 @@ class Task:
     status: TaskStatus = TaskStatus.TODO
     comments: List[Dict[str, Any]] = field(default_factory=list)
     links: Dict[str, List[str]] = field(default_factory=dict)
+    epics: List[str] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
     started_at: float | None = None
@@ -59,6 +60,8 @@ class Task:
     def from_dict(cls, data: Dict[str, Any]) -> "Task":
         if 'status' in data and isinstance(data['status'], str):
             data['status'] = TaskStatus(data['status'])
+        if 'epics' not in data:
+            data['epics'] = []
         return cls(**data)
 
 @dataclass
