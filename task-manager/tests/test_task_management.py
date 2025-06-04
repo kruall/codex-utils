@@ -703,6 +703,73 @@ class TestTaskManagement(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("Error: Task 'nonexistent-1' not found", result.stderr)
 
+    def test_task_show_epic_information(self):
+        """Task show should include detailed epic information."""
+        # create tasks
+        self.run_task_manager([
+            "task",
+            "add",
+            "--title",
+            "Task 1",
+            "--description",
+            "D1",
+            "--queue",
+            "test-queue",
+        ])
+        self.run_task_manager([
+            "task",
+            "add",
+            "--title",
+            "Task 2",
+            "--description",
+            "D2",
+            "--queue",
+            "test-queue",
+        ])
+
+        # create epic and relate tasks
+        def run_local(args):
+            cmd = [
+                "python",
+                str(self.task_manager_path),
+                "--tasks-root",
+                str(self.tasks_root),
+            ] + args
+            return subprocess.run(cmd, capture_output=True, text=True, cwd=self.test_dir)
+
+        run_local([
+            "epic",
+            "add",
+            "--title",
+            "Epic",
+            "--description",
+            "E desc",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-1",
+            "--task-id",
+            "test-queue-1",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-1",
+            "--task-id",
+            "test-queue-2",
+        ])
+
+        result = run_local(["task", "show", "--id", "test-queue-1"])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Epic (open)", result.stdout)
+        self.assertIn("E desc", result.stdout)
+        self.assertIn("test-queue-2: Task 2 (todo)", result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main() 

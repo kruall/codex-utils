@@ -115,6 +115,42 @@ def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
         print(f"ID: {task_data['id']}")
         print(f"Title: {task_data['title']}")
         print(f"Description: {task_data['description']}")
+
+        epics = tm.task_parent_epics(task_data['id'])
+        if epics:
+            print("Epics:")
+            for epic in epics:
+                print(
+                    f"  {epic['id']}: {epic['title']} ({epic['status']})"
+                )
+                print(f"    {epic['description']}")
+
+                other_tasks = [
+                    t for t in epic.get('child_tasks', []) if t != task_data['id']
+                ]
+                if other_tasks:
+                    print("    Tasks:")
+                    for tid in other_tasks:
+                        try:
+                            tdata = tm.task_show(tid)
+                            print(
+                                f"      - {tdata['id']}: {tdata['title']} ({tdata['status']})"
+                            )
+                        except TaskManagerError:
+                            print(f"      - {tid} (missing)")
+
+                child_epics = epic.get('child_epics', [])
+                if child_epics:
+                    print("    Child Epics:")
+                    for eid in child_epics:
+                        try:
+                            edata = tm.epic_show(eid)
+                            print(
+                                f"      - {edata['id']}: {edata['title']} ({edata['status']})"
+                            )
+                        except TaskManagerError:
+                            print(f"      - {eid} (missing)")
+
         print(f"Status: {task_data['status']}")
         print(f"Created: {format_timestamp(task_data.get('created_at', 0))}")
         print(f"Updated: {format_timestamp(task_data.get('updated_at', 0))}")
@@ -122,11 +158,6 @@ def task_show_cmd(args: argparse.Namespace, tm: TaskManager) -> int:
             print(f"Started: {format_timestamp(task_data['started_at'])}")
         if task_data.get('closed_at'):
             print(f"Closed: {format_timestamp(task_data['closed_at'])}")
-
-        if task_data.get('epics'):
-            print("Epics:")
-            for e in task_data['epics']:
-                print(f"  - {e}")
 
         comments = task_data.get('comments', [])
         if comments:
