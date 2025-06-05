@@ -161,6 +161,8 @@ npm run dev
 ```
 Use `npm run build` to generate a static site in `out/` for GitHub Pages deployment.
 
+The dashboard now supports selecting a GitHub repository at runtime. Visit `/repos` after logging in to choose a repository. The selection is stored in `localStorage` and used when loading tasks.
+
 
 ### Epic Model
 Initial support for Epics is being introduced. The entity represents a

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { Task, TaskContextType } from '../types'
 import { useAuth } from './AuthContext'
+import { useRepo } from './RepoContext'
 import { fetchTasksFromRepos } from '../lib/githubTasks'
 
 const TaskContext = createContext<TaskContextType>({ tasks: [], setTasks: () => {} })
@@ -12,12 +13,19 @@ interface TaskProviderProps {
 export function TaskProvider({ children }: TaskProviderProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const { token } = useAuth()
+  const { repo } = useRepo()
 
   useEffect(() => {
     async function fetchTasks() {
+      const repos: string[] = []
+      if (repo) {
+        repos.push(repo)
+      }
       const reposEnv = process.env.NEXT_PUBLIC_GITHUB_REPOS
       if (reposEnv) {
-        const repos = reposEnv.split(',').map(r => r.trim()).filter(Boolean)
+        repos.push(...reposEnv.split(',').map(r => r.trim()).filter(Boolean))
+      }
+      if (repos.length > 0) {
         const repoResults = await fetchTasksFromRepos(repos, token || undefined)
         
         // Extract and flatten tasks from all repositories
@@ -40,7 +48,7 @@ export function TaskProvider({ children }: TaskProviderProps) {
       }
     }
     fetchTasks()
-  }, [token])
+  }, [token, repo])
 
   return (
     <TaskContext.Provider value={{ tasks, setTasks }}>

@@ -7,6 +7,7 @@ test('renders navigation links', () => {
   render(<AuthProvider><Navigation /></AuthProvider>)
   expect(screen.getByText(/Home/)).toBeInTheDocument()
   expect(screen.getByText(/Task List/)).toBeInTheDocument()
+  expect(screen.getByText(/Repos/)).toBeInTheDocument()
   expect(screen.getByText(/Login/)).toBeInTheDocument()
 })
 import { fireEvent, waitFor } from '@testing-library/react'

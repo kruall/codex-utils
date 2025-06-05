@@ -17,6 +17,9 @@ export default function Navigation() {
         <Link href="/epics" className={styles.link}>
           📂 Epics
         </Link>
+        <Link href="/repos" className={styles.link}>
+          📦 Repos
+        </Link>
         <Link href="/workflows" className={styles.link}>
           🚀 Workflows
         </Link>
