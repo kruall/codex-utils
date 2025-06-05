@@ -2,8 +2,19 @@
   "id": "TM-16",
   "title": "Add tests for enhanced task show epic information",
   "description": "Create comprehensive tests for the enhanced task show functionality. Test epic information display, hierarchical relationships, task/epic listing with descriptions and statuses. Include unit tests and integration tests.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start implementing tests for epic display",
+      "created_at": 1749022566.2022808
+    },
+    {
+      "id": 2,
+      "text": "Added tests for child epic info, task statuses, and missing tasks",
+      "created_at": 1749022917.2355945
+    }
+  ],
   "links": {
     "related": [
       "TM-15"
@@ -13,7 +24,7 @@
     "epic-1"
   ],
   "created_at": 1749018770.384402,
-  "updated_at": 1749018779.930017,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749022920.25588,
+  "started_at": 1749022561.6095898,
+  "closed_at": 1749022920.2558548
 }
