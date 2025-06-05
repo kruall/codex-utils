@@ -5,6 +5,9 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import { useTaskContext } from '../../context/TaskContext'
 import { useAuth } from '../../context/AuthContext'
 import Navigation from '../../components/Navigation'
+import useEpics from '../../hooks/useEpics'
+import useTasks from '../../hooks/useTasks'
+import TaskEpicInfo from '../../components/TaskEpicInfo'
 import styles from '../Page.module.css'
 import { Task } from '../../types'
 
@@ -56,6 +59,8 @@ export default function TaskPage({ task }: TaskPageProps) {
   const [success, setSuccess] = useState<boolean>(false)
   const { setTasks } = useTaskContext()
   const { csrfToken, token } = useAuth()
+  const epics = useEpics()
+  const tasksList = useTasks()
 
   const save = async (): Promise<void> => {
     setSaving(true)
@@ -126,6 +131,7 @@ export default function TaskPage({ task }: TaskPageProps) {
       </button>
       <h2>Description</h2>
       <p>{task.description}</p>
+      <TaskEpicInfo taskId={task.id} epics={epics} tasks={tasksList} />
       <h2>Comments</h2>
       <ul>
         {(task.comments || []).map((c) => (
