@@ -151,4 +151,5 @@ Use `npm run build` to generate a static site in `out/` for GitHub Pages deploym
 ### Epic Model
 Initial support for Epics is being introduced. The entity represents a
 collection of tasks and/or sub-epics. See `docs/epic_model.md` for
-field definitions and storage details.
+field definitions and storage details. Epic persistence is provided by the
+`EpicManager` service which is used internally by the CLI and UI layers.

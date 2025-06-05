@@ -2,12 +2,17 @@
   "id": "TM_WEB-34",
   "title": "Refactor Web dashboard epic components",
   "description": "Refactor epic-related code in React web dashboard. Improve epic components architecture, state management, and API integration. Extract epic hooks and utilities, enhance epic visualization and interaction patterns.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "WEB REFACTORING AREAS: 1) Extract epic React components into dedicated modules, 2) Implement epic-specific hooks for state management, 3) Refactor epic API integration and data fetching, 4) Improve epic visualization components (tree view, progress), 5) Enhance epic routing and navigation, 6) Add epic-specific utilities and helpers",
       "created_at": 1749020733.993351
+    },
+    {
+      "id": 2,
+      "text": "Plan to expose epic data via new service",
+      "created_at": 1749113006.204525
     }
   ],
   "links": {},
@@ -15,7 +20,7 @@
     "epic-2"
   ],
   "created_at": 1749020689.595413,
-  "updated_at": 1749020733.993362,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749113732.3263698,
+  "started_at": 1749112987.3004816,
+  "closed_at": 1749113732.3262875
 }

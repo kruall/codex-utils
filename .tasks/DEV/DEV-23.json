@@ -2,12 +2,17 @@
   "id": "DEV-23",
   "title": "Refactor epic test suite organization",
   "description": "Refactor epic-related test code for better organization and coverage. Consolidate epic tests, improve test utilities, add integration tests for epic workflows, and enhance test data management for epic scenarios.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "TEST REFACTORING AREAS: 1) Consolidate epic test files into organized test suite, 2) Create epic test utilities and fixtures, 3) Add comprehensive integration tests for epic workflows, 4) Improve epic test data management and cleanup, 5) Add performance tests for epic operations, 6) Enhance epic validation test coverage",
       "created_at": 1749020744.453411
+    },
+    {
+      "id": 2,
+      "text": "Move epic tests to subpackage",
+      "created_at": 1749113012.9041476
     }
   ],
   "links": {},
@@ -15,7 +20,7 @@
     "epic-2"
   ],
   "created_at": 1749020709.7017732,
-  "updated_at": 1749020744.453423,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749113747.5544105,
+  "started_at": 1749112993.7573254,
+  "closed_at": 1749113747.5543718
 }

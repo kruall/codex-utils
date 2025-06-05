@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Epic, Task } from '../types'
 import { calculateEpicProgress } from '../lib/epicUtils'
+import { formatEpicStatus } from '../lib/format'
 
 interface EpicTreeProps {
   epic: Epic
@@ -21,7 +22,7 @@ export default function EpicTree({ epic, epics, tasks, visited = new Set() }: Ep
 
   return (
     <li>
-      <Link href={`/epic/${epic.id}`}>{epic.id}</Link> - {epic.title} ({pct}%)
+      <Link href={`/epic/${epic.id}`}>{epic.id}</Link> - {epic.title} [{formatEpicStatus(epic.status)}] ({pct}%)
       {epic.child_tasks.length > 0 && (
         <ul>
           {epic.child_tasks.map(tid => (
