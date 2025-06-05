@@ -27,7 +27,7 @@ export function TaskProvider({ children }: TaskProviderProps) {
       }
       if (repos.length > 0) {
         const repoResults = await fetchTasksFromRepos(repos, token || undefined)
-        
+
         // Extract and flatten tasks from all repositories
         const allTasks: Task[] = []
         repoResults.forEach(result => {
@@ -35,8 +35,11 @@ export function TaskProvider({ children }: TaskProviderProps) {
             allTasks.push(...result.tasks)
           }
         })
-        
+
         setTasks(allTasks)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('cachedTasks', JSON.stringify(allTasks))
+        }
         return
       }
       try {
@@ -44,6 +47,13 @@ export function TaskProvider({ children }: TaskProviderProps) {
         const data: Task[] = await res.json()
         setTasks(data || [])
       } catch {
+        const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
+        if (cached) {
+          try {
+            setTasks(JSON.parse(cached))
+            return
+          } catch { /* ignore */ }
+        }
         setTasks([])
       }
     }

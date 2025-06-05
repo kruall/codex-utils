@@ -2,14 +2,25 @@
   "id": "TM_WEB-41",
   "title": "Implement GitHub API client for reading .tasks and .epics",
   "description": "Create GitHub API client to read files from .tasks/ and .epics/ directories in the main branch. Parse JSON files to build task and epic lists. Handle API rate limits and error cases. Cache data in localStorage for offline access.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting task implementation: fetch tasks and epics from GitHub via API",
+      "created_at": 1749126222.5359683
+    },
+    {
+      "id": 2,
+      "text": "Added GitHub API epics fetcher, caching tasks and epics in localStorage, updated contexts and tests.",
+      "created_at": 1749126422.1224222
+    }
+  ],
   "links": {},
   "epics": [
     "epic-3"
   ],
   "created_at": 1749120292.3667352,
-  "updated_at": 1749120337.590507,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749126424.7935443,
+  "started_at": 1749126216.164952,
+  "closed_at": 1749126424.793519
 }
