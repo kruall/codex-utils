@@ -770,6 +770,196 @@ class TestTaskManagement(unittest.TestCase):
         self.assertIn("E desc", result.stdout)
         self.assertIn("test-queue-2: Task 2 (todo)", result.stdout)
 
+    def test_task_show_child_epic_information(self):
+        """Task show should list child epics for the parent epic."""
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task 1",
+            "--description", "D1",
+            "--queue", "test-queue",
+        ])
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task 2",
+            "--description", "D2",
+            "--queue", "test-queue",
+        ])
+
+        def run_local(args):
+            cmd = [
+                "python",
+                str(self.task_manager_path),
+                "--tasks-root",
+                str(self.tasks_root),
+            ] + args
+            return subprocess.run(cmd, capture_output=True, text=True, cwd=self.test_dir)
+
+        run_local([
+            "epic",
+            "add",
+            "--title",
+            "Parent",
+            "--description",
+            "P desc",
+        ])
+
+        run_local([
+            "epic",
+            "add",
+            "--title",
+            "Child",
+            "--description",
+            "C desc",
+        ])
+
+        run_local([
+            "epic",
+            "add-epic",
+            "--id",
+            "epic-1",
+            "--child-id",
+            "epic-2",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-2",
+            "--task-id",
+            "test-queue-1",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-2",
+            "--task-id",
+            "test-queue-2",
+        ])
+
+        result = run_local(["task", "show", "--id", "test-queue-1"])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("epic-2: Child (open)", result.stdout)
+        self.assertIn("test-queue-2: Task 2 (todo)", result.stdout)
+
+    def test_task_show_other_task_status_display(self):
+        """Other tasks should show their status in task show output."""
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task 1",
+            "--description", "D1",
+            "--queue", "test-queue",
+        ])
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task 2",
+            "--description", "D2",
+            "--queue", "test-queue",
+        ])
+
+        # Mark second task as done
+        self.run_task_manager(["task", "done", "--id", "test-queue-2"])
+
+        def run_local(args):
+            cmd = [
+                "python",
+                str(self.task_manager_path),
+                "--tasks-root",
+                str(self.tasks_root),
+            ] + args
+            return subprocess.run(cmd, capture_output=True, text=True, cwd=self.test_dir)
+
+        run_local([
+            "epic",
+            "add",
+            "--title",
+            "Epic",
+            "--description",
+            "E desc",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-1",
+            "--task-id",
+            "test-queue-1",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-1",
+            "--task-id",
+            "test-queue-2",
+        ])
+
+        result = run_local(["task", "show", "--id", "test-queue-1"])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("test-queue-2: Task 2 (done)", result.stdout)
+
+    def test_task_show_missing_other_task(self):
+        """Missing tasks should be indicated in task show output."""
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task 1",
+            "--description", "D1",
+            "--queue", "test-queue",
+        ])
+        self.run_task_manager([
+            "task", "add",
+            "--title", "Task 2",
+            "--description", "D2",
+            "--queue", "test-queue",
+        ])
+
+        def run_local(args):
+            cmd = [
+                "python",
+                str(self.task_manager_path),
+                "--tasks-root",
+                str(self.tasks_root),
+            ] + args
+            return subprocess.run(cmd, capture_output=True, text=True, cwd=self.test_dir)
+
+        run_local([
+            "epic",
+            "add",
+            "--title",
+            "Epic",
+            "--description",
+            "E desc",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-1",
+            "--task-id",
+            "test-queue-1",
+        ])
+
+        run_local([
+            "epic",
+            "add-task",
+            "--id",
+            "epic-1",
+            "--task-id",
+            "test-queue-2",
+        ])
+
+        # Remove second task
+        self.run_task_manager(["task", "delete", "--id", "test-queue-2"])
+
+        result = run_local(["task", "show", "--id", "test-queue-1"])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("test-queue-2 (missing)", result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main() 
