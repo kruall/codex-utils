@@ -33,7 +33,7 @@ export function calculateEpicProgress(
     e.child_epics.forEach(eid => {
       const child = epicMap.get(eid)
       if (child) {
-        const p = helper(child, new Set(seen))
+        const p = helper(child, seen)
         total += p.total
         done += p.done
       }
