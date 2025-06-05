@@ -96,14 +96,28 @@ Launch the interactive Textual interface:
 
 ### Epic Management
 ```bash
+# List all epics
+./tm epic list
+
 # Create an epic
 ./tm epic add --title "Release" --description "Release preparations"
+
+# Show epic details
+./tm epic show --id epic-1
+
+# Update epic fields
+./tm epic update --id epic-1 --field title --value "Updated title"
+./tm epic update --id epic-1 --field description --value "Updated description"
 
 # Attach work items
 ./tm epic add-task --id epic-1 --task-id feature-queue-1
 ./tm epic add-epic --id epic-1 --child-id epic-2
 
-# Manage task membership
+# Remove work items
+./tm epic remove-task --id epic-1 --task-id feature-queue-1
+./tm epic remove-epic --id epic-1 --child-id epic-2
+
+# Manage task membership (alternative approach)
 ./tm task add-to-epic --id feature-queue-1 --epic-id epic-1
 ./tm task remove-from-epic --id feature-queue-1 --epic-id epic-1
 

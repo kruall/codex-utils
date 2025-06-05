@@ -149,6 +149,37 @@ The task manager provides multiple interfaces for different use cases:
 ./tm task link remove --id feature-queue-1 --target-id feature-queue-2
 ```
 
+#### Epic Management
+```bash
+# List all epics
+./tm epic list
+
+# Create an epic
+./tm epic add --title "Release" --description "Release preparations"
+
+# Show epic details
+./tm epic show --id epic-1
+
+# Update epic fields
+./tm epic update --id epic-1 --field title --value "Updated title"
+./tm epic update --id epic-1 --field description --value "Updated description"
+
+# Attach work items
+./tm epic add-task --id epic-1 --task-id feature-queue-1
+./tm epic add-epic --id epic-1 --child-id epic-2
+
+# Remove work items
+./tm epic remove-task --id epic-1 --task-id feature-queue-1
+./tm epic remove-epic --id epic-1 --child-id epic-2
+
+# Manage task membership (alternative approach)
+./tm task add-to-epic --id feature-queue-1 --epic-id epic-1
+./tm task remove-from-epic --id feature-queue-1 --epic-id epic-1
+
+# Close when all children are done
+./tm epic done --id epic-1
+```
+
 ### Task Workflow
 1. **Create queue** (if needed): `./tm queue add --name "my-queue" --title "My Queue" --description "Description"`
 2. **Create task**: `./tm task add --title "Task title" --description "Description" --queue my-queue`
@@ -157,6 +188,15 @@ The task manager provides multiple interfaces for different use cases:
 5. **🚨 COMPLETE TASK**: `./tm task done --id my-queue-1` **← DO NOT FORGET THIS STEP!**
 
 **⚠️ REMINDER**: Step 5 is the most commonly forgotten step. Always verify the task is closed before ending your work session.
+
+### Epic Workflow
+1. **Create epic**: `./tm epic add --title "Epic title" --description "Epic description"`
+2. **Add tasks to epic**: `./tm epic add-task --id epic-1 --task-id my-queue-1`
+3. **Add sub-epics** (if needed): `./tm epic add-epic --id epic-1 --child-id epic-2`
+4. **Work on individual tasks**: Follow the Task Workflow above for each task
+5. **🚨 CLOSE EPIC**: `./tm epic done --id epic-1` **← Only when ALL child tasks and epics are done!**
+
+**⚠️ EPIC CLOSURE RULE**: An epic can only be closed when ALL its child tasks are "done" and ALL child epics are "closed".
 
 #### PR Instructions
 
@@ -188,10 +228,17 @@ The task manager provides multiple interfaces for different use cases:
 # Check if you have any tasks still in progress
 ./tm task list --status in_progress
 
+# Check if you have any epics with invalid status
+./tm verify
+
 # If you see any tasks, close them:
 ./tm task done --id <task-id>
+
+# If you see any epics with invalid status, ensure all children are done first, then close:
+./tm epic done --id <epic-id>
 ```
 
 **🚨 DO NOT LEAVE TASKS IN "in_progress" STATUS 🚨**
+**🚨 DO NOT LEAVE EPICS WITH INVALID STATUS 🚨**
 
-Every started task MUST be closed. No exceptions.
+Every started task MUST be closed. Every epic with incomplete children MUST be properly closed. No exceptions.
