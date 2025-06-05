@@ -15,7 +15,12 @@ function CountEpics() {
 }
 
 describe('EpicProvider', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
   afterEach(() => {
+    ;(console.error as jest.Mock).mockRestore()
     jest.resetAllMocks()
     localStorage.clear()
   })
