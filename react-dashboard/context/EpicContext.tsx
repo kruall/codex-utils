@@ -18,7 +18,7 @@ export function EpicProvider({ children }: EpicProviderProps) {
   useEffect(() => {
     async function fetchEpics() {
       try {
-        const res = await fetch('/codex-utils/epics.json')
+        const res = await fetch('/epics.json')
         const data: Epic[] = await res.json()
         setEpics(data || [])
       } catch {

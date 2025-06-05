@@ -1,0 +1,24 @@
+{
+  "id": "TM_WEB-35",
+  "title": "Fix Epic data fetch path",
+  "description": "Adjust EpicContext to fetch epics.json from correct path",
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Investigating path mismatch for epics.json",
+      "created_at": 1749109780.1204627
+    },
+    {
+      "id": 2,
+      "text": "Changed EpicContext fetch path to '/epics.json'.",
+      "created_at": 1749109871.5453749
+    }
+  ],
+  "links": {},
+  "epics": [],
+  "created_at": 1749109772.137044,
+  "updated_at": 1749109876.0044148,
+  "started_at": 1749109777.6428063,
+  "closed_at": 1749109876.004387
+}
