@@ -27,16 +27,34 @@ export function TaskProvider({ children }: TaskProviderProps) {
       }
       if (repos.length > 0) {
         const repoResults = await fetchTasksFromRepos(repos, token || undefined)
-        
+
         // Extract and flatten tasks from all repositories
         const allTasks: Task[] = []
+        let anySuccess = false
         repoResults.forEach(result => {
           if (result.tasks && Array.isArray(result.tasks) && !result.error) {
             allTasks.push(...result.tasks)
+            anySuccess = true
           }
         })
-        
-        setTasks(allTasks)
+
+        if (anySuccess) {
+          setTasks(allTasks)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cachedTasks', JSON.stringify(allTasks))
+          }
+        } else {
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
+          if (cached) {
+            try {
+              setTasks(JSON.parse(cached))
+            } catch {
+              setTasks([])
+            }
+          } else {
+            setTasks([])
+          }
+        }
         return
       }
       try {
@@ -44,6 +62,13 @@ export function TaskProvider({ children }: TaskProviderProps) {
         const data: Task[] = await res.json()
         setTasks(data || [])
       } catch {
+        const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
+        if (cached) {
+          try {
+            setTasks(JSON.parse(cached))
+            return
+          } catch { /* ignore */ }
+        }
         setTasks([])
       }
     }
