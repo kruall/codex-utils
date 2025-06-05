@@ -1,0 +1,15 @@
+{
+  "id": "TM_WEB-41",
+  "title": "Implement GitHub API client for reading .tasks and .epics",
+  "description": "Create GitHub API client to read files from .tasks/ and .epics/ directories in the main branch. Parse JSON files to build task and epic lists. Handle API rate limits and error cases. Cache data in localStorage for offline access.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "epics": [
+    "epic-3"
+  ],
+  "created_at": 1749120292.3667352,
+  "updated_at": 1749120337.590507,
+  "started_at": null,
+  "closed_at": null
+}

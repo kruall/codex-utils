@@ -1,0 +1,15 @@
+{
+  "id": "TM_WEB-43",
+  "title": "Build individual task and epic detail pages",
+  "description": "Create detailed view pages for individual tasks and epics. Load data dynamically from GitHub API. Display all task/epic properties, comments, links, and relationships. Implement client-side routing for task/epic URLs.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "epics": [
+    "epic-3"
+  ],
+  "created_at": 1749120302.774859,
+  "updated_at": 1749120338.435574,
+  "started_at": null,
+  "closed_at": null
+}

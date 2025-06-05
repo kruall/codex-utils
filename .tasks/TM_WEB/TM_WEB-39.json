@@ -1,0 +1,15 @@
+{
+  "id": "TM_WEB-39",
+  "title": "Implement GitHub OAuth authentication page",
+  "description": "Create authentication page with GitHub OAuth integration. Add login button that redirects to GitHub OAuth flow. Handle OAuth callback and store access token in localStorage. Implement logout functionality.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "epics": [
+    "epic-3"
+  ],
+  "created_at": 1749120281.458207,
+  "updated_at": 1749120328.833727,
+  "started_at": null,
+  "closed_at": null
+}

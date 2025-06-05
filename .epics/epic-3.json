@@ -1,0 +1,21 @@
+{
+  "id": "epic-3",
+  "title": "Client-side GitHub Pages Task Manager",
+  "description": "Transform the task manager into a fully client-side GitHub Pages application with GitHub authentication, repository access, and file management capabilities. No backend required - all operations performed client-side with GitHub API and local storage for settings.",
+  "status": "open",
+  "child_tasks": [
+    "TM_WEB-39",
+    "TM_WEB-40",
+    "TM_WEB-41",
+    "TM_WEB-42",
+    "TM_WEB-43",
+    "TM_WEB-44",
+    "TM_WEB-45",
+    "TM_WEB-46",
+    "TM_WEB-47"
+  ],
+  "child_epics": [],
+  "parent_epic": null,
+  "created_at": 1749120275.731381,
+  "updated_at": 1749120347.584607
+}

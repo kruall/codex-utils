@@ -1,0 +1,15 @@
+{
+  "id": "TM_WEB-44",
+  "title": "Implement file editing and creation interface",
+  "description": "Create interface for editing existing task/epic JSON files and creating new ones. Build forms for task/epic properties. Implement client-side JSON validation. Prepare changes for GitHub API submission.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "epics": [
+    "epic-3"
+  ],
+  "created_at": 1749120307.701992,
+  "updated_at": 1749120346.33334,
+  "started_at": null,
+  "closed_at": null
+}

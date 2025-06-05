@@ -1,0 +1,15 @@
+{
+  "id": "TM_WEB-47",
+  "title": "Remove static generation and update deployment",
+  "description": "Remove Next.js static generation features and update to client-side only rendering. Update GitHub Pages deployment configuration. Remove build-time data fetching. Ensure all functionality works in browser-only environment.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "epics": [
+    "epic-3"
+  ],
+  "created_at": 1749120323.374039,
+  "updated_at": 1749120347.584848,
+  "started_at": null,
+  "closed_at": null
+}

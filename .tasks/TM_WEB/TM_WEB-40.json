@@ -1,0 +1,15 @@
+{
+  "id": "TM_WEB-40",
+  "title": "Add repository selection and access interface",
+  "description": "Create interface for selecting and accessing GitHub repositories. Display user's repositories, allow selection of target repository. Store selected repository in localStorage. Implement repository access validation using GitHub API.",
+  "status": "todo",
+  "comments": [],
+  "links": {},
+  "epics": [
+    "epic-3"
+  ],
+  "created_at": 1749120286.521446,
+  "updated_at": 1749120337.174056,
+  "started_at": null,
+  "closed_at": null
+}
