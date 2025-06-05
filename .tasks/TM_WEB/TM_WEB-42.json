@@ -2,14 +2,20 @@
   "id": "TM_WEB-42",
   "title": "Create dynamic task and epic listing pages",
   "description": "Build dynamic pages that display tasks and epics loaded from GitHub repository. Replace static generation with client-side rendering. Implement filtering, sorting, and search functionality. Show task/epic relationships and status.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Started implementing dynamic listing pages",
+      "created_at": 1749152581.3829174
+    }
+  ],
   "links": {},
   "epics": [
     "epic-3"
   ],
   "created_at": 1749120297.8059351,
-  "updated_at": 1749120338.011998,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749152848.1656892,
+  "started_at": 1749152578.8178847,
+  "closed_at": 1749152848.165667
 }
