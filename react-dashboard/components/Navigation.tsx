@@ -14,6 +14,9 @@ export default function Navigation() {
         <Link href="/table" className={styles.link}>
           📋 Task List
         </Link>
+        <Link href="/epics" className={styles.link}>
+          📂 Epics
+        </Link>
         <Link href="/workflows" className={styles.link}>
           🚀 Workflows
         </Link>

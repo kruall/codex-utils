@@ -2,15 +2,27 @@
   "id": "TM_WEB-30",
   "title": "Add Epic support to Web dashboard",
   "description": "Implement Epic functionality in React dashboard. Add Epic views, hierarchical display, progress tracking, and Epic management interface. Show Epic tree structure and completion progress.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start work on epic support. Will add epic listing and detail views, context hooks, and progress calculation.",
+      "created_at": 1749022545.089889
+    },
+    {
+      "id": 2,
+      "text": "Implemented epic listing and detail pages with progress tree, new context, scripts, and tests.",
+      "created_at": 1749022810.6216497
+    }
+  ],
   "links": {
     "related": [
       "TM-10"
     ]
   },
+  "epics": [],
   "created_at": 1748891423.243001,
-  "updated_at": 1748891439.020323,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749022810.6216843,
+  "started_at": 1749022542.8104224,
+  "closed_at": 1749022806.0867634
 }
