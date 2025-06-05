@@ -1,0 +1,28 @@
+{
+  "id": "TM_WEB-49",
+  "title": "Fix empty results caching",
+  "description": "GitHub fetch returning empty arrays should overwrite cache rather than reuse cached epics/tasks",
+  "status": "in_progress",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Investigating caching logic when GitHub returns empty results",
+      "created_at": 1749150933.5458255
+    },
+    {
+      "id": 2,
+      "text": "Updated EpicContext and TaskContext to treat successful empty API results as valid and overwrite caches, added tests",
+      "created_at": 1749151107.7195623
+    }
+  ],
+  "links": {
+    "related": [
+      "TM_WEB-48"
+    ]
+  },
+  "epics": [],
+  "created_at": 1749150929.6964524,
+  "updated_at": 1749151110.8190777,
+  "started_at": 1749150931.2468417,
+  "closed_at": null
+}

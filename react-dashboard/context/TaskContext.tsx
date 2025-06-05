@@ -38,7 +38,7 @@ export function TaskProvider({ children }: TaskProviderProps) {
           }
         })
 
-        if (anySuccess && allTasks.length > 0) {
+        if (anySuccess) {
           setTasks(allTasks)
           if (typeof window !== 'undefined') {
             localStorage.setItem('cachedTasks', JSON.stringify(allTasks))

@@ -42,7 +42,7 @@ export function EpicProvider({ children }: EpicProviderProps) {
             console.error('Failed to fetch epics', err)
           }
         }
-        if (anySuccess && all.length > 0) {
+        if (anySuccess) {
           setEpics(all)
           if (typeof window !== 'undefined') {
             localStorage.setItem('cachedEpics', JSON.stringify(all))

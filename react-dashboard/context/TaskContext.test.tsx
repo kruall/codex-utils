@@ -59,4 +59,21 @@ describe('TaskProvider', () => {
     await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'))
     expect(localStorage.getItem('cachedTasks')).not.toBeNull()
   })
+
+  test('overwrites cache when GitHub fetch succeeds with empty list', async () => {
+    ;(fetchTasksFromRepos as jest.Mock).mockResolvedValueOnce([{ repo: 'r', tasks: [] }])
+    localStorage.setItem('cachedTasks', JSON.stringify([{ id: 'T1', title: 'cached', status: 'todo' }]))
+    localStorage.setItem('selectedRepo', 'owner/repo')
+    render(
+      <AuthProvider>
+        <RepoProvider>
+          <TaskProvider>
+            <CountTasks />
+          </TaskProvider>
+        </RepoProvider>
+      </AuthProvider>
+    )
+    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('0'))
+    expect(localStorage.getItem('cachedTasks')).toBe('[]')
+  })
 })

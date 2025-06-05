@@ -12,12 +12,13 @@
   ],
   "links": {
     "related": [
-      "TM_WEB-41"
+      "TM_WEB-41",
+      "TM_WEB-49"
     ]
   },
   "epics": [],
   "created_at": 1749130062.3130677,
-  "updated_at": 1749133453.0442953,
+  "updated_at": 1749151110.821038,
   "started_at": 1749130064.6411345,
   "closed_at": 1749133453.044251
 }
