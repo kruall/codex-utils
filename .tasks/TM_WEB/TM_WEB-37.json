@@ -1,0 +1,24 @@
+{
+  "id": "TM_WEB-37",
+  "title": "Add cycle detection to epic progress",
+  "description": "Prevent infinite recursion in progress calculation and EpicTree",
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on cycle detection for epic progress",
+      "created_at": 1749110378.9463887
+    },
+    {
+      "id": 2,
+      "text": "Added visited set to progress calculation and EpicTree to prevent cycles",
+      "created_at": 1749110418.0531754
+    }
+  ],
+  "links": {},
+  "epics": [],
+  "created_at": 1749110374.834194,
+  "updated_at": 1749110571.7653933,
+  "started_at": 1749110376.825084,
+  "closed_at": 1749110571.7653625
+}

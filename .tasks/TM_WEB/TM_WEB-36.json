@@ -1,0 +1,24 @@
+{
+  "id": "TM_WEB-36",
+  "title": "Handle missing/invalid epic JSON",
+  "description": "Add error handling in page getStaticProps for missing or invalid epic file",
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on error handling for epic JSON files",
+      "created_at": 1749110372.3831642
+    },
+    {
+      "id": 2,
+      "text": "Implemented try/catch in getStaticProps to handle missing or invalid epic JSON",
+      "created_at": 1749110415.9039285
+    }
+  ],
+  "links": {},
+  "epics": [],
+  "created_at": 1749110367.7914274,
+  "updated_at": 1749110568.559073,
+  "started_at": 1749110369.9308057,
+  "closed_at": 1749110568.5589325
+}
