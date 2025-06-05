@@ -8,6 +8,16 @@ export interface Task {
   queue?: string;
 }
 
+export interface Epic {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'open' | 'closed';
+  child_tasks: string[];
+  child_epics: string[];
+  parent_epic?: string | null;
+}
+
 export interface TaskContextType {
   tasks: Task[];
   setTasks: (tasks: Task[] | ((prevTasks: Task[]) => Task[])) => void;

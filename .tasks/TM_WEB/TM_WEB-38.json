@@ -1,0 +1,29 @@
+{
+  "id": "TM_WEB-38",
+  "title": "Fix shared state in epic progress calculation",
+  "description": "Share visited set in recursive helper to avoid double counting epics",
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start fixing progress calculation visited set sharing",
+      "created_at": 1749111367.9345195
+    },
+    {
+      "id": 2,
+      "text": "Use shared visited set and add unit test for progress",
+      "created_at": 1749111411.0755785
+    },
+    {
+      "id": 3,
+      "text": "Address EpicTree visited set bug for cycle detection",
+      "created_at": 1749112288.693643
+    }
+  ],
+  "links": {},
+  "epics": [],
+  "created_at": 1749111363.267634,
+  "updated_at": 1749112436.981363,
+  "started_at": 1749111365.6435738,
+  "closed_at": 1749112436.981209
+}
