@@ -2,7 +2,7 @@
   "id": "epic-2",
   "title": "Refactor epic-related code",
   "description": "Comprehensive refactoring of epic-related code across all project components. Improve code organization, maintainability, and consistency in epic handling throughout the codebase.",
-  "status": "open",
+  "status": "closed",
   "child_tasks": [
     "TM-18",
     "TM_TUI-13",
@@ -13,5 +13,5 @@
   "child_epics": [],
   "parent_epic": "epic-1",
   "created_at": 1749020654.641527,
-  "updated_at": 1749020714.821741
+  "updated_at": 1749113747.5560691
 }

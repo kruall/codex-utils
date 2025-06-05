@@ -42,3 +42,18 @@ The `tm` command offers helpers for managing epics from the command line:
 # Close an epic when all children are done
 ./tm epic done --id epic-1
 ```
+
+## EpicManager Service
+
+Epic operations are handled by a dedicated `EpicManager` service class. This
+object encapsulates persistence and lookup logic so higher level components only
+interact with its public API.
+
+```python
+from pathlib import Path
+from task_manager.epic_manager import EpicManager
+
+manager = EpicManager(Path('.epics'))
+for epic in manager.list_epics():
+    print(epic['id'], epic['title'])
+```

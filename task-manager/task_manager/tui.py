@@ -351,13 +351,22 @@ else:
                 return "0/0"
             return f"{done}/{total}"
 
+        def _status_label(self, status: str) -> str:
+            """Format status for display."""
+            return status.upper()
+
         def refresh_screen(self) -> None:
             assert self.body is not None
             self.body.remove_children()
             table: DataTable = DataTable()
             table.add_columns("ID", "Title", "Status", "Progress")
             for e in self.manager.epic_list():
-                table.add_row(e["id"], e["title"], e["status"], self._progress(e))
+                table.add_row(
+                    e["id"],
+                    e["title"],
+                    self._status_label(e["status"]),
+                    self._progress(e),
+                )
             self.body.mount(table)
             self.set_focus(table)
             self.body.mount(Input(placeholder="Epic ID", id="epic_id"))

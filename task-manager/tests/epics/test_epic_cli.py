@@ -8,7 +8,7 @@ class TestEpicCLI(unittest.TestCase):
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
         self.tasks_root = Path(self.test_dir) / "tasks"
-        self.task_manager_path = Path(__file__).parent.parent / "task_manager.py"
+        self.task_manager_path = Path(__file__).resolve().parents[2] / "task_manager.py"
 
     def tearDown(self):
         import shutil

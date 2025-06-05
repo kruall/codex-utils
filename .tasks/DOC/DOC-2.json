@@ -2,12 +2,17 @@
   "id": "DOC-2",
   "title": "Refactor epic documentation and examples",
   "description": "Refactor and improve epic-related documentation. Update README, AGENTS.md, and epic_model.md with clearer examples, better organization, and comprehensive usage patterns. Add epic workflow diagrams and best practices.",
-  "status": "todo",
+  "status": "done",
   "comments": [
     {
       "id": 1,
       "text": "DOCUMENTATION REFACTORING AREAS: 1) Reorganize epic documentation structure in docs/, 2) Add comprehensive epic workflow examples, 3) Create epic best practices guide, 4) Add epic CLI command reference, 5) Improve epic model documentation with diagrams, 6) Add troubleshooting guide for epic operations",
       "created_at": 1749020739.184642
+    },
+    {
+      "id": 2,
+      "text": "Document new EpicManager",
+      "created_at": 1749113009.7062817
     }
   ],
   "links": {},
@@ -15,7 +20,7 @@
     "epic-2"
   ],
   "created_at": 1749020699.5945332,
-  "updated_at": 1749020739.184654,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749113741.3856688,
+  "started_at": 1749112990.711482,
+  "closed_at": 1749113741.3854554
 }

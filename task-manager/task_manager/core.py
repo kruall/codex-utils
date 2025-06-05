@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Union
 
 from .models import Queue, Task, TaskStatus, Epic, EpicStatus
 from .utils import log_error
+from .epic_manager import EpicManager
 from .storage import load_json, save_json
 from .exceptions import (
     QueueExistsError,
@@ -30,6 +31,7 @@ class TaskManager:
         self.tasks_root.mkdir(exist_ok=True)
         self.epics_root = Path(epics_root)
         self.epics_root.mkdir(exist_ok=True)
+        self.epic_manager = EpicManager(self.epics_root)
         self._queue_list_cache: List[Dict[str, str]] | None = None
         self._task_list_cache: dict[tuple[Optional[str], Optional[str], Optional[str]], List[Dict]] = {}
         self._epic_list_cache: Optional[List[Dict]] = None
@@ -180,47 +182,18 @@ class TaskManager:
 
     def _find_epic_file(self, epic_id: str) -> Optional[Path]:
         """Find the epic file for a given epic ID."""
-        if not epic_id.startswith("epic-"):
-            return None
-
-        epic_file = self.epics_root / f"{epic_id}.json"
-        if epic_file.exists():
-            return epic_file
-        return None
+        return self.epic_manager.find_epic_file(epic_id)
 
     def _load_epic(self, epic_id: str) -> Epic:
-        epic_file = self._find_epic_file(epic_id)
-        if not epic_file:
-            raise TaskNotFoundError(f"Epic '{epic_id}' not found")
-
-        data = load_json(epic_file)
-        if data is None:
-            raise StorageError(f"Failed to read epic '{epic_id}'")
-        return Epic.from_dict(data)
+        return self.epic_manager.load_epic(epic_id)
 
     def _save_epic(self, epic_data: Epic) -> None:
-        epic_id = epic_data.id
-        epic_file = self._find_epic_file(epic_id)
-        if not epic_file:
-            raise TaskNotFoundError(f"Epic '{epic_id}' not found")
-
-        epic_data.updated_at = time.time()
-        if not save_json(epic_file, epic_data.to_dict()):
-            raise StorageError(f"Failed to save epic '{epic_id}'")
+        self.epic_manager.save_epic(epic_data)
         self._invalidate_epic_cache()
 
     def _get_all_epics(self) -> List[Epic]:
         """Return all epics as objects."""
-        epics: list[Epic] = []
-        for epic_file in self.epics_root.glob("epic-*.json"):
-            data = load_json(epic_file)
-            if data is None:
-                continue
-            try:
-                epics.append(Epic.from_dict(data))
-            except Exception as e:  # pragma: no cover - shouldn't happen
-                log_error(f"Error loading epic '{epic_file}': {e}")
-        return epics
+        return self.epic_manager.load_all_epics()
 
     def _get_parent_epics(self, item_id: str) -> List[Epic]:
         """Return epics that reference the given task or epic."""
@@ -602,19 +575,7 @@ class TaskManager:
         """List all epics."""
         if self._epic_list_cache is not None:
             return self._epic_list_cache
-
-        epics: List[Dict] = []
-        for epic_file in self.epics_root.glob("epic-*.json"):
-            try:
-                data = load_json(epic_file)
-                if data is None:
-                    continue
-                epics.append(Epic.from_dict(data).to_dict())
-            except (FileNotFoundError, PermissionError, json.JSONDecodeError) as e:
-                log_error(f"Error processing epic file '{epic_file}': {e}")
-                continue
-
-        epics.sort(key=lambda e: e.get("created_at", 0))
+        epics = self.epic_manager.list_epics()
         self._epic_list_cache = epics
         return epics
 
