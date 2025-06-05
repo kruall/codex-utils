@@ -3,7 +3,11 @@ import glob
 import os
 import re
 import subprocess
+import sys
+from pathlib import Path
 from typing import Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "task-manager"))
 
 from task_manager import TaskManager
 
