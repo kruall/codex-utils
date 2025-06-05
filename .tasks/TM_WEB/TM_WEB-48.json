@@ -1,0 +1,19 @@
+{
+  "id": "TM_WEB-48",
+  "title": "Prevent GitHub fetch failures from clearing caches",
+  "description": "If GitHub epic/task fetch fails or returns empty, use cached data instead of overwriting localStorage with empty arrays",
+  "status": "in_progress",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Investigating caching bugs in EpicContext and TaskContext",
+      "created_at": 1749130067.8161745
+    }
+  ],
+  "links": {},
+  "epics": [],
+  "created_at": 1749130062.3130677,
+  "updated_at": 1749130067.8161983,
+  "started_at": 1749130064.6411345,
+  "closed_at": null
+}

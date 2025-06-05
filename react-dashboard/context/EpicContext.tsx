@@ -32,17 +32,32 @@ export function EpicProvider({ children }: EpicProviderProps) {
       }
       if (repos.length > 0) {
         const all: Epic[] = []
+        let anySuccess = false
         for (const r of repos) {
           try {
             const eps = await fetchEpicsFromRepo(r, token || undefined)
             all.push(...eps)
+            anySuccess = true
           } catch (err) {
             console.error('Failed to fetch epics', err)
           }
         }
-        setEpics(all)
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('cachedEpics', JSON.stringify(all))
+        if (anySuccess && all.length > 0) {
+          setEpics(all)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cachedEpics', JSON.stringify(all))
+          }
+        } else {
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedEpics') : null
+          if (cached) {
+            try {
+              setEpics(JSON.parse(cached))
+            } catch {
+              setEpics([])
+            }
+          } else {
+            setEpics([])
+          }
         }
         return
       }

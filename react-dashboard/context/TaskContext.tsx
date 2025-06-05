@@ -30,15 +30,30 @@ export function TaskProvider({ children }: TaskProviderProps) {
 
         // Extract and flatten tasks from all repositories
         const allTasks: Task[] = []
+        let anySuccess = false
         repoResults.forEach(result => {
           if (result.tasks && Array.isArray(result.tasks) && !result.error) {
             allTasks.push(...result.tasks)
+            anySuccess = true
           }
         })
 
-        setTasks(allTasks)
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('cachedTasks', JSON.stringify(allTasks))
+        if (anySuccess && allTasks.length > 0) {
+          setTasks(allTasks)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cachedTasks', JSON.stringify(allTasks))
+          }
+        } else {
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
+          if (cached) {
+            try {
+              setTasks(JSON.parse(cached))
+            } catch {
+              setTasks([])
+            }
+          } else {
+            setTasks([])
+          }
         }
         return
       }
