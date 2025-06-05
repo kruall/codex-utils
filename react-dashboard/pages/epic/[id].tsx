@@ -34,8 +34,13 @@ export const getStaticProps: GetStaticProps<EpicPageProps> = async ({ params }) 
   }
   const id = params.id as string
   const file = path.join(process.cwd(), '..', '.epics', `${id}.json`)
-  const epic = JSON.parse(fs.readFileSync(file, 'utf8'))
-  return { props: { epic } }
+  try {
+    const data = fs.readFileSync(file, 'utf8')
+    const epic = JSON.parse(data)
+    return { props: { epic } }
+  } catch {
+    return { notFound: true }
+  }
 }
 
 export default function EpicPage({ epic }: EpicPageProps) {

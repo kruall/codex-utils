@@ -7,9 +7,15 @@ interface EpicTreeProps {
   epic: Epic
   epics: Epic[]
   tasks: Task[]
+  visited?: Set<string>
 }
 
-export default function EpicTree({ epic, epics, tasks }: EpicTreeProps) {
+export default function EpicTree({ epic, epics, tasks, visited = new Set() }: EpicTreeProps) {
+  if (visited.has(epic.id)) {
+    return null
+  }
+  visited.add(epic.id)
+
   const progress = calculateEpicProgress(epic, tasks, epics)
   const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0
 
@@ -30,7 +36,13 @@ export default function EpicTree({ epic, epics, tasks }: EpicTreeProps) {
           {epic.child_epics.map(eid => {
             const child = epics.find(e => e.id === eid)
             return child ? (
-              <EpicTree key={eid} epic={child} epics={epics} tasks={tasks} />
+              <EpicTree
+                key={eid}
+                epic={child}
+                epics={epics}
+                tasks={tasks}
+                visited={new Set(visited)}
+              />
             ) : (
               <li key={eid}>{eid}</li>
             )

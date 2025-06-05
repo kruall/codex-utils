@@ -5,11 +5,20 @@ export interface EpicProgress {
   done: number
 }
 
-export function calculateEpicProgress(epic: Epic, tasks: Task[], epics: Epic[]): EpicProgress {
+export function calculateEpicProgress(
+  epic: Epic,
+  tasks: Task[],
+  epics: Epic[],
+): EpicProgress {
   const taskMap = new Map(tasks.map(t => [t.id, t]))
   const epicMap = new Map(epics.map(e => [e.id, e]))
 
-  function helper(e: Epic): EpicProgress {
+  function helper(e: Epic, seen: Set<string>): EpicProgress {
+    if (seen.has(e.id)) {
+      return { total: 0, done: 0 }
+    }
+    seen.add(e.id)
+
     let total = 0
     let done = 0
 
@@ -24,7 +33,7 @@ export function calculateEpicProgress(epic: Epic, tasks: Task[], epics: Epic[]):
     e.child_epics.forEach(eid => {
       const child = epicMap.get(eid)
       if (child) {
-        const p = helper(child)
+        const p = helper(child, new Set(seen))
         total += p.total
         done += p.done
       }
@@ -33,6 +42,6 @@ export function calculateEpicProgress(epic: Epic, tasks: Task[], epics: Epic[]):
     return { total, done }
   }
 
-  return helper(epic)
+  return helper(epic, new Set())
 }
 
