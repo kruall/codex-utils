@@ -3,7 +3,13 @@ import glob
 import os
 import re
 import subprocess
+import sys
+from pathlib import Path
 from typing import Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "task-manager"))
+
+from task_manager import TaskManager
 
 
 def get_task_status_from_commit(task_file: str, commit_hash: str) -> Optional[str]:
@@ -21,9 +27,29 @@ def get_task_status_from_commit(task_file: str, commit_hash: str) -> Optional[st
         return None
 
 
+def get_epic_status_from_commit(epic_file: str, commit_hash: str) -> Optional[str]:
+    """Get epic status from a specific commit."""
+    try:
+        result = subprocess.run(
+            ["git", "show", f"{commit_hash}:{epic_file}"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        data = json.loads(result.stdout)
+        return data.get("status")
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        return None
+
+
 def get_task_status_before_pr(task_file: str, pr_base_sha: str) -> Optional[str]:
     """Get task status from the base branch before PR changes."""
     return get_task_status_from_commit(task_file, pr_base_sha)
+
+
+def get_epic_status_before_pr(epic_file: str, pr_base_sha: str) -> Optional[str]:
+    """Get epic status from the base branch before PR changes."""
+    return get_epic_status_from_commit(epic_file, pr_base_sha)
 
 
 def main() -> int:
@@ -48,40 +74,83 @@ def main() -> int:
         print("Could not get base branch SHA")
         return 1
 
-    # Extract task ID from PR title
+    # Extract item ID from PR title
     match = re.search(r"\[([^\]]+)\]", title)
     if not match:
         print(f"PR title '{title}' does not contain [task-id]")
         return 1
 
-    task_id = match.group(1)
-    task_files = glob.glob(f".tasks/**/{task_id}.json", recursive=True)
-    if not task_files:
-        print(f"Task '{task_id}' not found")
-        return 1
+    item_id = match.group(1)
 
-    task_file = task_files[0]
-    
-    # Get current task status (after PR changes)
-    with open(task_file, "r", encoding="utf-8") as f:
-        task_data = json.load(f)
-    current_status = task_data.get("status")
-    
-    # Get task status before PR
-    status_before_pr = get_task_status_before_pr(task_file, base_sha)
-    
-    print(f"Task {task_id} status before PR: {status_before_pr}")
-    print(f"Task {task_id} status after PR: {current_status}")
+    if item_id.startswith("epic-"):
+        epic_file = f".epics/{item_id}.json"
+        if not os.path.exists(epic_file):
+            print(f"Epic '{item_id}' not found")
+            return 1
 
-    if status_before_pr == "done":
-        print(f"Error: Task {task_id} was already 'done' before PR. Tasks should not be 'done' before work starts.")
-        return 1
-    
-    if current_status != "done":
-        print(f"Error: Task {task_id} must be 'done' when PR is merged; current: {current_status}")
-        return 1
-        
-    print(f"✓ Task {task_id} workflow is correct: {status_before_pr} → {current_status}")
+        with open(epic_file, "r", encoding="utf-8") as f:
+            epic_data = json.load(f)
+        current_status = epic_data.get("status")
+
+        status_before_pr = get_epic_status_before_pr(epic_file, base_sha)
+
+        print(f"Epic {item_id} status before PR: {status_before_pr}")
+        print(f"Epic {item_id} status after PR: {current_status}")
+
+        if status_before_pr == "closed":
+            print(
+                f"Error: Epic {item_id} was already 'closed' before PR. Epics should not be 'closed' before work starts."
+            )
+            return 1
+
+        if current_status != "closed":
+            print(
+                f"Error: Epic {item_id} must be 'closed' when PR is merged; current: {current_status}"
+            )
+            return 1
+
+        tm = TaskManager(tasks_root=".tasks", epics_root=".epics")
+        if item_id in tm.invalid_closed_epics():
+            print(
+                f"Error: Epic {item_id} has incomplete child tasks or epics"
+            )
+            return 1
+
+        print(
+            f"✓ Epic {item_id} workflow is correct: {status_before_pr} → {current_status}"
+        )
+    else:
+        task_files = glob.glob(f".tasks/**/{item_id}.json", recursive=True)
+        if not task_files:
+            print(f"Task '{item_id}' not found")
+            return 1
+
+        task_file = task_files[0]
+
+        with open(task_file, "r", encoding="utf-8") as f:
+            task_data = json.load(f)
+        current_status = task_data.get("status")
+
+        status_before_pr = get_task_status_before_pr(task_file, base_sha)
+
+        print(f"Task {item_id} status before PR: {status_before_pr}")
+        print(f"Task {item_id} status after PR: {current_status}")
+
+        if status_before_pr == "done":
+            print(
+                f"Error: Task {item_id} was already 'done' before PR. Tasks should not be 'done' before work starts."
+            )
+            return 1
+
+        if current_status != "done":
+            print(
+                f"Error: Task {item_id} must be 'done' when PR is merged; current: {current_status}"
+            )
+            return 1
+
+        print(
+            f"✓ Task {item_id} workflow is correct: {status_before_pr} → {current_status}"
+        )
 
     return 0
 
