@@ -1,7 +1,5 @@
-import fs from 'fs'
-import path from 'path'
-import { useState, ChangeEvent } from 'react'
-import { GetStaticPaths, GetStaticProps } from 'next'
+import { useState, ChangeEvent, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { useTaskContext } from '../../context/TaskContext'
 import { useAuth } from '../../context/AuthContext'
 import Navigation from '../../components/Navigation'
@@ -11,49 +9,14 @@ import TaskEpicInfo from '../../components/TaskEpicInfo'
 import styles from '../Page.module.css'
 import { Task } from '../../types'
 
-interface TaskPageProps {
-  task: Task & {
-    description?: string;
-    comments?: Array<{ id: string; text: string }>;
-    links?: Record<string, string[]>;
-  };
-}
+export default function TaskPage() {
+  const router = useRouter()
+  const { id } = router.query
+  const tasks = useTasks()
+  const task = tasks.find(t => t.id === id)
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const tasksDir = path.join(process.cwd(), '..', '.tasks')
-  const paths: Array<{ params: { id: string } }> = []
-  try {
-    const queues = fs.readdirSync(tasksDir)
-    for (const q of queues) {
-      const queueDir = path.join(tasksDir, q)
-      for (const file of fs.readdirSync(queueDir)) {
-        if (file.endsWith('.json') && file !== 'meta.json') {
-          const id = file.replace('.json', '')
-          paths.push({ params: { id } })
-        }
-      }
-    }
-  } catch {
-    // ignore build errors
-  }
-  return { paths, fallback: false }
-}
-
-export const getStaticProps: GetStaticProps<TaskPageProps> = async ({ params }) => {
-  if (!params || !params.id) {
-    return { notFound: true }
-  }
-  
-  const id = params.id as string
-  const queue = id.split('-')[0]
-  const file = path.join(process.cwd(), '..', '.tasks', queue, `${id}.json`)
-  const task = JSON.parse(fs.readFileSync(file, 'utf8'))
-  return { props: { task } }
-}
-
-export default function TaskPage({ task }: TaskPageProps) {
-  const [title, setTitle] = useState<string>(task.title)
-  const [status, setStatus] = useState<string>(task.status)
+  const [title, setTitle] = useState<string>('')
+  const [status, setStatus] = useState<string>('todo')
   const [saving, setSaving] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<boolean>(false)
@@ -61,6 +24,31 @@ export default function TaskPage({ task }: TaskPageProps) {
   const { csrfToken, token } = useAuth()
   const epics = useEpics()
   const tasksList = useTasks()
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title)
+      setStatus(task.status)
+    }
+  }, [task])
+
+  if (!router.isReady || !id) {
+    return (
+      <div className={styles.container}>
+        <Navigation />
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  if (!task) {
+    return (
+      <div className={styles.container}>
+        <Navigation />
+        <p>Task not found</p>
+      </div>
+    )
+  }
 
   const save = async (): Promise<void> => {
     setSaving(true)

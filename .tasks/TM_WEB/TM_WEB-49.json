@@ -2,7 +2,7 @@
   "id": "TM_WEB-49",
   "title": "Fix empty results caching",
   "description": "GitHub fetch returning empty arrays should overwrite cache rather than reuse cached epics/tasks",
-  "status": "in_progress",
+  "status": "done",
   "comments": [
     {
       "id": 1,
@@ -22,7 +22,7 @@
   },
   "epics": [],
   "created_at": 1749150929.6964524,
-  "updated_at": 1749151110.8190777,
+  "updated_at": 1749152844.07854,
   "started_at": 1749150931.2468417,
-  "closed_at": null
+  "closed_at": 1749152844.078516
 }
