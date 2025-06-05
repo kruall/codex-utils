@@ -2,8 +2,19 @@
   "id": "TM_WEB-33",
   "title": "Update Web dashboard task view with enhanced epic information",
   "description": "Adapt React web dashboard to display enhanced epic information in task views. Show epic hierarchy and related tasks/epics with descriptions and statuses. Ensure consistent display with CLI improvements.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Start implementing Task epic info UI",
+      "created_at": 1749117660.6808314
+    },
+    {
+      "id": 2,
+      "text": "Implemented Task epic info component and page updates",
+      "created_at": 1749118425.3974988
+    }
+  ],
   "links": {
     "related": [
       "TM-15"
@@ -13,7 +24,7 @@
     "epic-1"
   ],
   "created_at": 1749018737.961942,
-  "updated_at": 1749018764.659486,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749118425.397531,
+  "started_at": 1749117657.5927126,
+  "closed_at": 1749118419.4184241
 }
