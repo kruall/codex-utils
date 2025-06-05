@@ -28,3 +28,16 @@ test('handles circular references without crashing', () => {
   expect(screen.getByText('epic-b')).toBeInTheDocument()
 })
 
+test('shared child epics are rendered only once', () => {
+  const epics: Epic[] = [
+    { id: 'epic-a', title: 'A', status: 'open', child_tasks: [], child_epics: ['epic-b', 'epic-c'], parent_epic: null },
+    { id: 'epic-b', title: 'B', status: 'open', child_tasks: [], child_epics: ['epic-d'], parent_epic: 'epic-a' },
+    { id: 'epic-c', title: 'C', status: 'open', child_tasks: [], child_epics: ['epic-d'], parent_epic: 'epic-a' },
+    { id: 'epic-d', title: 'D', status: 'open', child_tasks: [], child_epics: [], parent_epic: null },
+  ]
+  const tasks: Task[] = []
+
+  render(<ul><EpicTree epic={epics[0]} epics={epics} tasks={tasks} /></ul>)
+  expect(screen.getAllByText('epic-d')).toHaveLength(1)
+})
+

@@ -41,7 +41,7 @@ export default function EpicTree({ epic, epics, tasks, visited = new Set() }: Ep
                 epic={child}
                 epics={epics}
                 tasks={tasks}
-                visited={new Set(visited)}
+                visited={visited}
               />
             ) : (
               <li key={eid}>{eid}</li>
