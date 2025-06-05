@@ -29,7 +29,11 @@ describe('fetchTasksFromRepo', () => {
 
     const tasks = await fetchTasksFromRepo('owner/repo', 'tkn');
     expect(tasks).toEqual([fileData]);
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toContain('owner/repo');
+    const call1 = (global.fetch as jest.Mock).mock.calls[0];
+    expect(call1[0]).toContain('owner/repo');
+    expect(call1[1].headers.Accept).toBe('application/vnd.github.v3+json');
+    const call3 = (global.fetch as jest.Mock).mock.calls[2];
+    expect(call3[1].headers.Accept).toBe('application/vnd.github.v3.raw');
   });
 });
 

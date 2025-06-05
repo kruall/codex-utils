@@ -14,15 +14,18 @@ export function generateTaskPath(taskId: string): string {
 }
 
 export async function fetchTasksFromRepo(repo: string, token?: string): Promise<any[]> {
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github.v3.raw'
-  };
-  if (token) {
-    headers.Authorization = `token ${token}`;
+  function makeHeaders(raw = false): Record<string, string> {
+    const h: Record<string, string> = {
+      Accept: raw ? 'application/vnd.github.v3.raw' : 'application/vnd.github.v3+json'
+    }
+    if (token) {
+      h.Authorization = `token ${token}`
+    }
+    return h
   }
 
-  async function fetchJson(url: string): Promise<any> {
-    const res = await fetch(url, { headers });
+  async function fetchJson(url: string, raw = false): Promise<any> {
+    const res = await fetch(url, { headers: makeHeaders(raw) });
     if (!res.ok) {
       throw new Error(`Failed to fetch ${url}`);
     }
@@ -34,7 +37,7 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
   }
 
   async function fetchFile(url: string): Promise<any> {
-    return fetchJson(url);
+    return fetchJson(url, true);
   }
 
   const rootUrl = `https://api.github.com/repos/${repo}/contents/.tasks`;

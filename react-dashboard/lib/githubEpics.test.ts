@@ -21,6 +21,10 @@ describe('fetchEpicsFromRepo', () => {
 
     const epics = await fetchEpicsFromRepo('owner/repo', 'tkn')
     expect(epics).toEqual([epicData])
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toContain('owner/repo')
+    const firstCall = (global.fetch as jest.Mock).mock.calls[0]
+    expect(firstCall[0]).toContain('owner/repo')
+    expect(firstCall[1].headers.Accept).toBe('application/vnd.github.v3+json')
+    const secondCall = (global.fetch as jest.Mock).mock.calls[1]
+    expect(secondCall[1].headers.Accept).toBe('application/vnd.github.v3.raw')
   })
 })

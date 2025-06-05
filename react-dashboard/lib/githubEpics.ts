@@ -7,13 +7,18 @@ export interface GitHubContentItem {
 }
 
 export async function fetchEpicsFromRepo(repo: string, token?: string): Promise<any[]> {
-  const headers: Record<string, string> = { Accept: 'application/vnd.github.v3.raw' }
-  if (token) {
-    headers.Authorization = `token ${token}`
+  function makeHeaders(raw = false): Record<string, string> {
+    const headers: Record<string, string> = {
+      Accept: raw ? 'application/vnd.github.v3.raw' : 'application/vnd.github.v3+json',
+    }
+    if (token) {
+      headers.Authorization = `token ${token}`
+    }
+    return headers
   }
 
-  async function fetchJson(url: string): Promise<any> {
-    const res = await fetch(url, { headers })
+  async function fetchJson(url: string, raw = false): Promise<any> {
+    const res = await fetch(url, { headers: makeHeaders(raw) })
     if (!res.ok) {
       throw new Error(`Failed to fetch ${url}`)
     }
@@ -25,7 +30,7 @@ export async function fetchEpicsFromRepo(repo: string, token?: string): Promise<
   const epics = await Promise.all(
     items.map(item => {
       if (item.type === 'file' && item.download_url && item.name.endsWith('.json')) {
-        return fetchJson(item.download_url)
+        return fetchJson(item.download_url, true)
       }
       return null
     })
