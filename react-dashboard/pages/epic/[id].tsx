@@ -48,11 +48,11 @@ export default function EpicPage() {
           Parent Epic: <Link href={`/epic/${parent.id}`}>{parent.id}</Link> - {parent.title}
         </p>
       )}
-      {current.child_tasks.length > 0 && (
+      {current.child_tasks?.length > 0 && (
         <>
           <h2>Tasks</h2>
           <ul>
-            {current.child_tasks.map(tid => {
+            {current.child_tasks?.map(tid => {
               const t = tasks.find(t => t.id === tid)
               return (
                 <li key={tid}>
@@ -64,11 +64,11 @@ export default function EpicPage() {
           </ul>
         </>
       )}
-      {current.child_epics.length > 0 && (
+      {current.child_epics?.length > 0 && (
         <>
           <h2>Child Epics</h2>
           <ul>
-            {current.child_epics.map(eid => {
+            {current.child_epics?.map(eid => {
               const child = epics.find(e => e.id === eid)
               return (
                 <li key={eid}>

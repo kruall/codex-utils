@@ -13,6 +13,11 @@
       "id": 2,
       "text": "Epic details page enhanced",
       "created_at": 1749155466.9341242
+    },
+    {
+      "id": 3,
+      "text": "Fixing unprotected access to epic child lists",
+      "created_at": 1749195874.7985344
     }
   ],
   "links": {},
@@ -20,7 +25,7 @@
     "epic-3"
   ],
   "created_at": 1749120302.774859,
-  "updated_at": 1749155466.9341795,
+  "updated_at": 1749196054.7343225,
   "started_at": 1749154791.2662838,
   "closed_at": 1749155462.378429
 }
