@@ -182,3 +182,4 @@ _next/
 react-dashboard/coverage/
 
 react-dashboard/public/tasks.json
+react-dashboard/public/epics.json

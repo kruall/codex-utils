@@ -10,7 +10,7 @@ export interface GitHubContentItem {
 
 // Helper function to generate task file path
 export function generateTaskPath(taskId: string): string {
-  return `.tasks/${taskId.split('-')[0]}/${taskId}.json`
+  return `.tasks/${taskId.includes('-') ? taskId.split('-')[0] : 'default'}/${taskId}.json`
 }
 
 export async function fetchTasksFromRepo(repo: string, token?: string): Promise<any[]> {
@@ -36,8 +36,15 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
     return fetchJson(url);
   }
 
-  async function fetchFile(url: string): Promise<any> {
-    return fetchJson(url, true);
+  async function fetchFile(apiUrl: string): Promise<any> {
+    // Use the GitHub API content endpoint instead of download_url to avoid CORS
+    const response = await fetchJson(apiUrl);
+    if (response.content && response.encoding === 'base64') {
+      // Decode base64 content
+      const decoded = atob(response.content.replace(/\s/g, ''));
+      return JSON.parse(decoded);
+    }
+    throw new Error('Invalid file content format');
   }
 
   const rootUrl = `https://api.github.com/repos/${repo}/contents/.tasks`;
@@ -46,11 +53,11 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
   const rootTasks = await Promise.all(
     rootItems.map(async (item) => {
       if (item.type === 'file' && item.name.endsWith('.json')) {
-        if (!item.download_url) {
-          console.warn(`No download_url for file ${item.name}`);
+        if (!item.url) {
+          console.warn(`No API url for file ${item.name}`);
           return null;
         }
-        return fetchFile(item.download_url);
+        return fetchFile(item.url);
       } else if (item.type === 'dir') {
         if (!item.url) {
           console.warn(`No url for directory ${item.name}`);
@@ -61,11 +68,11 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
           subItems
             .filter((sub) => sub.type === 'file' && sub.name.endsWith('.json'))
             .map((sub) => {
-              if (!sub.download_url) {
-                console.warn(`No download_url for file ${sub.name}`);
+              if (!sub.url) {
+                console.warn(`No API url for file ${sub.name}`);
                 return null;
               }
-              return fetchFile(sub.download_url);
+              return fetchFile(sub.url);
             })
         );
         return subTasks.filter(task => task !== null);

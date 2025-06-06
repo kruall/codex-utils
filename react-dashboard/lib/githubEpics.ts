@@ -25,12 +25,23 @@ export async function fetchEpicsFromRepo(repo: string, token?: string): Promise<
     return res.json()
   }
 
+  async function fetchFile(apiUrl: string): Promise<any> {
+    // Use the GitHub API content endpoint instead of download_url to avoid CORS
+    const response = await fetchJson(apiUrl);
+    if (response.content && response.encoding === 'base64') {
+      // Decode base64 content
+      const decoded = atob(response.content.replace(/\s/g, ''));
+      return JSON.parse(decoded);
+    }
+    throw new Error('Invalid file content format');
+  }
+
   const rootUrl = `https://api.github.com/repos/${repo}/contents/.epics`
   const items: GitHubContentItem[] = await fetchJson(rootUrl)
   const epics = await Promise.all(
     items.map(item => {
-      if (item.type === 'file' && item.download_url && item.name.endsWith('.json')) {
-        return fetchJson(item.download_url, true)
+      if (item.type === 'file' && item.url && item.name.endsWith('.json')) {
+        return fetchFile(item.url)
       }
       return null
     })

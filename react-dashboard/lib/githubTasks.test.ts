@@ -18,14 +18,18 @@ describe('fetchTasksFromRepo', () => {
       { name: 'TM_WEB', path: '.tasks/TM_WEB', type: 'dir', url: 'dir-url' }
     ];
     const secondDir = [
-      { name: 'TM_WEB-1.json', path: '.tasks/TM_WEB/TM_WEB-1.json', type: 'file', download_url: 'file-url' }
+      { name: 'TM_WEB-1.json', path: '.tasks/TM_WEB/TM_WEB-1.json', type: 'file', url: 'file-api-url' }
     ];
     const fileData = { id: 'TM_WEB-1', title: 'Test', status: 'todo' as const };
+    const fileApiResponse = { 
+      content: Buffer.from(JSON.stringify(fileData)).toString('base64'), 
+      encoding: 'base64' 
+    };
 
     global.fetch = jest.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => firstDir })
       .mockResolvedValueOnce({ ok: true, json: async () => secondDir })
-      .mockResolvedValueOnce({ ok: true, json: async () => fileData });
+      .mockResolvedValueOnce({ ok: true, json: async () => fileApiResponse });
 
     const tasks = await fetchTasksFromRepo('owner/repo', 'tkn');
     expect(tasks).toEqual([fileData]);
@@ -33,7 +37,33 @@ describe('fetchTasksFromRepo', () => {
     expect(call1[0]).toContain('owner/repo');
     expect(call1[1].headers.Accept).toBe('application/vnd.github.v3+json');
     const call3 = (global.fetch as jest.Mock).mock.calls[2];
-    expect(call3[1].headers.Accept).toBe('application/vnd.github.v3.raw');
+    expect(call3[1].headers.Accept).toBe('application/vnd.github.v3+json');
+  });
+
+  test('handles base64 decoding correctly', async () => {
+    const testData = { id: 'test-1', title: 'Test Task', status: 'todo' as const };
+    const base64Content = Buffer.from(JSON.stringify(testData)).toString('base64');
+    const apiResponse = {
+      content: base64Content,
+      encoding: 'base64'
+    };
+
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => [{ name: 'test-1.json', type: 'file', url: 'api-url' }] })
+      .mockResolvedValueOnce({ ok: true, json: async () => apiResponse });
+
+    const tasks = await fetchTasksFromRepo('owner/repo', 'token');
+    expect(tasks).toEqual([testData]);
+  });
+
+  test('handles invalid file content format', async () => {
+    const invalidResponse = { content: 'invalid', encoding: 'invalid' };
+
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => [{ name: 'test-1.json', type: 'file', url: 'api-url' }] })
+      .mockResolvedValueOnce({ ok: true, json: async () => invalidResponse });
+
+    await expect(fetchTasksFromRepo('owner/repo', 'token')).rejects.toThrow('Invalid file content format');
   });
 });
 
