@@ -50,14 +50,47 @@ jobs:
     if: needs.changes.outputs.react == 'true'
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
+          cache-dependency-path: react-dashboard/package-lock.json
       - name: Install React dependencies
         run: |
           cd react-dashboard
-          npm install
+          npm ci
+      - name: Clean previous builds
+        run: |
+          cd react-dashboard
+          rm -rf .next out
       - name: React Tests
         run: |
           cd react-dashboard
-          npm test -- --coverage
+          npm test -- --coverage --watchAll=false
+      - name: React Build Verification
+        run: |
+          cd react-dashboard
+          npm run build
+      - name: Verify Build Output
+        run: |
+          cd react-dashboard
+          if [ ! -d "out" ]; then
+            echo "❌ Build output directory 'out' not found"
+            exit 1
+          fi
+          if [ ! -f "out/index.html" ]; then
+            echo "❌ Main index.html not found in build output"
+            exit 1
+          fi
+          echo "✅ React build verification successful"
+          echo "📦 Build output size:"
+          du -sh out/
+          echo "📄 Generated files:"
+          find out/ -name "*.html" | head -10

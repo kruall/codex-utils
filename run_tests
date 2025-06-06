@@ -106,6 +106,10 @@ run_test "Python linting (ruff)" "ruff check ." || true
 
 run_test "Python type checking (mypy)" "mypy ." || true
 
+# Clean React build artifacts before running tests to avoid compiled test file issues
+print_status "Cleaning React build artifacts..."
+(cd react-dashboard && rm -rf .next out) || true
+
 run_test "React tests" "(cd react-dashboard && npm test)" "true" || true
 
 run_test "Task verification (tm verify)" "./tm verify" || true

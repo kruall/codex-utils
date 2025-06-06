@@ -1,0 +1,118 @@
+name: React Build Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  react-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: react-dashboard/package-lock.json
+      
+      - name: Install React dependencies
+        run: |
+          cd react-dashboard
+          npm ci
+      
+      - name: Clean previous builds
+        run: |
+          cd react-dashboard
+          rm -rf .next out
+      
+      - name: Run React tests
+        run: |
+          cd react-dashboard
+          npm test -- --coverage --watchAll=false
+      
+      - name: Build React application
+        run: |
+          cd react-dashboard
+          npm run build
+      
+      - name: Verify build output
+        run: |
+          cd react-dashboard
+          echo "🔍 Checking build output..."
+          
+          # Check if output directory exists
+          if [ ! -d "out" ]; then
+            echo "❌ Build output directory 'out' not found"
+            exit 1
+          fi
+          
+          # Check if main files exist
+          if [ ! -f "out/index.html" ]; then
+            echo "❌ Main index.html not found in build output"
+            exit 1
+          fi
+          
+          # Check for essential pages (Next.js creates subdirectories)
+          essential_pages=("table/index.html" "epics/index.html" "login/index.html")
+          for page in "${essential_pages[@]}"; do
+            if [ ! -f "out/$page" ]; then
+              echo "⚠️  Warning: Essential page $page not found"
+            else
+              echo "✅ Found $page"
+            fi
+          done
+          
+          # Check for static assets
+          if [ ! -d "out/_next" ]; then
+            echo "❌ Next.js static assets directory not found"
+            exit 1
+          fi
+          
+          # Check for task and epic dynamic pages
+          if [ ! -f "out/task/[id]/index.html" ]; then
+            echo "⚠️  Warning: Task detail page template not found"
+          else
+            echo "✅ Found task detail page template"
+          fi
+          
+          if [ ! -f "out/epic/[id]/index.html" ]; then
+            echo "⚠️  Warning: Epic detail page template not found"
+          else
+            echo "✅ Found epic detail page template"
+          fi
+          
+          echo "✅ React build verification successful"
+          echo "📦 Build output size:"
+          du -sh out/
+          echo "📄 Generated HTML files:"
+          find out/ -name "*.html" | sort
+          echo "📊 Build statistics:"
+          echo "  - HTML files: $(find out/ -name "*.html" | wc -l)"
+          echo "  - JS files: $(find out/ -name "*.js" | wc -l)"
+          echo "  - CSS files: $(find out/ -name "*.css" | wc -l)"
+          echo "  - Total size: $(du -sh out/ | cut -f1)"
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: react-build-output
+          path: react-dashboard/out/
+          retention-days: 7 
