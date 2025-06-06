@@ -27,9 +27,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [csrfToken, setCsrfToken] = useState<string | null>(null)
 
   useEffect(() => {
-    const storedRaw = typeof window !== 'undefined' ? sessionStorage.getItem('githubToken') : null
-    const expiry = typeof window !== 'undefined' ? Number(sessionStorage.getItem('githubTokenExpiry')) : 0
-    const csrf = typeof window !== 'undefined' ? sessionStorage.getItem('csrfToken') : null
+    const storedRaw = typeof window !== 'undefined' ? localStorage.getItem('githubToken') : null
+    const expiry = typeof window !== 'undefined' ? Number(localStorage.getItem('githubTokenExpiry')) : 0
+    const csrf = typeof window !== 'undefined' ? localStorage.getItem('csrfToken') : null
     const stored = storedRaw && expiry > Date.now() ? storedRaw : null
     if (stored) {
       setToken(stored)
@@ -38,8 +38,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         document.cookie = `csrfToken=${csrf}; path=/`
       }
     } else {
-      sessionStorage.removeItem('githubToken')
-      sessionStorage.removeItem('githubTokenExpiry')
+      localStorage.removeItem('githubToken')
+      localStorage.removeItem('githubTokenExpiry')
     }
 
     // Check for OAuth callback with code parameter
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     }
     const interval = setInterval(() => {
-      const expiryTime = Number(sessionStorage.getItem('githubTokenExpiry'))
+      const expiryTime = Number(localStorage.getItem('githubTokenExpiry'))
       if (expiryTime && expiryTime <= Date.now()) {
         logout()
       }
@@ -97,9 +97,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const clean = token.trim()
         const expiry = Date.now() + EXPIRY_MS
         const csrf = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2)
-        sessionStorage.setItem('githubToken', clean)
-        sessionStorage.setItem('githubTokenExpiry', expiry.toString())
-        sessionStorage.setItem('csrfToken', csrf)
+        localStorage.setItem('githubToken', clean)
+        localStorage.setItem('githubTokenExpiry', expiry.toString())
+        localStorage.setItem('csrfToken', csrf)
         document.cookie = `csrfToken=${csrf}; path=/`
         setCsrfToken(csrf)
         setToken(clean)
@@ -116,9 +116,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = (): void => {
-    sessionStorage.removeItem('githubToken')
-    sessionStorage.removeItem('githubTokenExpiry')
-    sessionStorage.removeItem('csrfToken')
+    localStorage.removeItem('githubToken')
+    localStorage.removeItem('githubTokenExpiry')
+    localStorage.removeItem('csrfToken')
     document.cookie = 'csrfToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     setToken(null)
     setCsrfToken(null)

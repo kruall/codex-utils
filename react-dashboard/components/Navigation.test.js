@@ -13,16 +13,16 @@ test('renders navigation links', () => {
 import { fireEvent, waitFor } from '@testing-library/react'
 
 afterEach(() => {
-  sessionStorage.clear()
+  localStorage.clear()
 })
 
 test('shows logout when authenticated and clears session on click', async () => {
-  sessionStorage.setItem('githubToken', 'tok')
-  sessionStorage.setItem('githubTokenExpiry', String(Date.now() + 5000))
-  sessionStorage.setItem('csrfToken', 'c')
+  localStorage.setItem('githubToken', 'tok')
+  localStorage.setItem('githubTokenExpiry', String(Date.now() + 5000))
+  localStorage.setItem('csrfToken', 'c')
   render(<AuthProvider><Navigation /></AuthProvider>)
   await waitFor(() => expect(screen.getByText(/Logout/)).toBeInTheDocument())
   fireEvent.click(screen.getByText(/Logout/))
   await waitFor(() => expect(screen.getByText(/Login/)).toBeInTheDocument())
-  expect(sessionStorage.getItem('githubToken')).toBeNull()
+  expect(localStorage.getItem('githubToken')).toBeNull()
 })

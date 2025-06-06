@@ -2,14 +2,25 @@
   "id": "TM_WEB-46",
   "title": "Implement local storage for settings and tokens",
   "description": "Create local storage management for GitHub tokens, selected repositories, user preferences, and cached data. Implement secure token storage practices. Add settings page for configuration management. Handle storage cleanup and data migration.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Switch token storage to localStorage",
+      "created_at": 1749198495.9876862
+    },
+    {
+      "id": 2,
+      "text": "Token now persists via localStorage",
+      "created_at": 1749198782.0697737
+    }
+  ],
   "links": {},
   "epics": [
     "epic-3"
   ],
   "created_at": 1749120317.838759,
-  "updated_at": 1749120347.170149,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749198782.069966,
+  "started_at": 1749198492.0771866,
+  "closed_at": 1749198772.9598312
 }
