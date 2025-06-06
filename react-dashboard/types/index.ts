@@ -6,6 +6,20 @@ export interface Task {
   created?: string;
   updated?: string;
   queue?: string;
+  comments?: Array<{
+    id: number;
+    text: string;
+    created_at?: number;
+    updated_at?: number;
+  }>;
+  links?: {
+    [relation: string]: string[];
+  };
+  epics?: string[];
+  created_at?: number;
+  updated_at?: number;
+  started_at?: number | null;
+  closed_at?: number | null;
 }
 
 export interface Epic {
