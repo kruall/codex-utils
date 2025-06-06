@@ -15,7 +15,7 @@ describe('AuthProvider', () => {
   }
 
   beforeEach(() => {
-    sessionStorage.clear()
+    localStorage.clear()
     jest.spyOn(window, 'alert').mockImplementation(() => {})
     Object.defineProperty(window, 'confirm', { value: jest.fn(() => true), writable: true })
     Object.defineProperty(window, 'prompt', { value: jest.fn(() => 'pat'), writable: true })
@@ -24,16 +24,16 @@ describe('AuthProvider', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
-    sessionStorage.clear()
+    localStorage.clear()
     delete (window as any).confirm
     delete (window as any).prompt
     delete process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
   })
 
-  test('loads token from sessionStorage', async () => {
-    sessionStorage.setItem('githubToken', 'abc')
-    sessionStorage.setItem('githubTokenExpiry', String(Date.now() + 5000))
-    sessionStorage.setItem('csrfToken', 'csrf')
+  test('loads token from storage', async () => {
+    localStorage.setItem('githubToken', 'abc')
+    localStorage.setItem('githubTokenExpiry', String(Date.now() + 5000))
+    localStorage.setItem('csrfToken', 'csrf')
     render(
       <AuthProvider>
         <Wrapper />
@@ -49,15 +49,15 @@ describe('AuthProvider', () => {
       </AuthProvider>
     )
     fireEvent.click(screen.getByText('login'))
-    expect(sessionStorage.getItem('githubToken')).toBe('pat')
-    expect(sessionStorage.getItem('csrfToken')).not.toBeNull()
+    expect(localStorage.getItem('githubToken')).toBe('pat')
+    expect(localStorage.getItem('csrfToken')).not.toBeNull()
     await waitFor(() => expect(screen.getByTestId('token')).toHaveTextContent('pat'))
   })
 
   test('logout clears token from storage', async () => {
-    sessionStorage.setItem('githubToken', 'abc')
-    sessionStorage.setItem('githubTokenExpiry', String(Date.now() + 5000))
-    sessionStorage.setItem('csrfToken', 'csrf')
+    localStorage.setItem('githubToken', 'abc')
+    localStorage.setItem('githubTokenExpiry', String(Date.now() + 5000))
+    localStorage.setItem('csrfToken', 'csrf')
     render(
       <AuthProvider>
         <Wrapper />
@@ -66,6 +66,6 @@ describe('AuthProvider', () => {
     await waitFor(() => expect(screen.getByTestId('token')).toHaveTextContent('abc'))
     fireEvent.click(screen.getByText('logout'))
     await waitFor(() => expect(screen.getByTestId('token')).toHaveTextContent(''))
-    expect(sessionStorage.getItem('githubToken')).toBeNull()
+    expect(localStorage.getItem('githubToken')).toBeNull()
   })
 })

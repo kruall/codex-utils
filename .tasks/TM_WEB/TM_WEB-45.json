@@ -2,14 +2,25 @@
   "id": "TM_WEB-45",
   "title": "Add GitHub API file modification capabilities",
   "description": "Implement GitHub API integration for creating, updating, and deleting files in the repository. Handle commit creation with proper messages. Implement conflict resolution and error handling. Support batch operations for multiple file changes.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Add generic GitHub file modification functions",
+      "created_at": 1749198194.9941099
+    },
+    {
+      "id": 2,
+      "text": "Implemented helper functions and tests",
+      "created_at": 1749198323.0711777
+    }
+  ],
   "links": {},
   "epics": [
     "epic-3"
   ],
   "created_at": 1749120312.78112,
-  "updated_at": 1749120346.7512279,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749198326.6226513,
+  "started_at": 1749198190.8948798,
+  "closed_at": 1749198326.6226175
 }

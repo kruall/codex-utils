@@ -14,6 +14,9 @@ export default function Navigation() {
         <Link href="/table" className={styles.link}>
           📋 Task List
         </Link>
+        <Link href="/task/new" className={styles.link}>
+          ➕ New Task
+        </Link>
         <Link href="/epics" className={styles.link}>
           📂 Epics
         </Link>
