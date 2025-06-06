@@ -3,12 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "npm run generate-tasks && npm run generate-epics && next dev",
-    "build": "npm run generate-tasks && npm run generate-epics && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "export": "npm run generate-tasks && npm run generate-epics && next build",
-    "generate-tasks": "node scripts/generate-tasks.js",
-    "generate-epics": "node scripts/generate-epics.js",
+    "export": "next build",
     "test": "jest --coverage"
   },
   "dependencies": {

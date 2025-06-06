@@ -25,6 +25,7 @@ export function TaskProvider({ children }: TaskProviderProps) {
       if (reposEnv) {
         repos.push(...reposEnv.split(',').map(r => r.trim()).filter(Boolean))
       }
+      
       if (repos.length > 0) {
         const repoResults = await fetchTasksFromRepos(repos, token || undefined)
 
@@ -44,6 +45,7 @@ export function TaskProvider({ children }: TaskProviderProps) {
             localStorage.setItem('cachedTasks', JSON.stringify(allTasks))
           }
         } else {
+          // GitHub API failed, use cached data if available
           const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
           if (cached) {
             try {
@@ -55,35 +57,18 @@ export function TaskProvider({ children }: TaskProviderProps) {
             setTasks([])
           }
         }
-        return
-      }
-      try {
-        const res = await fetch('/codex-utils/tasks.json')
-        if (res.ok) {
-          const data: Task[] = await res.json()
-          setTasks(data || [])
-        } else {
-          // tasks.json doesn't exist, use cached data or empty array
-          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
-          if (cached) {
-            try {
-              setTasks(JSON.parse(cached))
-            } catch {
-              setTasks([])
-            }
-          } else {
-            setTasks([])
-          }
-        }
-      } catch {
+      } else {
+        // No repos configured, use cached data if available
         const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
         if (cached) {
           try {
             setTasks(JSON.parse(cached))
-            return
-          } catch { /* ignore */ }
+          } catch {
+            setTasks([])
+          }
+        } else {
+          setTasks([])
         }
-        setTasks([])
       }
     }
     fetchTasks()

@@ -30,6 +30,7 @@ export function EpicProvider({ children }: EpicProviderProps) {
       if (env) {
         repos.push(...env.split(',').map(r => r.trim()).filter(Boolean))
       }
+      
       if (repos.length > 0) {
         const all: Epic[] = []
         let anySuccess = false
@@ -48,6 +49,7 @@ export function EpicProvider({ children }: EpicProviderProps) {
             localStorage.setItem('cachedEpics', JSON.stringify(all))
           }
         } else {
+          // GitHub API failed, use cached data if available
           const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedEpics') : null
           if (cached) {
             try {
@@ -59,35 +61,18 @@ export function EpicProvider({ children }: EpicProviderProps) {
             setEpics([])
           }
         }
-        return
-      }
-      try {
-        const res = await fetch('/epics.json')
-        if (res.ok) {
-          const data: Epic[] = await res.json()
-          setEpics(data || [])
-        } else {
-          // epics.json doesn't exist, use cached data or empty array
-          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedEpics') : null
-          if (cached) {
-            try {
-              setEpics(JSON.parse(cached))
-            } catch {
-              setEpics([])
-            }
-          } else {
-            setEpics([])
-          }
-        }
-      } catch {
+      } else {
+        // No repos configured, use cached data if available
         const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedEpics') : null
         if (cached) {
           try {
             setEpics(JSON.parse(cached))
-            return
-          } catch { /* ignore */ }
+          } catch {
+            setEpics([])
+          }
+        } else {
+          setEpics([])
         }
-        setEpics([])
       }
     }
     fetchEpics()

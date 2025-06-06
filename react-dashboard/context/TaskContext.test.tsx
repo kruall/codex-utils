@@ -16,27 +16,12 @@ function CountTasks() {
 
 describe('TaskProvider', () => {
   beforeEach(() => {
-    ;(global as any).fetch = jest.fn(async () => ({
-      ok: true,
-      json: async () => [{ id: 'T1', title: 't', status: 'todo' }]
-    }))
+    ;(fetchTasksFromRepos as jest.Mock).mockResolvedValue([])
   })
 
   afterEach(() => {
-    ;(global as any).fetch = undefined
     jest.restoreAllMocks()
     localStorage.clear()
-  })
-
-  test('loads tasks from tasks.json', async () => {
-    render(
-      <AuthProvider>
-        <TaskProvider>
-          <CountTasks />
-        </TaskProvider>
-      </AuthProvider>
-    )
-    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'))
   })
 
   test('uses cached tasks when GitHub fetch fails', async () => {
@@ -76,5 +61,24 @@ describe('TaskProvider', () => {
     )
     await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('0'))
     expect(localStorage.getItem('cachedTasks')).toBe('[]')
+  })
+
+  test('loads tasks from GitHub API', async () => {
+    ;(fetchTasksFromRepos as jest.Mock).mockResolvedValueOnce([
+      { repo: 'owner/repo', tasks: [{ id: 'T1', title: 'GitHub task', status: 'todo' }] }
+    ])
+    localStorage.setItem('selectedRepo', 'owner/repo')
+    
+    render(
+      <AuthProvider>
+        <RepoProvider>
+          <TaskProvider>
+            <CountTasks />
+          </TaskProvider>
+        </RepoProvider>
+      </AuthProvider>
+    )
+    
+    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'))
   })
 })

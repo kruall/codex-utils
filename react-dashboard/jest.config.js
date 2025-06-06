@@ -10,6 +10,11 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(.*\\.mjs$))'
   ],
+  testPathIgnorePatterns: [
+    '<rootDir>/.next/',
+    '<rootDir>/out/',
+    '<rootDir>/node_modules/'
+  ],
   collectCoverage: true,
   coverageDirectory: 'coverage',
   extensionsToTreatAsEsm: ['.jsx', '.ts', '.tsx']

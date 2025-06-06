@@ -1,6 +1,6 @@
 # Codex React Dashboard
 
-This directory contains a small [Next.js](https://nextjs.org/) application that renders tasks from the `.tasks` directory.
+This directory contains a [Next.js](https://nextjs.org/) application that renders tasks and epics directly from GitHub repositories via the GitHub API.
 
 ## Development
 
@@ -11,11 +11,20 @@ npm install
 npm run dev
 ```
 
-This script uses a small Python helper to export tasks from the `.tasks`
-directory before starting the Next.js server. Ensure Python is available in your
-environment.
+The dashboard loads tasks and epics at runtime directly from GitHub repositories using the GitHub API. No local data generation is required.
 
-The dashboard loads tasks at runtime using a shared React hook and API route.
+### Configuration
+
+The dashboard can be configured to work with GitHub repositories in two ways:
+
+1. **Runtime Repository Selection**: Users can select a repository through the `/repos` page after authentication
+2. **Environment Variable**: Set `NEXT_PUBLIC_GITHUB_REPOS` to a comma-separated list of repositories (format: `owner/repo`)
+
+### Authentication
+
+The dashboard supports GitHub authentication via:
+- Personal Access Tokens (recommended for static deployments)
+- OAuth flow (requires server-side token exchange)
 
 ### Pages
 
@@ -24,11 +33,21 @@ The dashboard loads tasks at runtime using a shared React hook and API route.
 - `/task/[id]` - view and edit an individual task
 - `/epics` - browse epics and progress
 - `/epic/[id]` - view an epic tree and details
+- `/repos` - select GitHub repository
+- `/login` - authentication page
 
-To generate a static site for GitHub Pages run:
+### Deployment
+
+To generate a static site for GitHub Pages:
 
 ```bash
 npm run build
 ```
 
-The output will be placed in the `out/` directory.
+The output will be placed in the `out/` directory. The application works entirely client-side and fetches data directly from the GitHub API.
+
+### Data Sources
+
+- **Tasks**: Loaded from `.tasks/` directory in the configured GitHub repositories
+- **Epics**: Loaded from `.epics/` directory in the configured GitHub repositories
+- **Caching**: Data is cached in localStorage for offline access
