@@ -7,7 +7,10 @@ import { TaskTableProps, Task } from '../types'
 export default function TaskTable({ tasks: tasksProp }: TaskTableProps) {
   const tasks = tasksProp ?? useTasks()
   const sortedTasks = useMemo(() => {
-    const parseId = (id: string): { queue: string; num: number } => {
+    const parseId = (id: string | undefined): { queue: string; num: number } => {
+      if (!id || typeof id !== 'string') {
+        return { queue: 'unknown', num: Number.MAX_SAFE_INTEGER }
+      }
       const match = id.match(/^(.*?)-(\d+)$/)
       if (!match) {
         return { queue: id, num: Number.MAX_SAFE_INTEGER }
@@ -117,11 +120,11 @@ export default function TaskTable({ tasks: tasksProp }: TaskTableProps) {
           </tr>
         </thead>
         <tbody>
-          {pagedTasks.map((task: Task) => (
-            <tr key={task.id}>
+          {pagedTasks.map((task: Task, index: number) => (
+            <tr key={task.id || `task-${index}`}>
               <td>
-                <Link href={`/task/${task.id}`} className={styles.link}>
-                  {task.id}
+                <Link href={`/task/${task.id || 'unknown'}`} className={styles.link}>
+                  {task.id || 'N/A'}
                 </Link>
               </td>
               <td>{task.title}</td>

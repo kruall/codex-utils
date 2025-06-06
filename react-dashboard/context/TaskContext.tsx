@@ -59,8 +59,22 @@ export function TaskProvider({ children }: TaskProviderProps) {
       }
       try {
         const res = await fetch('/codex-utils/tasks.json')
-        const data: Task[] = await res.json()
-        setTasks(data || [])
+        if (res.ok) {
+          const data: Task[] = await res.json()
+          setTasks(data || [])
+        } else {
+          // tasks.json doesn't exist, use cached data or empty array
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
+          if (cached) {
+            try {
+              setTasks(JSON.parse(cached))
+            } catch {
+              setTasks([])
+            }
+          } else {
+            setTasks([])
+          }
+        }
       } catch {
         const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedTasks') : null
         if (cached) {

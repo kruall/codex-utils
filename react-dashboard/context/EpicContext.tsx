@@ -63,8 +63,22 @@ export function EpicProvider({ children }: EpicProviderProps) {
       }
       try {
         const res = await fetch('/epics.json')
-        const data: Epic[] = await res.json()
-        setEpics(data || [])
+        if (res.ok) {
+          const data: Epic[] = await res.json()
+          setEpics(data || [])
+        } else {
+          // epics.json doesn't exist, use cached data or empty array
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedEpics') : null
+          if (cached) {
+            try {
+              setEpics(JSON.parse(cached))
+            } catch {
+              setEpics([])
+            }
+          } else {
+            setEpics([])
+          }
+        }
       } catch {
         const cached = typeof window !== 'undefined' ? localStorage.getItem('cachedEpics') : null
         if (cached) {

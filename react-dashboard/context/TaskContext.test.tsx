@@ -17,6 +17,7 @@ function CountTasks() {
 describe('TaskProvider', () => {
   beforeEach(() => {
     ;(global as any).fetch = jest.fn(async () => ({
+      ok: true,
       json: async () => [{ id: 'T1', title: 't', status: 'todo' }]
     }))
   })
