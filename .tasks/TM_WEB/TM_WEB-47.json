@@ -2,14 +2,30 @@
   "id": "TM_WEB-47",
   "title": "Remove static generation and update deployment",
   "description": "Remove Next.js static generation features and update to client-side only rendering. Update GitHub Pages deployment configuration. Remove build-time data fetching. Ensure all functionality works in browser-only environment.",
-  "status": "todo",
-  "comments": [],
+  "status": "done",
+  "comments": [
+    {
+      "id": 1,
+      "text": "Starting work on removing static generation from the web dashboard.",
+      "created_at": 1749276828.3217669
+    },
+    {
+      "id": 2,
+      "text": "Removed Next.js API route and updated task page to use GitHub API directly.",
+      "created_at": 1749277078.1792507
+    },
+    {
+      "id": 3,
+      "text": "Updated deployment to rely solely on client-side rendering.",
+      "created_at": 1749277082.5613308
+    }
+  ],
   "links": {},
   "epics": [
     "epic-3"
   ],
   "created_at": 1749120323.374039,
-  "updated_at": 1749120347.584848,
-  "started_at": null,
-  "closed_at": null
+  "updated_at": 1749277082.5613558,
+  "started_at": 1749276826.586803,
+  "closed_at": 1749277076.0352566
 }
