@@ -27,7 +27,15 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
   async function fetchJson(url: string, raw = false): Promise<any> {
     const res = await fetch(url, { headers: makeHeaders(raw) });
     if (!res.ok) {
-      throw new Error(`Failed to fetch ${url}`);
+      if (res.status === 404) {
+        throw new Error(`Repository or .tasks directory not found: ${url}`)
+      } else if (res.status === 401) {
+        throw new Error(`Authentication failed. Please check your GitHub token: ${url}`)
+      } else if (res.status === 403) {
+        throw new Error(`Access forbidden. Check repository permissions or rate limits: ${url}`)
+      } else {
+        throw new Error(`Failed to fetch ${url} (${res.status}: ${res.statusText})`)
+      }
     }
     return res.json();
   }
@@ -37,52 +45,68 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
   }
 
   async function fetchFile(apiUrl: string): Promise<any> {
-    // Use the GitHub API content endpoint instead of download_url to avoid CORS
-    const response = await fetchJson(apiUrl);
-    if (response.content && response.encoding === 'base64') {
-      // Decode base64 content
-      const decoded = atob(response.content.replace(/\s/g, ''));
-      return JSON.parse(decoded);
+    try {
+      // Use the GitHub API content endpoint instead of download_url to avoid CORS
+      const response = await fetchJson(apiUrl);
+      if (response.content && response.encoding === 'base64') {
+        // Decode base64 content
+        const decoded = atob(response.content.replace(/\s/g, ''));
+        return JSON.parse(decoded);
+      }
+      throw new Error('Invalid file content format');
+    } catch (err) {
+      console.warn(`Failed to fetch file ${apiUrl}:`, err);
+      return null;
     }
-    throw new Error('Invalid file content format');
   }
 
-  const rootUrl = `https://api.github.com/repos/${repo}/contents/.tasks`;
-  const rootItems = await fetchDir(rootUrl);
-  
-  const rootTasks = await Promise.all(
-    rootItems.map(async (item) => {
-      if (item.type === 'file' && item.name.endsWith('.json')) {
-        if (!item.url) {
-          console.warn(`No API url for file ${item.name}`);
-          return null;
+  try {
+    const rootUrl = `https://api.github.com/repos/${repo}/contents/.tasks`;
+    const rootItems = await fetchDir(rootUrl);
+    
+    const rootTasks = await Promise.all(
+      rootItems.map(async (item) => {
+        if (item.type === 'file' && item.name.endsWith('.json')) {
+          if (!item.url) {
+            console.warn(`No API url for file ${item.name}`);
+            return null;
+          }
+          return fetchFile(item.url);
+        } else if (item.type === 'dir') {
+          if (!item.url) {
+            console.warn(`No url for directory ${item.name}`);
+            return null;
+          }
+          try {
+            const subItems = await fetchDir(item.url);
+            const subTasks = await Promise.all(
+              subItems
+                .filter((sub) => sub.type === 'file' && sub.name.endsWith('.json'))
+                .map((sub) => {
+                  if (!sub.url) {
+                    console.warn(`No API url for file ${sub.name}`);
+                    return null;
+                  }
+                  return fetchFile(sub.url);
+                })
+            );
+            return subTasks.filter(task => task !== null);
+          } catch (err) {
+            console.warn(`Failed to fetch directory ${item.name}:`, err);
+            return null;
+          }
         }
-        return fetchFile(item.url);
-      } else if (item.type === 'dir') {
-        if (!item.url) {
-          console.warn(`No url for directory ${item.name}`);
-          return null;
-        }
-        const subItems = await fetchDir(item.url);
-        const subTasks = await Promise.all(
-          subItems
-            .filter((sub) => sub.type === 'file' && sub.name.endsWith('.json'))
-            .map((sub) => {
-              if (!sub.url) {
-                console.warn(`No API url for file ${sub.name}`);
-                return null;
-              }
-              return fetchFile(sub.url);
-            })
-        );
-        return subTasks.filter(task => task !== null);
-      }
-      return null;
-    })
-  );
+        return null;
+      })
+    );
 
-  const tasks = rootTasks.flat().filter((task) => task !== null);
-  return tasks;
+    const tasks = rootTasks.flat().filter((task) => task !== null);
+    return tasks;
+  } catch (err) {
+    console.error(`Failed to fetch tasks from repo ${repo}:`, err);
+    // Return empty array instead of throwing to allow graceful fallback
+    return [];
+  }
 }
 
 export async function fetchTasksFromRepos(repos: string[], token?: string): Promise<{
