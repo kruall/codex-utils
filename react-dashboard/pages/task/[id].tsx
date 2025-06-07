@@ -2,12 +2,14 @@ import { useState, ChangeEvent, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTaskContext } from '../../context/TaskContext'
 import { useAuth } from '../../context/AuthContext'
+import { useRepo } from '../../context/RepoContext'
 import Navigation from '../../components/Navigation'
 import useEpics from '../../hooks/useEpics'
 import useTasks from '../../hooks/useTasks'
 import TaskEpicInfo from '../../components/TaskEpicInfo'
 import styles from '../Page.module.css'
 import { Task } from '../../types'
+import { updateTaskInRepo } from '../../lib/githubTasks'
 
 export default function TaskPage() {
   const router = useRouter()
@@ -21,7 +23,8 @@ export default function TaskPage() {
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<boolean>(false)
   const { setTasks } = useTaskContext()
-  const { csrfToken, token } = useAuth()
+  const { token } = useAuth()
+  const { repo } = useRepo()
   const epics = useEpics()
   const tasksList = useTasks()
 
@@ -51,35 +54,29 @@ export default function TaskPage() {
   }
 
   const save = async (): Promise<void> => {
+    if (!token) {
+      setError('Not authenticated')
+      return
+    }
+    if (!repo) {
+      setError('No repository selected')
+      return
+    }
     setSaving(true)
     setError('')
     setSuccess(false)
     try {
-      const res = await fetch('/api/update-task', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken || '',
-          ...(token ? { Authorization: `token ${token}` } : {})
-        },
-        body: JSON.stringify({
-          repo: (process.env.NEXT_PUBLIC_GITHUB_REPOS || '').split(',')[0],
-          task: { id: task.id, title, status }
-        })
-      })
-
-      const data = await res.json().catch(() => null)
-
-      if (!res.ok) {
-        const message = data && typeof data.error === 'string'
-          ? data.error
-          : `Request failed: ${res.status} ${res.statusText}`
-        throw new Error(message)
+      const ok = await updateTaskInRepo(
+        repo,
+        { id: task.id, title, status },
+        token
+      )
+      if (!ok) {
+        throw new Error('Failed to update task')
       }
-
-      if (data && data.task) {
-        setTasks((ts: Task[]) => ts.map((t: Task) => (t.id === task.id ? { ...t, ...data.task } : t)))
-      }
+      setTasks((ts: Task[]) =>
+        ts.map((t: Task) => (t.id === task.id ? { ...t, title, status } : t))
+      )
       setSuccess(true)
     } catch (err: unknown) {
       if (err instanceof Error) {
