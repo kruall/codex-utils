@@ -63,7 +63,8 @@ describe('fetchTasksFromRepo', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => [{ name: 'test-1.json', type: 'file', url: 'api-url' }] })
       .mockResolvedValueOnce({ ok: true, json: async () => invalidResponse });
 
-    await expect(fetchTasksFromRepo('owner/repo', 'token')).rejects.toThrow('Invalid file content format');
+    const tasks = await fetchTasksFromRepo('owner/repo', 'token');
+    expect(tasks).toEqual([]);
   });
 });
 

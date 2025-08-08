@@ -36,15 +36,19 @@ export async function fetchTasksFromRepo(repo: string, token?: string): Promise<
     return fetchJson(url);
   }
 
-  async function fetchFile(apiUrl: string): Promise<any> {
-    // Use the GitHub API content endpoint instead of download_url to avoid CORS
-    const response = await fetchJson(apiUrl);
-    if (response.content && response.encoding === 'base64') {
-      // Decode base64 content
-      const decoded = atob(response.content.replace(/\s/g, ''));
-      return JSON.parse(decoded);
+  async function fetchFile(apiUrl: string): Promise<any | null> {
+    try {
+      // Use the GitHub API content endpoint instead of download_url to avoid CORS
+      const response = await fetchJson(apiUrl);
+      if (response.content && response.encoding === 'base64') {
+        const decoded = Buffer.from(response.content, 'base64').toString('utf-8');
+        return JSON.parse(decoded);
+      }
+      throw new Error('Invalid file content format');
+    } catch (err) {
+      console.warn(`Failed to fetch file ${apiUrl}:`, err);
+      return null;
     }
-    throw new Error('Invalid file content format');
   }
 
   const rootUrl = `https://api.github.com/repos/${repo}/contents/.tasks`;
